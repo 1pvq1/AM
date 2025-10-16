@@ -1,8 +1,3 @@
-# AM
-An android secreatary, assistanat.
-
-<pre><code>
-```
 [?7l[39;1m[0m[34;1mKOTLIN[0m[35;1mKOTLINKOTLINKO[0m[33;1mTLINKOTLINKOTLINKOTL[0m   [34;1m[0m[34;1mgit version 2.39.5 (Apple Git-154)[0m
 [39;1m[0m[34;1mKOTLINKO[0m[35;1mTLINKOTLIN[0m[33;1mKOTLINKOTLINKOTLINKO[0m     [39m----------------------------------[39m
 [39;1m[0m[34;1mKOTLINKOTL[0m[35;1mINKOTL[0m[33;1mINKOTLINKOTLINKOTLIN[0m       [34;1mProject[0m[39;1m:[0m [39mAM (1 branch)[0m
@@ -24,5 +19,3 @@ An android secreatary, assistanat.
 [39;1m[0m[35;1mKOTL[0m[34;1mINKOTLINKOTLINKOT[0m[35;1mLINKOTLINKOTLINKO[0m  
 [39;1m[0m[35;1mKO[0m[34;1mTLINKOTLINKOTLINKOTLI[0m[35;1mNKOTLINKOTLINKOTL[0m
 [?7h
-```
-</code></pre>
