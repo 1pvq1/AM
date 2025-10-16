@@ -1,28 +1,2 @@
 # AM
 An android secreatary, assistanat.
-
-<pre><code>
-```
-[?7l[39;1m[0m[34;1mKOTLIN[0m[35;1mKOTLINKOTLINKO[0m[33;1mTLINKOTLINKOTLINKOTL[0m   [34;1m[0m[34;1mgit version 2.39.5 (Apple Git-154)[0m
-[39;1m[0m[34;1mKOTLINKO[0m[35;1mTLINKOTLIN[0m[33;1mKOTLINKOTLINKOTLINKO[0m     [39m----------------------------------[39m
-[39;1m[0m[34;1mKOTLINKOTL[0m[35;1mINKOTL[0m[33;1mINKOTLINKOTLINKOTLIN[0m       [34;1mProject[0m[39;1m:[0m [39mAM (1 branch)[0m
-[39;1m[0m[34;1mKOTLINKOTLIN[0m[35;1mKO[0m[33;1mTLINKOTLINKOTLINKOTL[0m         [34;1mHEAD[0m[39;1m:[0m [39m2d10b34 (main, origin/main)[0m
-[39;1m[0m[34;1mKOTLINKOTLIN[0m[33;1mKOTLINKOTLINKOTLINKO[0m           [34;1mPending[0m[39;1m:[0m [39m1+[0m
-[39;1m[0m[34;1mKOTLINKOTL[0m[33;1mINKOTLINKOTLINKOTLIN[0m             [34;1mCreated[0m[39;1m:[0m [39m24 minutes ago[0m
-[39;1m[0m[34;1mKOTLINKO[0m[33;1mTLINKOTLINKOTLINKOTL[0m               [34;1mLanguages[0m[39;1m:[0m [39m[41m                       [49m[42m  [49m[43m [49m[44m [49m[45m [49m[46m [49m[0m
-[39;1m[0m[34;1mKOTLIN[0m[33;1mKOTLINKOTLINKOTLINKO[0m                 [39m           [31m●[39m [39mKotlin (87.6 %)[39m [32m●[39m [39mShell (8.0 %)[39m[0m
-[39;1m[0m[34;1mKOTL[0m[33;1mINKOTLINKOTLINKOTLIN[0m                   [39m           [33m●[39m [39mSwift (1.8 %)[39m [34m●[39m [39mJavaScript (1.1 %)[39m[0m
-[39;1m[0m[34;1mKO[0m[33;1mTLINKOTLINKOTLINKOTL[0m                     [39m           [35m●[39m [39mHTML (0.9 %)[39m [36m●[39m [39mCSS (0.5 %)[39m[0m
-[39;1m[0m[33;1mKOTLINKOTLINKOTLINKO[0m[35;1mTL[0m                     [34;1mAuthor[0m[39;1m:[0m [39m100% Cyb3rs3r 3[0m
-[39;1m[0m[35;1mKO[0m[33;1mTLINKOTLINKOTLIN[0m[35;1mKOTLIN[0m                   [34;1mLast change[0m[39;1m:[0m [39m5 minutes ago[0m
-[39;1m[0m[35;1mKOTL[0m[33;1mINKOTLINKOTL[0m[35;1mINKOTLINKO[0m                 [34;1mURL[0m[39;1m:[0m [39mhttps://github.com/1pvq1/AM.git[0m
-[39;1m[0m[35;1mKOTLIN[0m[33;1mKOTLINKO[0m[35;1mTLINKOTLINKOTL[0m               [34;1mCommits[0m[39;1m:[0m [39m3[0m
-[39;1m[0m[35;1mKOTLINKO[0m[33;1mTLIN[0m[34;1mK[0m[35;1mOTLINKOTLINKOTLIN[0m             [34;1mLines of code[0m[39;1m:[0m [39m1324[0m
-[39;1m[0m[35;1mKOTLINKOTL[0m[34;1mINKOT[0m[35;1mLINKOTLINKOTLINKO[0m           [34;1mSize[0m[39;1m:[0m [39m5.87 MiB (79 files)[0m
-[39;1m[0m[35;1mKOTLINKO[0m[34;1mTLINKOTLI[0m[35;1mNKOTLINKOTLINKOTL[0m         
-[39;1m[0m[35;1mKOTLIN[0m[34;1mKOTLINKOTLINK[0m[35;1mOTLINKOTLINKOTLIN[0m       [40m   [49m[41m   [49m[42m   [49m[43m   [49m[44m   [49m[45m   [49m[46m   [49m[47m   [49m
-[39;1m[0m[35;1mKOTL[0m[34;1mINKOTLINKOTLINKOT[0m[35;1mLINKOTLINKOTLINKO[0m  
-[39;1m[0m[35;1mKO[0m[34;1mTLINKOTLINKOTLINKOTLI[0m[35;1mNKOTLINKOTLINKOTL[0m
-[?7h
-```
-</code></pre>
