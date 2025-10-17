@@ -1,4 +1,4 @@
-package com.example.androidmaiden.views
+package com.example.androidmaiden.views.eg
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

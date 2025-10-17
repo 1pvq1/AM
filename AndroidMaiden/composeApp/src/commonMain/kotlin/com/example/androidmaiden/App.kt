@@ -9,6 +9,8 @@ sealed class Screen(val title: String) {
     object Home : Screen("首页")
     object Skills : Screen("技能")
     object Settings : Screen("设置")
+    object Files : Screen("文件管理")
+    object FileAnalysis : Screen("文件分析")
 }
 
 @Composable

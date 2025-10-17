@@ -21,7 +21,6 @@ import com.example.androidmaiden.Greeting
 import com.example.androidmaiden.ui.DevButton
 import com.example.androidmaiden.ui.ShowDialogButton
 import com.example.androidmaiden.ui.SwitchLayoutButton
-import com.example.androidmaiden.views.CommonUITaskPanel
 import com.example.androidmaiden.views.character.*
 import com.example.androidmaiden.views.panel.PanelOfTask
 

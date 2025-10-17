@@ -60,7 +60,11 @@ actual fun PlatformApp() {
                         onThemePreview = { themeMode = it }
                     )
 
-                    is Screen.Skills -> SkillsPage()
+                    is Screen.Skills -> SkillsPage(onNavigate = { screen ->
+                        currentScreen = screen
+                    })
+                    is Screen.Files -> FilesScreen(onNavigate = { screen -> currentScreen = screen })
+                    is Screen.FileAnalysis -> FileAnalysisScreen()
                 }
             }
         }
