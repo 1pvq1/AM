@@ -19,3 +19,20 @@ actual fun fileTypeIcon(type: FileType): ImageVector? {
         FileType.OTHER -> Icons.Default.InsertDriveFile
     }
 }
+
+@Composable
+actual fun toolbarIcon(icon: ToolbarIcon): ImageVector? {
+    return when (icon) {
+        ToolbarIcon.LIST -> Icons.Default.List
+        ToolbarIcon.GRID -> Icons.Default.GridView
+        ToolbarIcon.TREE -> Icons.Default.AccountTree
+        ToolbarIcon.SORT -> Icons.Default.Sort
+    }
+}
+
+//@Composable
+//actual fun m3Icons(icon: m3): ImageVector? {
+//    return when (icon) {
+//        m3Icons.ADD -> Icons.Default.Add
+//    }
+//}

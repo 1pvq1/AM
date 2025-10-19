@@ -6,18 +6,23 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Screen
-import com.example.androidmaiden.views.eg.PlaceholderScreen
+import com.example.androidmaiden.views.eg.PlaceholderCard
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-//class FileSys {
-//}
+
+@Preview(showBackground = true)
+@Composable
+fun FileSysScreenPreview() {
+    FilesScreen { it }
+}
+
+
 data class FileFeature(
     val title: String,
     val description: String,
     val screen: Screen? = null // 有跳转的功能才填
 )
 
-@Preview
 @Composable
 fun FilesScreen(onNavigate: (Screen) -> Unit) {
     val features = listOf(
@@ -44,11 +49,11 @@ fun FilesScreen(onNavigate: (Screen) -> Unit) {
                     title = feature.title,
                     description = feature.description,
                     onClick = { onNavigate(feature.screen) },
-//                    showDetail = true
+                    showDetail = true
                 )
             } else {
                 // ⏸ 其他：占位页面
-                PlaceholderScreen(
+                PlaceholderCard(
                     title = feature.title,
                     description = feature.description
                 )
@@ -58,7 +63,12 @@ fun FilesScreen(onNavigate: (Screen) -> Unit) {
 }
 
 @Composable
-fun FileFeatureCard(title: String, description: String, onClick: () -> Unit) {
+fun FileFeatureCard(
+    title: String,
+    description: String,
+    onClick: () -> Unit,
+    showDetail: Boolean
+) {
     Surface(
         shape = MaterialTheme.shapes.medium,
         tonalElevation = 2.dp,
@@ -69,9 +79,14 @@ fun FileFeatureCard(title: String, description: String, onClick: () -> Unit) {
             Text(title, style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(4.dp))
             Text(description, style = MaterialTheme.typography.bodyMedium)
+
             Spacer(Modifier.height(8.dp))
-            TextButton(onClick = onClick) {
-                Text("详细")
+
+            if (showDetail) {
+                Spacer(Modifier.height(8.dp))
+                TextButton(onClick = onClick) {
+                    Text("详细")
+                }
             }
         }
     }

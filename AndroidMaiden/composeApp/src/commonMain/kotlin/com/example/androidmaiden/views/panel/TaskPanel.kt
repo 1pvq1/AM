@@ -80,7 +80,8 @@ private fun inputNewTask(
             label = { Text("新任务") },
             modifier = Modifier.weight(1f).padding(5.dp)
         )
-        Button(
+        IconButton(
+            content = Icon,
             onClick = {
                 if (newTaskTitle1.isNotBlank()) {
                     val nextId = (tasks1.maxOfOrNull { it.id } ?: 0) + 1
@@ -102,13 +103,12 @@ fun TaskItem(task: Task, onCheckedChange: (Boolean) -> Unit) {
         tonalElevation = 2.dp,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Row(
+        OutlinedCard(
             modifier = Modifier
                 .padding(12.dp)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
                     checked = task.isDone,
                     onCheckedChange = onCheckedChange
