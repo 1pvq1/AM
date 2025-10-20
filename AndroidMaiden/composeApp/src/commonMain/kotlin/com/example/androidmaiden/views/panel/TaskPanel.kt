@@ -80,8 +80,8 @@ private fun inputNewTask(
             label = { Text("新任务") },
             modifier = Modifier.weight(1f).padding(5.dp)
         )
-        IconButton(
-            content = Icon,
+        Button(
+//            content = Icon,
             onClick = {
                 if (newTaskTitle1.isNotBlank()) {
                     val nextId = (tasks1.maxOfOrNull { it.id } ?: 0) + 1

@@ -30,26 +30,4 @@ fun AppAndroidPreview() {
     App()
 }
 
-@Composable
-fun RequestStoragePermission() {
-    val context = LocalContext.current
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        // 这里可以检查哪些权限被授予
-    }
 
-    LaunchedEffect(Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            launcher.launch(arrayOf(
-                Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.READ_MEDIA_VIDEO,
-                Manifest.permission.READ_MEDIA_AUDIO
-            ))
-        } else {
-            launcher.launch(arrayOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ))
-        }
-    }
-}

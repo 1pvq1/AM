@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.mods.RequestStoragePermission
 import com.example.androidmaiden.mods.listFiles
 import com.example.androidmaiden.ui.icons.fileTypeIcon
 import com.example.androidmaiden.views.fileSys.*
@@ -37,6 +38,8 @@ enum class ViewMode { LIST, GRID, TREE }
 @Preview(showBackground = true)
 @Composable
 fun FileAnalysisScreen() {
+    RequestStoragePermission()
+
     var viewMode by remember { mutableStateOf(ViewMode.LIST) }
     var sortMode by remember { mutableStateOf(SortMode.NAME) }
     var useMock by remember { mutableStateOf(true) }
@@ -47,6 +50,9 @@ fun FileAnalysisScreen() {
         children = listFiles("/storage/emulated/0"), // 公共存储根目录
         isMock = false
     )
+
+    // ✅ 进入页面时触发权限请求
+    RequestStoragePermission()
 
     Column(
         Modifier.fillMaxSize().padding(16.dp).scrollable(
@@ -138,7 +144,8 @@ fun FileItem(node: FileNode, modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             fileTypeIcon(node.type)?.let { icon ->
                 Icon(
@@ -147,16 +154,31 @@ fun FileItem(node: FileNode, modifier: Modifier = Modifier) {
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
+
             Column(Modifier.padding(8.dp)) {
                 Text(node.name, style = MaterialTheme.typography.bodyLarge)
-                if (node.isDirectory && node.description.isNotBlank()) {
+
+                if (node.isDirectory) {
+                    // 文件夹说明
+                    if (node.description.isNotBlank()) {
+                        Text(
+                            node.description,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+
+                    // ✅ 文件夹内容统计
+                    val folderCount = node.children.count { it.isDirectory }
+                    val fileCount = node.children.count { !it.isDirectory }
                     Text(
-                        node.description,
+                        "$folderCount 个文件夹 · $fileCount 个文件",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
         }
     }
 }
+
