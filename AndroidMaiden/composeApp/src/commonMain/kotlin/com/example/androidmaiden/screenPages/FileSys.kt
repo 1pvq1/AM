@@ -1,6 +1,8 @@
 package com.example.androidmaiden.screenPages
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -31,9 +33,9 @@ fun FilesScreen(onNavigate: (Screen) -> Unit) {
         FileFeature("整理", "优化用户的目录结构，提升可读性"),
         FileFeature("清洁", "清理无用或重复文件")
     )
-
+    val scrollState = rememberScrollState()
     Column(
-        Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)
+        Modifier.fillMaxSize().padding(16.dp).verticalScroll(scrollState), verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text("文件管理页面", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(8.dp))

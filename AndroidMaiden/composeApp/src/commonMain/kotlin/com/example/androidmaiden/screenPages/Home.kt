@@ -13,6 +13,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import androidmaiden.composeapp.generated.resources.Res
 import androidmaiden.composeapp.generated.resources.*
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -112,7 +113,8 @@ private fun BarCharacterSection(
     onLayoutChange: (CharacterLayout) -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
+        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
 
         ShowDialogButton(showDialog) { onShowDialogChange(!showDialog) }

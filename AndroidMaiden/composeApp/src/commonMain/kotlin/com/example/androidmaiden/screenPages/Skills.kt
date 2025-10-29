@@ -2,6 +2,8 @@ package com.example.androidmaiden.screenPages
 
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,9 +32,9 @@ fun SkillsPage(onNavigate: (Screen) -> Unit = {}) {
 //        Feature(5, "技能区", "展示应用支持的功能"),
         Feature(5, "文件管理 ", "分析，归类，整理，清洁", Screen.Files)
     )
-
+    val scrollState = rememberScrollState()
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
