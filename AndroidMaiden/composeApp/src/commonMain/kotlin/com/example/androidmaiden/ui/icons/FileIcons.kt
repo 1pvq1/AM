@@ -2,10 +2,10 @@ package com.example.androidmaiden.ui.icons
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.androidmaiden.screenPages.FileType
+import com.example.androidmaiden.views.fileSys.FolderType
 
 @Composable
-expect fun fileTypeIcon(type: FileType): ImageVector?
+expect fun folderTypeIcon(type: FolderType): ImageVector?
 
 enum class ToolbarIcon { LIST, GRID, TREE, SORT }
 

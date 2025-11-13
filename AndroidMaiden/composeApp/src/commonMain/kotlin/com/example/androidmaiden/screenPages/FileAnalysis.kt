@@ -1,58 +1,47 @@
 package com.example.androidmaiden.screenPages
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.mods.RequestStoragePermission
 import com.example.androidmaiden.mods.listFiles
-import com.example.androidmaiden.ui.icons.fileTypeIcon
+import com.example.androidmaiden.ui.icons.folderTypeIcon
 import com.example.androidmaiden.views.fileSys.*
+import com.example.androidmaiden.views.others.simFileNode
 import com.example.androidmaiden.views.panel.*
+import kotlinx.datetime.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlin.collections.sortedWith
+import kotlin.math.log10
+import kotlin.math.pow
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 //class FileAnalysis {}
 
-enum class FileType {
-    FOLDER, DOCUMENT, IMAGE, MUSIC, VIDEO, OTHER
-}
 
-data class FileNode(
-    val name: String,
-    val isDirectory: Boolean,
-    val children: List<FileNode> = emptyList(),
-    val description: String = "", // 用于教学说明
-    val isMock: Boolean = true,
-    val type: FileType = if (isDirectory) FileType.FOLDER else FileType.OTHER
-)
-
-
-enum class ViewMode { LIST, GRID, TREE }
-
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Preview(showBackground = true)
 @Composable
 fun FileAnalysisScreen() {
 
     var viewMode by remember { mutableStateOf(ViewMode.LIST) }
     var sortMode by remember { mutableStateOf(SortMode.NAME) }
+    var sortOrder by remember { mutableStateOf(SortOrder.ASC) }
     var useMock by remember { mutableStateOf(true) }
+
     val root = if (useMock) simFileNode()
     else FileNode(
-        "/", true,
-//        children = listFiles("/"),
+        name = "/",
+        nodeType = NodeType.FOLDER,
+        folderType = FolderType.FOLDER,
+        dataSource = DataSource.REAL,
         children = listFiles("/storage/emulated/0"), // 公共存储根目录
-        isMock = false
+        lastModified = Clock.System.now().toEpochMilliseconds(),
+        description = "真实设备根目录",
+        path = "/storage/emulated/0"
     )
 
     // ✅ 进入页面时触发权限请求
@@ -61,82 +50,28 @@ fun FileAnalysisScreen() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            .padding(8.dp),
         topBar = {
-            FAToolBarAndroid(scrollBehavior = scrollBehavior)
+            FileAnalysisToolbar(
+                viewMode = viewMode,
+                onViewModeChange = { viewMode = it },
+                useMock = useMock,
+                onUseMockChange = { useMock = it },
+                scrollBehavior = scrollBehavior,
+                isAndroid = true, // ✅ 这里可以用 expect/actual 或 Build check
+                sortMode = sortMode,
+                onSortModeChange = { sortMode = it },
+                sortOrder = sortOrder,
+                onSortOrderChange = { sortOrder = it }
+            )
         }
     ) { innerPadding ->
-        val collapsedFraction = scrollBehavior.state.collapsedFraction
-        val isCollapsed by remember { derivedStateOf { collapsedFraction >= 0.5f } }
-
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            AnimatedContent(targetState = isCollapsed, label = "toolbarContent") { collapsed ->
-                // ✅ 功能区：视图切换 + 排序 + 模拟/真实数据切换
-                if (!isCollapsed) {
-                    // 展开状态：多行布局
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        // 视图切换
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("视图：", style = MaterialTheme.typography.labelLarge)
-                            ViewChange(onViewModeChange = { viewMode = it }, viewMode = viewMode)
-
-                        }
-
-                        // 排序
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("排序：", style = MaterialTheme.typography.labelLarge)
-
-                            SortBy(onSortModeChange = { sortMode = it })
-
-                            Spacer(Modifier.weight(1f))
-
-                            // 模拟/真实数据切换
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("模拟/真实数据")
-                                Switch(
-                                    checked = !useMock,
-                                    onCheckedChange = { useMock = !useMock }
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    // ✅ 收起状态：单行布局
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        // 视图切换
-                        ViewChange(onViewModeChange = { viewMode = it }, viewMode = viewMode)
-
-                        Spacer(Modifier.weight(1f))
-
-                        // 排序
-                        SortBy(onSortModeChange = { sortMode = it })
-
-
-                        // 模拟/真实数据切换
-                        Switch(
-                            checked = !useMock, onCheckedChange = { useMock = !useMock }
-                        )
-                    }
-                }
-            }
-
             Text(
                 if (useMock) "当前展示数据类型：教学模拟用（Android 文件系统结构）"
                 else "当前展示数据类型：真实文件系统（Android）",
@@ -147,15 +82,11 @@ fun FileAnalysisScreen() {
 
             Spacer(Modifier.height(16.dp))
 
-            val sortedChildren = root.children.sortedWith(
-                when (sortMode) {
-                    SortMode.NAME -> compareBy { it.name.lowercase() }
-                    SortMode.DATE -> compareBy { /* TODO: 加入文件时间 */ it.name }
-                    SortMode.SIZE -> compareBy { /* TODO: 加入文件大小 */ it.name }
-                }
+            // 根据 sortMode 对文件排序
+            val sortedRoot = root.copy(
+                children = root.sortedChildren(mode = sortMode, order = sortOrder)
             )
 
-            val sortedRoot = root.copy(children = sortedChildren) // 根据 sortMode 对文件排序
             // 根据视图模式渲染
             when (viewMode) {
                 ViewMode.LIST -> FileListView(sortedRoot)
@@ -164,89 +95,6 @@ fun FileAnalysisScreen() {
             }
         }
     }
-}
-
-
-//    Column(
-//        Modifier.fillMaxSize().padding(16.dp).scrollable(
-//            state = rememberScrollableState { it },
-//            orientation = Orientation.Vertical,
-//            enabled = true
-//        ), verticalArrangement = Arrangement.Top
-//    ) {
-//        FileAnalysisToolbar(
-//            viewMode = viewMode,
-//            onViewModeChange = { viewMode = it },
-//            sortMode = sortMode,
-//            onSortModeChange = { sortMode = it },
-//            isAndroid = true // ✅ 这里可以用 expect/actual 或 Build check
-//        )
-//
-//        Row(verticalAlignment = Alignment.CenterVertically) {
-//            Text("模拟/真实 数据")
-//            Spacer(Modifier.width(10.dp))
-//            Switch(
-//                checked = !useMock, onCheckedChange = { useMock = !it })
-//        }
-//
-//        Text(
-//            if (useMock) "当前展示数据类型：教学模拟用（Android 文件系统结构）"
-//            else "当前展示数据类型：真实文件系统（Android）",
-//            style = MaterialTheme.typography.bodySmall,
-//            color = MaterialTheme.colorScheme.outline
-//        )
-//
-//        Spacer(Modifier.height(16.dp))
-//
-//        // 根据 sortMode 对文件排序
-//
-//        val sortedChildren = root.children.sortedWith(
-//            when (sortMode) {
-//                SortMode.NAME -> compareBy { it.name.lowercase() }
-//                SortMode.DATE -> compareBy { /* TODO: 加入文件时间 */ it.name }
-//                SortMode.SIZE -> compareBy { /* TODO: 加入文件大小 */ it.name }
-//            }
-//        )
-//        val sortedRoot = root.copy(children = sortedChildren)
-//
-//        // 根据视图模式渲染
-//        when (viewMode) {
-//            ViewMode.LIST -> FileListView(sortedRoot)
-//            ViewMode.GRID -> FileGridView(sortedRoot)
-//            ViewMode.TREE -> FileTreeView(sortedRoot)
-//        }
-//    }
-//}
-
-// 模拟文件结构
-private fun simFileNode(): FileNode {
-    val androidFileSystemMock = FileNode(
-        name = "/",
-        isDirectory = true,
-        description = "Android 文件系统根目录,这是文件系统的起点",
-        children = listOf(
-            FileNode(
-                "storage", true, description = "存放用户可访问的存储空间", children = listOf(
-                    FileNode(
-                        "emulated", true, description = "模拟的内部存储", children = listOf(
-                            FileNode(
-                                "0", true, description = "用户主目录", children = listOf(
-                                    FileNode("Download", true, description = "下载的文件"),
-                                    FileNode("Documents", true, description = "文档文件"),
-                                    FileNode("Pictures", true, description = "图片文件"),
-                                    FileNode("Music", true, description = "音乐文件")
-                                )
-                            )
-                        )
-                    )
-                )
-            ),
-            FileNode("system", true, description = "系统核心文件（只读，用户不可修改）"),
-            FileNode("data", true, description = "应用数据目录，每个应用有独立沙盒"),
-            FileNode("vendor", true, description = "硬件厂商相关文件")
-        )
-    )
-    return androidFileSystemMock
 }
 
 
@@ -261,7 +109,7 @@ fun FileItem(node: FileNode, modifier: Modifier = Modifier) {
             modifier = Modifier.padding(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            fileTypeIcon(node.type)?.let { icon ->
+            folderTypeIcon(node.folderType)?.let { icon ->
                 Icon(
                     imageVector = icon,
                     contentDescription = node.name,
@@ -272,7 +120,7 @@ fun FileItem(node: FileNode, modifier: Modifier = Modifier) {
             Column(Modifier.padding(8.dp)) {
                 Text(node.name, style = MaterialTheme.typography.bodyLarge)
 
-                if (node.isDirectory) {
+                if (node.isFolder) {
                     // 文件夹说明
                     if (node.description.isNotBlank()) {
                         Text(
@@ -283,10 +131,29 @@ fun FileItem(node: FileNode, modifier: Modifier = Modifier) {
                     }
 
                     // ✅ 文件夹内容统计
-                    val folderCount = node.children.count { it.isDirectory }
-                    val fileCount = node.children.count { !it.isDirectory }
+                    val folderCount = node.children.count { it.isFolder }
+                    val fileCount = node.children.count { !it.isFolder }
                     Text(
                         "$folderCount 个文件夹 · $fileCount 个文件",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    val timeText = node.lastModified?.let { formatDateTime(it) } ?: "未知时间"
+
+                    Text(
+//                        "$sizeText · $timeText",
+                        " $timeText",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                } else {
+                    // 文件信息：大小 + 修改时间
+//                    val sizeText = node.size?.let { formatFileSize(it) } ?: "未知大小"
+                    val timeText = node.lastModified?.let { formatDateTime(it) } ?: "未知时间"
+
+                    Text(
+//                        "$sizeText · $timeText",
+                        " $timeText",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -296,3 +163,21 @@ fun FileItem(node: FileNode, modifier: Modifier = Modifier) {
     }
 }
 
+// 文件大小格式化
+//fun formatFileSize(size: Long): String {
+//    if (size <= 0) return "0 B"
+//    val units = arrayOf("B", "KB", "MB", "GB", "TB")
+//    val digitGroups = (log10(size.toDouble()) / log10(1024.0)).toInt()
+//    val value = size / 1024.0.pow(digitGroups.toDouble())
+//    return "${"%.1f".format(value)} ${units[digitGroups]}"
+//}
+
+// 时间戳格式化
+@OptIn(ExperimentalTime::class)
+fun formatDateTime(epochMillis: Long?): String {
+    if (epochMillis == null) return "未知时间"
+    val instant = Instant.fromEpochMilliseconds(epochMillis)
+    val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+    return "${local.year}-${local.monthNumber.toString().padStart(2, '0')}-${local.dayOfMonth.toString().padStart(2, '0')} " +
+            "${local.hour.toString().padStart(2, '0')}:${local.minute.toString().padStart(2, '0')}"
+}

@@ -6,17 +6,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.androidmaiden.screenPages.FileType
+import com.example.androidmaiden.views.fileSys.FolderType
 
 @Composable
-actual fun fileTypeIcon(type: FileType): ImageVector? {
+actual fun folderTypeIcon(type: FolderType): ImageVector? {
     return when (type) {
-        FileType.FOLDER -> Icons.Default.Folder
-        FileType.DOCUMENT -> Icons.Default.Description
-        FileType.IMAGE -> Icons.Default.Image
-        FileType.MUSIC -> Icons.Default.MusicNote
-        FileType.VIDEO -> Icons.Default.VideoLibrary
-        FileType.OTHER -> Icons.Default.InsertDriveFile
+        FolderType.FOLDER -> Icons.Default.Folder
+        FolderType.DOCUMENT -> Icons.Default.Description
+        FolderType.IMAGE -> Icons.Default.Image
+        FolderType.MUSIC -> Icons.Default.MusicNote
+        FolderType.VIDEO -> Icons.Default.VideoLibrary
+        FolderType.OTHER -> Icons.Default.InsertDriveFile
     }
 }
 

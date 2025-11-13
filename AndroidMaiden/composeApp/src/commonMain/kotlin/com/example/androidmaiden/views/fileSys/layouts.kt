@@ -1,8 +1,6 @@
 package com.example.androidmaiden.views.fileSys
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,20 +12,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.screenPages.FileItem
-import com.example.androidmaiden.screenPages.FileNode
-import com.example.androidmaiden.ui.icons.fileTypeIcon
-import kotlinx.serialization.ContextualSerializer
+import com.example.androidmaiden.views.fileSys.*
+import com.example.androidmaiden.ui.icons.folderTypeIcon
 import kotlin.collections.chunked
 import kotlin.collections.forEach
 
+enum class ViewMode { LIST, GRID, TREE }
 
-enum class SortMode(val label: String) {
-    NAME("名称"), DATE("日期"), SIZE("大小")
-}
 
 @Composable
 fun FileListView(root: FileNode) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        item{Text("List 视图")}
         items(root.children) { node ->
             FileItem(node)
         }
@@ -41,7 +37,7 @@ fun FileGridView(root: FileNode) {
         modifier = Modifier.verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text("Grid 视图占位")
+        Text("Grid 视图")
         root.children.chunked(2).forEach { row ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 row.forEach { node -> FileItem(node, Modifier.weight(1f)) }
@@ -55,6 +51,8 @@ fun FileTreeView(root: FileNode) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
+        item{Text("Tree 视图")}
+
         item {
             FileTreeNode(node = root, indent = 0)
         }
@@ -68,11 +66,11 @@ fun FileTreeNode(node: FileNode, indent: Int) {
     Column {
         Row(
             modifier = Modifier.fillMaxWidth().padding(start = (indent * 16).dp).clickable {
-                if (node.isDirectory) expanded = !expanded
+                if (node.isFolder) expanded = !expanded
             }, verticalAlignment = Alignment.CenterVertically
         ) {
             // 图标
-            fileTypeIcon(node.type)?.let { icon ->
+            folderTypeIcon(node.folderType)?.let { icon ->
                 Icon(
                     imageVector = icon,
                     contentDescription = node.name,
@@ -86,7 +84,7 @@ fun FileTreeNode(node: FileNode, indent: Int) {
             Text(node.name, style = MaterialTheme.typography.bodyLarge)
 
             // 展开/折叠指示符
-            if (node.isDirectory) {
+            if (node.isFolder) {
                 Spacer(Modifier.width(8.dp))
                 Text(
                     if (expanded) "▼" else "▶",
