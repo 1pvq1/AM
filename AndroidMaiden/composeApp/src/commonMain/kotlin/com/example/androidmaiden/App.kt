@@ -11,6 +11,8 @@ sealed class Screen(val title: String) {
     object Settings : Screen("设置")
     object Files : Screen("文件管理")
     object FileAnalysis : Screen("文件分析")
+    object Todo : Screen("待办事项")
+    object CharacterInteraction : Screen("人物交流")
 }
 
 @Composable

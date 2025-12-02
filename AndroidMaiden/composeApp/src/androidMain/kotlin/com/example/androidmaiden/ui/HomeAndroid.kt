@@ -1,42 +1,37 @@
 package com.example.androidmaiden.ui
 
-import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.Composable
 
-
-// androidMain
 @Composable
 actual fun ShowDialogButton(showDialog: Boolean, onToggle: () -> Unit) {
-    FilledTonalButton(onClick = onToggle) {
-        Icon(
-            imageVector = if (showDialog) Icons.AutoMirrored.Filled.Chat else Icons.Filled.Person,
-            contentDescription = null
-        )
-        Spacer(Modifier.width(6.dp))
-        Text(if (showDialog) "人物+对话" else "仅人物")
-    }
+    StyledButton(
+        onClick = onToggle,
+        icon = if (showDialog) Icons.AutoMirrored.Filled.Chat else Icons.Filled.Person,
+        text = if (showDialog) "人物+对话" else "仅人物",
+        tooltip = "Toggle Dialog"
+    )
 }
 
 @Composable
 actual fun SwitchLayoutButton(enabled: Boolean, onSwitch: () -> Unit) {
-    FilledTonalButton(onClick = onSwitch, enabled = enabled) {
-        Icon(Icons.Filled.SwapHoriz, contentDescription = null)
-        Spacer(Modifier.width(6.dp))
-        Text("切换布局")
-    }
+    StyledButton(
+        onClick = onSwitch,
+        enabled = enabled,
+        icon = Icons.Filled.SwapHoriz,
+        text = "切换布局",
+        tooltip = "Switch Layout"
+    )
 }
 
 @Composable
 actual fun DevButton() {
-    OutlinedButton(onClick = { /* TODO */ }) {
-        Icon(Icons.Filled.Build, contentDescription = null)
-        Spacer(Modifier.width(6.dp))
-        Text("开发中")
-    }
+    StyledButton(
+        onClick = { /* TODO */ },
+        icon = Icons.Filled.Build,
+        text = "开发中",
+        tooltip = "Under Development"
+    )
 }

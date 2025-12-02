@@ -1,16 +1,18 @@
 package com.example.androidmaiden.screenPages
 
-import androidx.compose.runtime.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.* 
 import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
-
-//class Settings {
-//}
+import com.example.androidmaiden.ButtonDisplayStyle
 
 enum class ThemeMode {
     LIGHT, DARK, SYSTEM
@@ -20,126 +22,186 @@ enum class ThemeMode {
 @Composable
 fun SettingsScreenPreview() {
     SettingsScreen(
-        previewThemeMode = ThemeMode.DARK,
-        onThemePreview = {}
+        previewThemeMode = ThemeMode.SYSTEM,
+        onThemePreview = {},
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_ONLY,
+        onButtonDisplayStyleChange = {}
     )
 }
 
-//@Preview
 @Composable
-fun SettingsScreen(previewThemeMode: ThemeMode, onThemePreview: (ThemeMode) -> Unit) {
-    val options = listOf(
-        ThemeMode.LIGHT to "浅色", ThemeMode.DARK to "深色", ThemeMode.SYSTEM to "跟随系统"
-    )
-
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start
-    ) {
-        Text("设置", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(16.dp))
-        OutlinedCard(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-        // 方案一：SegmentedButton
-        ThemeSegmentedBtn(options, previewThemeMode, onThemePreview)
-
-        Spacer(Modifier.height(32.dp))
-        // 方案二：Slider
-        ThemeSlider(options, previewThemeMode, onThemePreview)
-    }
-    }
-}
-
-
-@Composable
-private fun ThemeSegmentedBtn(
-    options: List<Pair<ThemeMode, String>>,
+fun SettingsScreen(
     previewThemeMode: ThemeMode,
-    onThemePreview: (ThemeMode) -> Unit
+    onThemePreview: (ThemeMode) -> Unit,
+    buttonDisplayStyle: ButtonDisplayStyle,
+    onButtonDisplayStyleChange: (ButtonDisplayStyle) -> Unit
 ) {
-    Text("主题设置（分段按钮）", style = MaterialTheme.typography.titleMedium)
-    Spacer(Modifier.height(8.dp))
-    SingleChoiceSegmentedButtonRow {
-        options.forEachIndexed { index, (mode, label) ->
-            SegmentedButton(
-                modifier = Modifier.fillMaxHeight(0.10f),
-                selected = previewThemeMode == mode,
-                onClick = { onThemePreview(mode) },
-                shape = SegmentedButtonDefaults.itemShape(index, options.size)
-            ) {
-                Text(label)
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(vertical = 16.dp)
+    ) {
+        item {
+            Text(
+                "Settings",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp)
+            )
+        }
+
+        // Appearance Section
+        item {
+            SettingsGroup(title = "Appearance") {
+                ThemeSetting(previewThemeMode, onThemePreview)
+                Divider(modifier = Modifier.padding(vertical = 8.dp))
+                ButtonDisplayStyleSetting(buttonDisplayStyle, onButtonDisplayStyleChange)
+            }
+        }
+
+        item { Spacer(modifier = Modifier.height(16.dp)) }
+
+        // Notifications Section
+        item {
+            SettingsGroup(title = "Notifications") {
+                NotificationSetting(
+                    icon = Icons.Default.Notifications,
+                    title = "Enable Notifications",
+                    description = "Receive alerts for task deadlines"
+                )
+            }
+        }
+
+        item { Spacer(modifier = Modifier.height(16.dp)) }
+
+        // About Section
+        item {
+            SettingsGroup(title = "About") {
+                AboutSetting(icon = Icons.Default.Info, title = "App Version", value = "1.0.0-alpha01")
+                AboutSetting(
+                    icon = Icons.Default.Security,
+                    title = "Privacy Policy",
+                    value = "",
+                    onClick = { /* TODO: Navigate to Privacy Policy screen */ }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun ThemeSlider(
-    options: List<Pair<ThemeMode, String>>,
-    previewThemeMode: ThemeMode,
-    onThemePreview: (ThemeMode) -> Unit
-) {
-    val currentIndex = ThemeMode.entries.indexOf(previewThemeMode)
-
-    Text("主题设置（滑块选择）", style = MaterialTheme.typography.titleMedium)
-    Spacer(Modifier.height(8.dp))
-    Slider(
-        value = currentIndex.toFloat(),
-        onValueChange = { newValue ->
-            val index = newValue.toInt().coerceIn(0, ThemeMode.entries.toTypedArray().lastIndex)
-            onThemePreview(ThemeMode.entries[index])
-        },
-        steps = ThemeMode.entries.size - 2,
-        valueRange = 0f..(ThemeMode.entries.size - 1).toFloat()
-    )
-    Text("当前: ${options[currentIndex].second}", style = MaterialTheme.typography.bodyLarge)
+fun SettingsGroup(title: String, content: @Composable ColumnScope.() -> Unit) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                content()
+            }
+        }
+    }
 }
 
+@Composable
+fun ThemeSetting(previewThemeMode: ThemeMode, onThemePreview: (ThemeMode) -> Unit) {
+    val options = listOf(
+        ThemeMode.LIGHT to "Light", ThemeMode.DARK to "Dark", ThemeMode.SYSTEM to "System"
+    )
 
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun SettingsView(
-//    previewThemeMode: ThemeMode,
-//    onThemePreview: (ThemeMode) -> Unit,
-//    currentSize: String,
-//    onBack: () -> Unit,
-//) {
-//    val scrollState = rememberScrollState()
-//    var expanded by remember { mutableStateOf(false) }
-//
-//    // 计算绝对路径
-//
-//    Column(
-//        modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(scrollState),
-//        verticalArrangement = Arrangement.spacedBy(12.dp)
-//    ) {
-//
-//        Text("程序设置", style = MaterialTheme.typography.titleLarge)
-//        Spacer(Modifier.height(16.dp))
-//
-//        OutlinedCard(
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Column(Modifier.padding(16.dp)) {
-//                // 主题设置
+    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.Palette, contentDescription = "Theme", modifier = Modifier.padding(end = 16.dp))
+            Text("Theme", style = MaterialTheme.typography.bodyLarge)
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            options.forEachIndexed { index, (mode, label) ->
+                SegmentedButton(
+                    selected = previewThemeMode == mode,
+                    onClick = { onThemePreview(mode) },
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size)
+                ) {
+                    Text(label)
+                }
+            }
+        }
+    }
+}
 
-//        Spacer(Modifier.height(16.dp))
-//
-//        // 根目录设置
-//
-//        // --- 窗口大小设置 ---
-//        OutlinedCard(
-//            modifier = Modifier.fillMaxWidth(), colors = CardDefaults.outlinedCardColors()
-//        ) {
-//            Column(Modifier.padding(16.dp)) {
-//                Text("窗口大小设置", style = MaterialTheme.typography.titleMedium)
-//
-//
-//            }
-//        }
-//
-//
-//    }
-//}
+@Composable
+fun ButtonDisplayStyleSetting(currentStyle: ButtonDisplayStyle, onStyleChange: (ButtonDisplayStyle) -> Unit) {
+    val options = listOf(
+        ButtonDisplayStyle.ICON_AND_TEXT to "Icon and Text",
+        ButtonDisplayStyle.ICON_ONLY to "Icon Only",
+        ButtonDisplayStyle.TEXT_ONLY to "Text Only"
+    )
+
+    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.Apps, contentDescription = "Button Style", modifier = Modifier.padding(end = 16.dp))
+            Text("Button Display Style", style = MaterialTheme.typography.bodyLarge)
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            options.forEachIndexed { index, (style, label) ->
+                SegmentedButton(
+                    selected = currentStyle == style,
+                    onClick = { onStyleChange(style) },
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size)
+                ) {
+                    Text(label)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun NotificationSetting(icon: ImageVector, title: String, description: String) {
+    var isChecked by remember { mutableStateOf(true) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { isChecked = !isChecked }
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(icon, contentDescription = title, modifier = Modifier.padding(end = 16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
+            Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Switch(
+            checked = isChecked,
+            onCheckedChange = null
+        )
+    }
+}
+
+@Composable
+fun AboutSetting(icon: ImageVector, title: String, value: String, onClick: (() -> Unit)? = null) {
+    val clickableModifier = if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(clickableModifier)
+            .padding(horizontal = 16.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(icon, contentDescription = title, modifier = Modifier.padding(end = 16.dp))
+        Text(title, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+        if (value.isNotEmpty()) {
+            Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        if (onClick != null) {
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                modifier = Modifier.padding(start = 8.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}

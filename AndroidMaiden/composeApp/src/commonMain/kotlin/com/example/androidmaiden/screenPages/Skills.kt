@@ -25,11 +25,10 @@ data class Feature(
 fun SkillsPage(onNavigate: (Screen) -> Unit = {}) {
     // 模拟功能列表（后续可从配置/后端/本地存储加载）
     val features = listOf(
-        Feature(1, "任务管理", "添加、完成、删除任务"),
-        Feature(2, "人物对话", "展示立绘和对话框"),
-        Feature(3, "主题切换", "支持明暗模式"),
+        Feature(1, "任务管理", "添加、完成、删除任务", Screen.Todo),
+        Feature(2, "人物交流", "展示立绘和对话框", Screen.CharacterInteraction),
+        Feature(3, "主题搭配", "后续支持。。。"),
         Feature(4, "统计分析", "任务完成度统计"),
-//        Feature(5, "技能区", "展示应用支持的功能"),
         Feature(5, "文件管理 ", "分析，归类，整理，清洁", Screen.Files)
     )
     val scrollState = rememberScrollState()

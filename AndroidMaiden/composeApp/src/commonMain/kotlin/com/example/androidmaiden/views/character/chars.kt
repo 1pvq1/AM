@@ -57,7 +57,7 @@ fun CharacterIllustration() {
 }
 
 @Composable
-fun CharacterIllustrationBox() {
+fun CharacterIllustrationBox(modifier: Modifier = Modifier) {
     Surface(
         shape = RoundedCornerShape(16.dp), // 圆角边框
         tonalElevation = 4.dp,             // 阴影/浮起效果

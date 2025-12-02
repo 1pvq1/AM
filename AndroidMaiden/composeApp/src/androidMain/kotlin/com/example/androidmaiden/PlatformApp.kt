@@ -18,6 +18,7 @@ import com.example.androidmaiden.screenPages.*
 @Composable
 actual fun PlatformApp() {
     var themeMode by remember { mutableStateOf(ThemeMode.SYSTEM) }
+    var buttonDisplayStyle by remember { mutableStateOf(ButtonDisplayStyle.ICON_ONLY) }
 
     val isDarkTheme = when (themeMode) {
         ThemeMode.LIGHT -> false
@@ -27,44 +28,50 @@ actual fun PlatformApp() {
 
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
 
-    MaterialTheme(colorScheme = if (isDarkTheme) darkColorScheme() else lightColorScheme()) {
-        Scaffold(
-            bottomBar = {
-                NavigationBar {
-                    NavigationBarItem(
-                        selected = currentScreen == Screen.Home,
-                        onClick = { currentScreen = Screen.Home },
-                        icon = { Icon(Icons.Filled.Home, contentDescription = "首页") },
-                        label = { Text("首页") }
-                    )
-                    NavigationBarItem(
-                        selected = currentScreen == Screen.Skills,
-                        onClick = { currentScreen = Screen.Skills },
-                        icon = { Icon(Icons.Default.Star, contentDescription = "技能区") },
-                        label = { Text("技能") }
-                    )
-                    NavigationBarItem(
-                        selected = currentScreen == Screen.Settings,
-                        onClick = { currentScreen = Screen.Settings },
-                        icon = { Icon(Icons.Filled.Settings, contentDescription = "设置") },
-                        label = { Text("设置") }
-                    )
+    CompositionLocalProvider(LocalButtonDisplayStyle provides buttonDisplayStyle) {
+        MaterialTheme(colorScheme = if (isDarkTheme) darkColorScheme() else lightColorScheme()) {
+            Scaffold(
+                bottomBar = {
+                    NavigationBar {
+                        NavigationBarItem(
+                            selected = currentScreen == Screen.Home,
+                            onClick = { currentScreen = Screen.Home },
+                            icon = { Icon(Icons.Filled.Home, contentDescription = "首页") },
+                            label = { Text("首页") }
+                        )
+                        NavigationBarItem(
+                            selected = currentScreen == Screen.Skills,
+                            onClick = { currentScreen = Screen.Skills },
+                            icon = { Icon(Icons.Default.Star, contentDescription = "技能区") },
+                            label = { Text("技能") }
+                        )
+                        NavigationBarItem(
+                            selected = currentScreen == Screen.Settings,
+                            onClick = { currentScreen = Screen.Settings },
+                            icon = { Icon(Icons.Filled.Settings, contentDescription = "设置") },
+                            label = { Text("设置") }
+                        )
+                    }
                 }
-            }
-        ) { innerPadding ->
-            Box(modifier = Modifier.padding(innerPadding)) {
-                when (currentScreen) {
-                    is Screen.Home -> HomeScreen()
-                    is Screen.Settings -> SettingsScreen(
-                        previewThemeMode = themeMode,
-                        onThemePreview = { themeMode = it }
-                    )
+            ) { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    when (currentScreen) {
+                        is Screen.Home -> HomeScreen()
+                        is Screen.Settings -> SettingsScreen(
+                            previewThemeMode = themeMode,
+                            onThemePreview = { themeMode = it },
+                            buttonDisplayStyle = buttonDisplayStyle,
+                            onButtonDisplayStyleChange = { buttonDisplayStyle = it }
+                        )
 
-                    is Screen.Skills -> SkillsPage(onNavigate = { screen ->
-                        currentScreen = screen
-                    })
-                    is Screen.Files -> FilesScreen(onNavigate = { screen -> currentScreen = screen })
-                    is Screen.FileAnalysis -> FileAnalysisScreen()
+                        is Screen.Skills -> SkillsPage(onNavigate = { screen ->
+                            currentScreen = screen
+                        })
+                        is Screen.Files -> FilesScreen(onNavigate = { screen -> currentScreen = screen })
+                        is Screen.FileAnalysis -> FileAnalysisScreen()
+                        is Screen.Todo -> TodoPage()
+                        is Screen.CharacterInteraction -> CharacterInteractionPage()
+                    }
                 }
             }
         }
