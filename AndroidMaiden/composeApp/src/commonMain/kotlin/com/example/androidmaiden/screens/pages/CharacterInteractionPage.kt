@@ -1,5 +1,6 @@
-package com.example.androidmaiden.screenPages
+package com.example.androidmaiden.screens.pages
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -73,18 +74,13 @@ fun CharacterInteractionPage() {
                 onTextChange = { text = it },
                 onSendMessage = onSendMessage
             )
-            ChatViewMode.VIRTUAL -> {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    CharacterIllustrationBox(modifier = Modifier.fillMaxSize())
-                    VirtualChatContent(
-                        modifier = Modifier.padding(paddingValues).fillMaxSize(),
-                        chatHistory = chatHistory,
-                        text = text,
-                        onTextChange = { text = it },
-                        onSendMessage = onSendMessage
-                    )
-                }
-            }
+            ChatViewMode.VIRTUAL -> VirtualChatView(
+                modifier = Modifier.padding(paddingValues),
+                chatHistory = chatHistory,
+                text = text,
+                onTextChange = { text = it },
+                onSendMessage = onSendMessage
+            )
         }
     }
 }
@@ -115,7 +111,7 @@ fun RegularChatView(
 }
 
 @Composable
-fun VirtualChatContent(
+fun VirtualChatView(
     modifier: Modifier = Modifier,
     chatHistory: List<ChatMessage>,
     text: String,
@@ -124,31 +120,49 @@ fun VirtualChatContent(
 ) {
     val latestLlmMessage = chatHistory.lastOrNull { it.sender == Sender.CHARACTER }?.message ?: "..."
 
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
-            shape = MaterialTheme.shapes.medium
+    Box(modifier = Modifier.fillMaxSize()) {
+        CharacterIllustrationBox(modifier = Modifier.fillMaxSize())
+        Column(
+            modifier = modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = latestLlmMessage,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(16.dp)
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                shape = MaterialTheme.shapes.medium,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+            ) {
+                Text(
+                    text = latestLlmMessage,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
+            ChatInput(
+                text = text,
+                onTextChange = onTextChange,
+                onSendMessage = onSendMessage,
+                useTransparentStyle = true
             )
         }
-
-        ChatInput(text = text, onTextChange = onTextChange, onSendMessage = onSendMessage)
     }
 }
 
 @Composable
-fun ChatInput(text: String, onTextChange: (String) -> Unit, onSendMessage: () -> Unit) {
-    Surface(tonalElevation = 3.dp) {
+fun ChatInput(
+    text: String,
+    onTextChange: (String) -> Unit,
+    onSendMessage: () -> Unit,
+    useTransparentStyle: Boolean = false
+) {
+    Surface(
+        tonalElevation = if (useTransparentStyle) 0.dp else 3.dp,
+        shape = MaterialTheme.shapes.medium,
+        color = if (useTransparentStyle) Color.Transparent else MaterialTheme.colorScheme.surface
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -157,7 +171,19 @@ fun ChatInput(text: String, onTextChange: (String) -> Unit, onSendMessage: () ->
                 value = text,
                 onValueChange = onTextChange,
                 label = { Text("Message...") },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = if (useTransparentStyle) {
+                    TextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f),
+                        disabledContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent
+                    )
+                } else {
+                    TextFieldDefaults.colors()
+                }
             )
             Spacer(modifier = Modifier.width(8.dp))
             IconButton(
@@ -224,5 +250,37 @@ fun AvatarWithName(name: String, avatarColor: Color) {
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = name, style = MaterialTheme.typography.labelSmall)
+    }
+}
+
+@Preview
+@Composable
+fun RegularChatViewPreview() {
+    MaterialTheme {
+        RegularChatView(
+            chatHistory = listOf(
+                ChatMessage("Hello!", Sender.CHARACTER),
+                ChatMessage("How are you?", Sender.USER)
+            ),
+            text = "Hi there!",
+            onTextChange = {},
+            onSendMessage = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+fun VirtualChatViewPreview() {
+    MaterialTheme {
+        VirtualChatView(
+            chatHistory = listOf(
+                ChatMessage("This is a placeholder for our conversation.", Sender.CHARACTER),
+                ChatMessage("Me too! What should we talk about?", Sender.USER)
+            ),
+            text = "Let's talk about something.",
+            onTextChange = {},
+            onSendMessage = {}
+        )
     }
 }

@@ -1,4 +1,4 @@
-package com.example.androidmaiden.screenPages
+package com.example.androidmaiden.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -68,7 +68,7 @@ fun CharacterSection() {
                 if (showDialog) {
                     CharacterWithDialog(dialogText = dialogText, layout = layout)
                 } else {
-                    CharacterIllustrationBox()
+                    CharacterIllustrationBox(modifier = Modifier.size(width = 200.dp, height = 240.dp))
                 }
             }
         }

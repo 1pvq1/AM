@@ -1,32 +1,28 @@
 package com.example.androidmaiden.views.character
 
-import androidmaiden.composeapp.generated.resources.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.gestures.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.painterResource
+import androidmaiden.composeapp.generated.resources.Res
+import androidmaiden.composeapp.generated.resources.char_androidMaiden_full
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.snapping.SnapPosition
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.*
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.views.PreviewItem
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.painterResource
 
 
 @Composable
@@ -40,19 +36,12 @@ fun charPreviewItems() = listOf(
 )
 
 @Composable
-fun CharacterIllustration() {
-    val infiniteTransition = rememberInfiniteTransition(label = "floatAnim")
-    val offsetY by infiniteTransition.animateFloat(
-        initialValue = 0f, targetValue = 12f, // 上下浮动幅度
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing), repeatMode = RepeatMode.Reverse
-        ), label = "offsetY"
-    )
-
+fun CharacterIllustration(modifier: Modifier = Modifier) {
     Image(
         painter = painterResource(Res.drawable.char_androidMaiden_full), // TODO: 换成角色立绘资源
         contentDescription = "角色展示",
-        modifier = Modifier.size(200.dp).offset(y = offsetY.dp) // 应用动画偏移
+        contentScale = ContentScale.Fit, // This will ensure the image fits and is not cropped
+        modifier = modifier
     )
 }
 
@@ -63,15 +52,18 @@ fun CharacterIllustrationBox(modifier: Modifier = Modifier) {
         tonalElevation = 4.dp,             // 阴影/浮起效果
         border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline), // 边框
         color = MaterialTheme.colorScheme.surfaceVariant, // 背景色
-        modifier = Modifier
-            .size(width = 200.dp, height = 240.dp) // 控制立绘区域大小
-            .padding(8.dp)
+        modifier = modifier // Apply modifier for size here
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().padding(8.dp) // Padding inside the box
         ) {
-            CharacterIllustration()
+            AnimatedFloating { animationModifier ->
+                CharacterIllustration(
+                    // Apply animation after sizing
+                    modifier = Modifier.fillMaxSize().then(animationModifier)
+                )
+            }
         }
     }
 }
@@ -83,7 +75,7 @@ fun CharacterDialog(dialogText: String, modifier: Modifier = Modifier) {   // �
     val outlineColor = MaterialTheme.colorScheme.outline
 
     Box(
-        modifier = Modifier, contentAlignment = Alignment.CenterStart
+        modifier = modifier, contentAlignment = Alignment.CenterStart
     ) {
         // 对话框主体
         Surface(
@@ -137,7 +129,7 @@ fun CharacterWithDialog(
                     .padding(16.dp),
                 verticalAlignment = Alignment.Bottom
             ) {
-                CharacterIllustrationBox()
+                CharacterIllustrationBox(modifier = Modifier.size(width = 200.dp, height = 240.dp))
                 Spacer(Modifier.width(12.dp))
                 CharacterDialog(dialogText)
             }
@@ -150,7 +142,7 @@ fun CharacterWithDialog(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CharacterIllustrationBox()
+                CharacterIllustrationBox(modifier = Modifier.size(width = 200.dp, height = 240.dp))
                 Spacer(Modifier.height(12.dp))
                 CharacterDialog(dialogText)
             }
@@ -163,7 +155,7 @@ fun CharacterWithDialog(
                     .padding(16.dp),
 
                 ) {
-                CharacterIllustrationBox()
+                CharacterIllustrationBox(modifier = Modifier.size(width = 200.dp, height = 240.dp))
 
                 // 可拖动对话框
                 MovableDialog(dialogText)
@@ -190,4 +182,3 @@ fun MovableDialog(dialogText: String) {
             }
     )
 }
-

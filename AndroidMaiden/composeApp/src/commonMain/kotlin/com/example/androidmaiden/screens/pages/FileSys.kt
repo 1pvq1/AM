@@ -1,4 +1,4 @@
-package com.example.androidmaiden.screenPages
+package com.example.androidmaiden.screens.pages
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState

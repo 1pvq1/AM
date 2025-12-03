@@ -1,14 +1,11 @@
-package com.example.androidmaiden.screenPages
+package com.example.androidmaiden.screens
 
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Screen
 import org.jetbrains.compose.ui.tooling.preview.Preview

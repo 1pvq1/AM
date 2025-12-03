@@ -1,4 +1,4 @@
-package com.example.androidmaiden.screenPages
+package com.example.androidmaiden.screens.pages
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -14,8 +14,6 @@ import com.example.androidmaiden.views.others.simFileNode
 import com.example.androidmaiden.views.panel.*
 import kotlinx.datetime.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlin.math.log10
-import kotlin.math.pow
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 

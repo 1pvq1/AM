@@ -10,7 +10,12 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.androidmaiden.screenPages.*
+import com.example.androidmaiden.screens.*
+import com.example.androidmaiden.screens.pages.AdvancedLlmSettingsPage
+import com.example.androidmaiden.screens.pages.CharacterInteractionPage
+import com.example.androidmaiden.screens.pages.FileAnalysisScreen
+import com.example.androidmaiden.screens.pages.FilesScreen
+import com.example.androidmaiden.screens.pages.TodoPage
 
 
 // androidMain
@@ -61,16 +66,22 @@ actual fun PlatformApp() {
                             previewThemeMode = themeMode,
                             onThemePreview = { themeMode = it },
                             buttonDisplayStyle = buttonDisplayStyle,
-                            onButtonDisplayStyleChange = { buttonDisplayStyle = it }
+                            onButtonDisplayStyleChange = { buttonDisplayStyle = it },
+                            onNavigateToAdvancedLlmSettings = { currentScreen = Screen.AdvancedLlmSettings }
                         )
 
                         is Screen.Skills -> SkillsPage(onNavigate = { screen ->
                             currentScreen = screen
                         })
-                        is Screen.Files -> FilesScreen(onNavigate = { screen -> currentScreen = screen })
+                        is Screen.Files -> FilesScreen(onNavigate = { screen ->
+                            currentScreen = screen
+                        })
                         is Screen.FileAnalysis -> FileAnalysisScreen()
                         is Screen.Todo -> TodoPage()
                         is Screen.CharacterInteraction -> CharacterInteractionPage()
+                        is Screen.AdvancedLlmSettings -> AdvancedLlmSettingsPage(onNavigateBack = {
+                            currentScreen = Screen.Settings
+                        })
                     }
                 }
             }

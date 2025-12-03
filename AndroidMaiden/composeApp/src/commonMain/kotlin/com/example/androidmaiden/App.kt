@@ -13,6 +13,7 @@ sealed class Screen(val title: String) {
     object FileAnalysis : Screen("文件分析")
     object Todo : Screen("待办事项")
     object CharacterInteraction : Screen("人物交流")
+    object AdvancedLlmSettings : Screen("高级LLM设置")
 }
 
 @Composable
