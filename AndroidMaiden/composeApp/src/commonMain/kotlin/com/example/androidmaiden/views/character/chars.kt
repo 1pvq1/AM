@@ -3,7 +3,6 @@ package com.example.androidmaiden.views.character
 import androidmaiden.composeapp.generated.resources.Res
 import androidmaiden.composeapp.generated.resources.char_androidMaiden_full
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
@@ -14,12 +13,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.views.PreviewItem
 import org.jetbrains.compose.resources.painterResource
@@ -68,47 +73,61 @@ fun CharacterIllustrationBox(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-fun CharacterDialog(dialogText: String, modifier: Modifier = Modifier) {   // 对话框 + 三角形
-    // 先取出颜色（在 Composable 上下文里）
-    val surfaceColor = MaterialTheme.colorScheme.surface
-    val outlineColor = MaterialTheme.colorScheme.outline
-
-    Box(
-        modifier = modifier, contentAlignment = Alignment.CenterStart
-    ) {
-        // 对话框主体
-        Surface(
-            shape = RoundedCornerShape(12.dp),
-            tonalElevation = 2.dp,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-            modifier = Modifier.padding(start = 8.dp)
-        ) {
-            Text(
-                text = dialogText,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(12.dp)
-            )
-        }
-
+private class DialogBubbleShape(
+    private val cornerRadius: Dp,
+    private val arrowWidth: Dp,
+    private val arrowHeight: Dp,
+) : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        val cornerRadiusPx = with(density) { cornerRadius.toPx() }
+        val arrowWidthPx = with(density) { arrowWidth.toPx() }
+        val arrowHeightPx = with(density) { arrowHeight.toPx() }
         // 三角形指向人物
-        Canvas(
-            modifier = Modifier.size(16.dp).align(Alignment.CenterStart)
-        ) {
-            val path = Path().apply {
-                moveTo(0f, size.height / 2f)
-                lineTo(size.width, 0f)
-                lineTo(size.width, size.height)
-                close()
-            }
-            drawPath(
-                path = path, color = surfaceColor, style = Fill
+        val path = Path().apply {
+            val roundRect = RoundRect(
+                left = arrowWidthPx,
+                top = 0f,
+                right = size.width,
+                bottom = size.height,
+                cornerRadius = CornerRadius(cornerRadiusPx, cornerRadiusPx)
             )
-            drawPath(
-                path = path, color = outlineColor, style = Stroke(width = 1f)
-            )
+            addRoundRect(roundRect)
+
+            moveTo(0f, size.height / 2)
+            lineTo(arrowWidthPx, size.height / 2 - arrowHeightPx / 2)
+            lineTo(arrowWidthPx, size.height / 2 + arrowHeightPx / 2)
+            close()
         }
+        return Outline.Generic(path)
+    }
+}
+
+@Composable
+fun CharacterDialog(dialogText: String, modifier: Modifier = Modifier) {
+    val arrowWidth = 8.dp
+    val arrowHeight = 16.dp
+    Surface(
+        modifier = modifier,
+        shape = DialogBubbleShape(cornerRadius = 12.dp, arrowWidth = arrowWidth, arrowHeight = arrowHeight),
+        tonalElevation = 2.dp,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Text(
+            text = dialogText,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(
+                start = arrowWidth + 12.dp,
+                end = 12.dp,
+                top = 12.dp,
+                bottom = 12.dp
+            )
+        )
     }
 }
 

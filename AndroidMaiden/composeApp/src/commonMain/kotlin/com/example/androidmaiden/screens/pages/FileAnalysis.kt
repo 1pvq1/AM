@@ -8,16 +8,15 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.mods.RequestStoragePermission
 import com.example.androidmaiden.mods.listFiles
-import com.example.androidmaiden.ui.icons.folderTypeIcon
+import com.example.androidmaiden.model.*
+import com.example.androidmaiden.ui.icons.*
+import com.example.androidmaiden.utils.formatDateTime
 import com.example.androidmaiden.views.fileSys.*
-import com.example.androidmaiden.views.others.simFileNode
+import com.example.androidmaiden.views.eg.simFileNode
 import com.example.androidmaiden.views.panel.*
-import kotlinx.datetime.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-
-//class FileAnalysis {}
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
@@ -98,84 +97,48 @@ fun FileAnalysisScreen() {
 
 @Composable
 fun FileItem(node: FileNode, modifier: Modifier = Modifier) {
-    Surface(
-        shape = MaterialTheme.shapes.small,
-        tonalElevation = 1.dp,
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier.padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            folderTypeIcon(node.folderType)?.let { icon ->
-                Icon(
-                    imageVector = icon,
-                    contentDescription = node.name,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
+    val icon = if (node.isFolder) {
+        folderTypeIcon(node.folderType)
+    } else {
+        fileTypeIcon(node.name)
+    }
 
-            Column(Modifier.padding(8.dp)) {
-                Text(node.name, style = MaterialTheme.typography.bodyLarge)
-
+    ListItem(
+        headlineContent = { Text(node.name, style = MaterialTheme.typography.bodyLarge) },
+        supportingContent = {
+            Column {
+                if (node.description.isNotBlank()) {
+                    Text(
+                        node.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
+                val timeText = node.lastModified?.let { formatDateTime(it) } ?: "未知时间"
                 if (node.isFolder) {
-                    // 文件夹说明
-                    if (node.description.isNotBlank()) {
-                        Text(
-                            node.description,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                    }
-
-                    // ✅ 文件夹内容统计
                     val folderCount = node.children.count { it.isFolder }
                     val fileCount = node.children.count { !it.isFolder }
                     Text(
-                        "$folderCount 个文件夹 · $fileCount 个文件",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                    val timeText = node.lastModified?.let { formatDateTime(it) } ?: "未知时间"
-
-                    Text(
-//                        "$sizeText · $timeText",
-                        " $timeText",
+                        "$folderCount 文件夹 · $fileCount 文件 · $timeText",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
                 } else {
-                    // 文件信息：大小 + 修改时间
-//                    val sizeText = node.size?.let { formatFileSize(it) } ?: "未知大小"
-                    val timeText = node.lastModified?.let { formatDateTime(it) } ?: "未知时间"
-
                     Text(
-//                        "$sizeText · $timeText",
-                        " $timeText",
+                        timeText,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
-        }
-    }
-}
-
-// 文件大小格式化
-//fun formatFileSize(size: Long): String {
-//    if (size <= 0) return "0 B"
-//    val units = arrayOf("B", "KB", "MB", "GB", "TB")
-//    val digitGroups = (log10(size.toDouble()) / log10(1024.0)).toInt()
-//    val value = size / 1024.0.pow(digitGroups.toDouble())
-//    return "${"%.1f".format(value)} ${units[digitGroups]}"
-//}
-
-// 时间戳格式化
-@OptIn(ExperimentalTime::class)
-fun formatDateTime(epochMillis: Long?): String {
-    if (epochMillis == null) return "未知时间"
-    val instant = Instant.fromEpochMilliseconds(epochMillis)
-    val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-    return "${local.year}-${local.monthNumber.toString().padStart(2, '0')}-${local.dayOfMonth.toString().padStart(2, '0')} " +
-            "${local.hour.toString().padStart(2, '0')}:${local.minute.toString().padStart(2, '0')}"
+        },
+        leadingContent = {
+            Icon(
+                imageVector = icon,
+                contentDescription = node.name,
+                tint = MaterialTheme.colorScheme.primary
+            )
+        },
+        modifier = modifier.fillMaxWidth()
+    )
 }

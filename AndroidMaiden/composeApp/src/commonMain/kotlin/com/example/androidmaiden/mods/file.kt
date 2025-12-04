@@ -1,5 +1,5 @@
 package com.example.androidmaiden.mods
 
-import com.example.androidmaiden.views.fileSys.FileNode
+import com.example.androidmaiden.model.FileNode
 
 expect fun listFiles(path: String): List<FileNode>

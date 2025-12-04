@@ -1,10 +1,11 @@
 package com.example.androidmaiden.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -13,9 +14,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.ButtonDisplayStyle
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -61,8 +64,9 @@ fun SettingsScreen(
             trailingIcon = {
                 if (isSearchActive) {
                     Icon(
-                        modifier = Modifier.clickable { 
-                            if (searchQuery.isNotEmpty()) searchQuery = "" else isSearchActive = false 
+                        modifier = Modifier.clickable {
+                            if (searchQuery.isNotEmpty()) searchQuery = "" else isSearchActive =
+                                false
                         },
                         imageVector = Icons.Default.Close,
                         contentDescription = "Close search"
@@ -73,7 +77,7 @@ fun SettingsScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 8.dp)
-        ) { 
+        ) {
             // TODO: Implement search results 
         }
 
@@ -101,19 +105,23 @@ fun SettingsScreen(
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
                     ChatBackgroundSetting(
                         selectedColor = chatBgColor,
-                        onColorSelected = { chatBgColor = it } 
+                        onColorSelected = { chatBgColor = it }
                     )
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
                     UserAvatarSetting()
                 }
             }
-            
+
             item { Spacer(modifier = Modifier.height(16.dp)) }
 
             // LLM Settings Section
             item {
                 SettingsGroup(title = "LLM Settings") {
-                    AboutSetting(icon = Icons.Default.AutoAwesome, title = "Model Version", value = "Maiden-1.0-alpha")
+                    AboutSetting(
+                        icon = Icons.Default.AutoAwesome,
+                        title = "Model Version",
+                        value = "Maiden-1.0-alpha"
+                    )
                     ApiKeySetting()
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
                     AboutSetting(
@@ -143,7 +151,11 @@ fun SettingsScreen(
             // About Section
             item {
                 SettingsGroup(title = "About") {
-                    AboutSetting(icon = Icons.Default.Info, title = "App Version", value = "1.0.0-alpha01")
+                    AboutSetting(
+                        icon = Icons.Default.Info,
+                        title = "App Version",
+                        value = "1.0.0-alpha01"
+                    )
                     AboutSetting(
                         icon = Icons.Default.Security,
                         title = "Privacy Policy",
@@ -198,7 +210,11 @@ fun ThemeSetting(previewThemeMode: ThemeMode, onThemePreview: (ThemeMode) -> Uni
 
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Palette, contentDescription = "Theme", modifier = Modifier.padding(end = 16.dp))
+            Icon(
+                Icons.Default.Palette,
+                contentDescription = "Theme",
+                modifier = Modifier.padding(end = 16.dp)
+            )
             Text("Theme", style = MaterialTheme.typography.bodyLarge)
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -217,7 +233,10 @@ fun ThemeSetting(previewThemeMode: ThemeMode, onThemePreview: (ThemeMode) -> Uni
 }
 
 @Composable
-fun ButtonDisplayStyleSetting(currentStyle: ButtonDisplayStyle, onStyleChange: (ButtonDisplayStyle) -> Unit) {
+fun ButtonDisplayStyleSetting(
+    currentStyle: ButtonDisplayStyle,
+    onStyleChange: (ButtonDisplayStyle) -> Unit
+) {
     val options = listOf(
         ButtonDisplayStyle.ICON_AND_TEXT to "Icon and Text",
         ButtonDisplayStyle.ICON_ONLY to "Icon Only",
@@ -226,7 +245,11 @@ fun ButtonDisplayStyleSetting(currentStyle: ButtonDisplayStyle, onStyleChange: (
 
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Apps, contentDescription = "Button Style", modifier = Modifier.padding(end = 16.dp))
+            Icon(
+                Icons.Default.Apps,
+                contentDescription = "Button Style",
+                modifier = Modifier.padding(end = 16.dp)
+            )
             Text("Button Display Style", style = MaterialTheme.typography.bodyLarge)
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -259,8 +282,22 @@ fun ChatPreview(backgroundColor: Color) {
             modifier = Modifier.padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Surface(shape = CircleShape, modifier = Modifier.align(Alignment.End).size(24.dp), color = MaterialTheme.colorScheme.primaryContainer) {}
-            Surface(shape = CircleShape, modifier = Modifier.align(Alignment.Start).size(24.dp), color = MaterialTheme.colorScheme.secondaryContainer) {}
+            Surface(
+                shape = CircleShape,
+                modifier = Modifier.align(Alignment.End).size(24.dp),
+                color = MaterialTheme.colorScheme.primaryContainer
+            ) {}
+            Surface(
+                shape = CircleShape,
+                modifier = Modifier.align(Alignment.Start).size(24.dp),
+                color = MaterialTheme.colorScheme.secondaryContainer
+            ) {}
+            Text(
+                "preview",
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+                    .padding(4.dp).align(Alignment.End)
+            )
         }
     }
 }
@@ -277,7 +314,11 @@ fun ChatBackgroundSetting(selectedColor: Color, onColorSelected: (Color) -> Unit
 
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Wallpaper, contentDescription = "Chat Background", modifier = Modifier.padding(end = 16.dp))
+            Icon(
+                Icons.Default.Wallpaper,
+                contentDescription = "Chat Background",
+                modifier = Modifier.padding(end = 16.dp)
+            )
             Text("Chat Background", style = MaterialTheme.typography.bodyLarge)
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -291,11 +332,18 @@ fun ChatBackgroundSetting(selectedColor: Color, onColorSelected: (Color) -> Unit
                         .size(32.dp)
                         .clickable { onColorSelected(color) },
                     shape = CircleShape,
-                    color = if(color == Color.Transparent) MaterialTheme.colorScheme.surface else color,
-                    border = if (selectedColor == color) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                    color = if (color == Color.Transparent) MaterialTheme.colorScheme.surface else color,
+                    border = if (selectedColor == color) BorderStroke(
+                        2.dp,
+                        MaterialTheme.colorScheme.primary
+                    ) else BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                 ) {
                     if (color == Color.Transparent) {
-                        Icon(Icons.Default.BrightnessAuto, contentDescription = "System Default", tint = MaterialTheme.colorScheme.onSurface)
+                        Icon(
+                            Icons.Default.BrightnessAuto,
+                            contentDescription = "System Default",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }
@@ -305,7 +353,11 @@ fun ChatBackgroundSetting(selectedColor: Color, onColorSelected: (Color) -> Unit
             onClick = { /* TODO: Handle image picking */ },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Icon(Icons.Default.Image, contentDescription = "Choose Image", modifier = Modifier.padding(end = 8.dp))
+            Icon(
+                Icons.Default.Image,
+                contentDescription = "Choose Image",
+                modifier = Modifier.padding(end = 8.dp)
+            )
             Text("Choose from gallery")
         }
     }
@@ -321,7 +373,11 @@ fun UserAvatarSetting() {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.AccountCircle, contentDescription = "Your Avatar", modifier = Modifier.padding(end = 16.dp))
+            Icon(
+                Icons.Default.AccountCircle,
+                contentDescription = "Your Avatar",
+                modifier = Modifier.padding(end = 16.dp)
+            )
             Text("Your Avatar", style = MaterialTheme.typography.bodyLarge)
         }
 
@@ -353,10 +409,14 @@ fun SliderSetting(icon: ImageVector, title: String, description: String) {
 
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-             Icon(icon, contentDescription = title, modifier = Modifier.padding(end = 16.dp))
-             Text(title, style = MaterialTheme.typography.bodyLarge)
+            Icon(icon, contentDescription = title, modifier = Modifier.padding(end = 16.dp))
+            Text(title, style = MaterialTheme.typography.bodyLarge)
         }
-        Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            description,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Slider(
             value = sliderPosition,
             onValueChange = { sliderPosition = it },
@@ -380,7 +440,11 @@ fun NotificationSetting(icon: ImageVector, title: String, description: String) {
         Icon(icon, contentDescription = title, modifier = Modifier.padding(end = 16.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.bodyLarge)
-            Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
         Switch(
             checked = isChecked,
@@ -402,7 +466,11 @@ fun AboutSetting(icon: ImageVector, title: String, value: String, onClick: (() -
         Icon(icon, contentDescription = title, modifier = Modifier.padding(end = 16.dp))
         Text(title, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
         if (value.isNotEmpty()) {
-            Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                value,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
         if (onClick != null) {
             Icon(

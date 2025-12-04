@@ -1,4 +1,4 @@
-package com.example.androidmaiden.views.fileSys
+package com.example.androidmaiden.model
 
 // Todo： future
 //enum class FileType {
@@ -16,11 +16,12 @@ package com.example.androidmaiden.views.fileSys
 enum class FolderType {
     FOLDER, DOCUMENT, IMAGE, MUSIC, VIDEO, OTHER
 }
-
 enum class NodeType { FILE, FOLDER }
-
 enum class DataSource { MOCK, REAL }
 
+/**
+ * Core data structure for representing a file or folder.
+ */
 data class FileNode(
     val name: String,
     val size: Long? = null,            // 文件字节大小；文件夹可为 null

@@ -1,5 +1,8 @@
 package com.example.androidmaiden.views.fileSys
 
+import com.example.androidmaiden.model.FileNode
+import com.example.androidmaiden.model.NodeType
+
 
 //class sorter {
 //}
