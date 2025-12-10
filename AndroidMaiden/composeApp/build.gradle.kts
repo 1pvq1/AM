@@ -45,8 +45,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-
-
+            implementation(libs.generativeai)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -60,6 +59,7 @@ kotlin {
             implementation(projects.shared)
             implementation(libs.kotlinx.datetime)
             implementation(libs.material.icons.extended)
+            implementation(libs.kotlinx.coroutines.core)
 
         }
         commonTest.dependencies {

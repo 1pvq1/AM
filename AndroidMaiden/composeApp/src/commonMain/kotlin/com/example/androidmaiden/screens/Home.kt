@@ -42,7 +42,7 @@ fun HomeScreen() {
 @Composable
 fun CharacterSection() {
     var showDialog by remember { mutableStateOf(true) }
-    var layout by remember { mutableStateOf(CharacterLayout.Horizontal) }
+    var layout by remember { mutableStateOf(CharacterLayout.Vertical) }
     val dialogText = "\"欢迎回来，主人！请问有什么安排？\""
 
     Column(
