@@ -1,10 +1,20 @@
 package com.example.androidmaiden.screens
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,7 +25,9 @@ import com.example.androidmaiden.ButtonDisplayStyle
 import com.example.androidmaiden.screens.settings.AboutSettingsGroup
 import com.example.androidmaiden.screens.settings.AppearanceSettingsGroup
 import com.example.androidmaiden.screens.settings.ChatPersonalizationSettingsGroup
+import com.example.androidmaiden.screens.settings.LanguageSettingsGroup
 import com.example.androidmaiden.screens.settings.LlmSettingsGroup
+import com.example.androidmaiden.screens.settings.NetworkSettingsGroup
 import com.example.androidmaiden.screens.settings.NotificationsSettingsGroup
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -23,15 +35,24 @@ enum class ThemeMode {
     LIGHT, DARK, SYSTEM
 }
 
+enum class Language {
+    FOLLOW_SYSTEM, ENGLISH, CHINESE
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun SettingsScreenPreview() {
+    var previewThemeMode by remember { mutableStateOf(ThemeMode.SYSTEM) }
+    var buttonDisplayStyle by remember { mutableStateOf(ButtonDisplayStyle.ICON_ONLY) }
+    var language by remember { mutableStateOf(Language.FOLLOW_SYSTEM) }
     SettingsScreen(
-        previewThemeMode = ThemeMode.SYSTEM,
-        onThemePreview = {},
-        buttonDisplayStyle = ButtonDisplayStyle.ICON_ONLY,
-        onButtonDisplayStyleChange = {},
+        previewThemeMode = previewThemeMode,
+        onThemePreview = { previewThemeMode = it },
+        buttonDisplayStyle = buttonDisplayStyle,
+        onButtonDisplayStyleChange = { buttonDisplayStyle = it },
+        language = language,
+        onLanguageChange = { language = it },
         onNavigateToAdvancedLlmSettings = {}
     )
 }
@@ -43,6 +64,8 @@ fun SettingsScreen(
     onThemePreview: (ThemeMode) -> Unit,
     buttonDisplayStyle: ButtonDisplayStyle,
     onButtonDisplayStyleChange: (ButtonDisplayStyle) -> Unit,
+    language: Language,
+    onLanguageChange: (Language) -> Unit,
     onNavigateToAdvancedLlmSettings: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -93,9 +116,26 @@ fun SettingsScreen(
 
             item { Spacer(modifier = Modifier.height(16.dp)) }
 
+            // Language Section
+            item {
+                LanguageSettingsGroup(
+                    language = language,
+                    onLanguageChange = onLanguageChange
+                )
+            }
+
+            item { Spacer(modifier = Modifier.height(16.dp)) }
+
             // Chat Personalization Section
             item {
                 ChatPersonalizationSettingsGroup()
+            }
+
+            item { Spacer(modifier = Modifier.height(16.dp)) }
+
+            // Network Section
+            item {
+                NetworkSettingsGroup()
             }
 
             item { Spacer(modifier = Modifier.height(16.dp)) }

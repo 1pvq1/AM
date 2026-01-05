@@ -24,6 +24,18 @@ import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.ButtonDisplayStyle
 import com.example.androidmaiden.screens.SettingsGroup
 import com.example.androidmaiden.screens.ThemeMode
+import org.jetbrains.compose.ui.tooling.preview.Preview
+
+@Preview
+@Composable
+fun PreviewAppearanceSettingsGroup() {
+    AppearanceSettingsGroup(
+        previewThemeMode = ThemeMode.SYSTEM,
+        onThemePreview = {},
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_ONLY,
+        onButtonDisplayStyleChange = {}
+    )
+}
 
 @Composable
 fun AppearanceSettingsGroup(

@@ -46,6 +46,7 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.generativeai)
+            implementation(libs.ktor.client.okhttp)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -60,6 +61,8 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.material.icons.extended)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
 
         }
         commonTest.dependencies {
@@ -68,7 +71,14 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+            implementation(libs.ktor.client.java)
 
+        }
+        iosMain.dependencies {
+        }
+        jsMain.dependencies {
+        }
+        wasmJsMain.dependencies {
         }
     }
 }

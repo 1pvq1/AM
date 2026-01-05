@@ -67,7 +67,11 @@ actual fun PlatformApp() {
                             onThemePreview = { themeMode = it },
                             buttonDisplayStyle = buttonDisplayStyle,
                             onButtonDisplayStyleChange = { buttonDisplayStyle = it },
-                            onNavigateToAdvancedLlmSettings = { currentScreen = Screen.AdvancedLlmSettings }
+                            onNavigateToAdvancedLlmSettings = {
+                                currentScreen = Screen.AdvancedLlmSettings
+                            },
+                            language = TODO(),
+                            onLanguageChange = TODO()
                         )
 
                         is Screen.Skills -> SkillsPage(onNavigate = { screen ->
