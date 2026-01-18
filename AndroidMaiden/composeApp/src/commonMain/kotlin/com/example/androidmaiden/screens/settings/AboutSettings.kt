@@ -1,8 +1,6 @@
 package com.example.androidmaiden.screens.settings
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Security
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,21 +16,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.screens.SettingsGroup
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Preview
 @Composable
 fun AboutSettingsGroup() {
-    SettingsGroup(title = "About") {
+    SettingsGroup(title = stringResource(id = "settings_about_title")) {
         AboutSetting(
             icon = Icons.Default.Info,
-            title = "App Version",
+            title = stringResource(id = "settings_about_app_version"),
             value = "1.0.0-alpha01"
         )
         AboutSetting(
             icon = Icons.Default.Security,
-            title = "Privacy Policy",
+            title = stringResource(id = "settings_about_privacy_policy"),
             value = "",
             onClick = { /* TODO: Navigate to Privacy Policy screen */ }
         )

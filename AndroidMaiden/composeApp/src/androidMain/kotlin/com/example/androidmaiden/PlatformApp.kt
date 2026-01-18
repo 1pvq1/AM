@@ -70,16 +70,18 @@ actual fun PlatformApp() {
                             onNavigateToAdvancedLlmSettings = {
                                 currentScreen = Screen.AdvancedLlmSettings
                             },
-                            language = TODO(),
-                            onLanguageChange = TODO()
+                            language = Language.FOLLOW_SYSTEM,
+                            onLanguageChange = {}
                         )
 
                         is Screen.Skills -> SkillsPage(onNavigate = { screen ->
                             currentScreen = screen
                         })
+
                         is Screen.Files -> FilesScreen(onNavigate = { screen ->
                             currentScreen = screen
                         })
+
                         is Screen.FileAnalysis -> FileAnalysisScreen()
                         is Screen.Todo -> TodoPage()
                         is Screen.CharacterInteraction -> CharacterInteractionPage()

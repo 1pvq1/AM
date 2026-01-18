@@ -29,6 +29,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.screens.AboutSetting
 import com.example.androidmaiden.screens.SettingsGroup
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -43,7 +44,7 @@ fun PreviewLlmSettingsGroup() {
 fun LlmSettingsGroup(onNavigateToAdvancedLlmSettings: () -> Unit) {
     var apiKey by remember { mutableStateOf("") }
 
-    SettingsGroup(title = "LLM Settings") {
+    SettingsGroup(title = stringResource(id = "settings_llm_title")) {
         ModelSelectionSetting()
         ApiKeySetting(apiKey = apiKey, onApiKeyChange = { apiKey = it })
 
@@ -54,7 +55,7 @@ fun LlmSettingsGroup(onNavigateToAdvancedLlmSettings: () -> Unit) {
         Divider(modifier = Modifier.padding(vertical = 8.dp))
         AboutSetting(
             icon = Icons.Default.Tune,
-            title = "Advanced Settings",
+            title = stringResource(id = "settings_advanced_title"),
             value = "",
             onClick = onNavigateToAdvancedLlmSettings
         )
@@ -79,7 +80,7 @@ private fun ModelSelectionSetting() {
     ) {
         Icon(
             Icons.Default.AutoAwesome,
-            contentDescription = "Model Version",
+            contentDescription = stringResource(id = "settings_llm_model_version"),
             modifier = Modifier.padding(end = 16.dp)
         )
         ExposedDropdownMenuBox(
@@ -91,7 +92,7 @@ private fun ModelSelectionSetting() {
                 value = selectedModel,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Default Model") },
+                label = { Text(stringResource(id = "settings_llm_default_model")) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier.menuAnchor().fillMaxWidth()
             )
@@ -120,9 +121,9 @@ private fun ApiKeySetting(apiKey: String, onApiKeyChange: (String) -> Unit) {
     OutlinedTextField(
         value = apiKey,
         onValueChange = onApiKeyChange,
-        label = { Text("API Key") },
-        placeholder = { Text("Enter your API key") },
-        leadingIcon = { Icon(Icons.Default.Key, contentDescription = "API Key") },
+        label = { Text(stringResource(id = "settings_llm_api_key")) },
+        placeholder = { Text(stringResource(id = "settings_llm_api_key_placeholder")) },
+        leadingIcon = { Icon(Icons.Default.Key, contentDescription = stringResource(id = "settings_llm_api_key")) },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done
@@ -155,7 +156,7 @@ private fun ModelProvidersSetting() {
     ) {
         Icon(
             Icons.Default.AutoAwesome,
-            contentDescription = "Model Providers",
+            contentDescription = stringResource(id = "settings_llm_model_providers"),
             modifier = Modifier.padding(end = 16.dp)
         )
         ExposedDropdownMenuBox(
@@ -167,7 +168,7 @@ private fun ModelProvidersSetting() {
                 value = selectedModel,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Model Providers") },
+                label = { Text(stringResource(id = "settings_llm_model_providers")) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier.menuAnchor().fillMaxWidth()
             )

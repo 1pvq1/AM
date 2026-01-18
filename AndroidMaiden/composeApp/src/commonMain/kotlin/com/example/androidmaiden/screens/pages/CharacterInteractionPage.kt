@@ -1,20 +1,45 @@
 package com.example.androidmaiden.screens.pages
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.views.character.CharacterIllustrationBox
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -27,16 +52,20 @@ enum class ChatViewMode { REGULAR, VIRTUAL }
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun CharacterInteractionPage() {
+fun CharacterInteractionPage(onNavigateUp: () -> Unit = {}) {
     var viewMode by remember { mutableStateOf(ChatViewMode.REGULAR) }
+
+    // Load strings for initial chat history
+    val initialChatMessages = listOf(
+        ChatMessage(stringResource(id = "chat_greeting_1"), Sender.CHARACTER),
+        ChatMessage(stringResource(id = "chat_greeting_2"), Sender.USER),
+        ChatMessage(stringResource(id = "chat_greeting_3"), Sender.CHARACTER),
+        ChatMessage(stringResource(id = "chat_greeting_4"), Sender.CHARACTER),
+        ChatMessage(stringResource(id = "chat_greeting_5"), Sender.USER)
+    )
+
     val chatHistory = remember {
-        mutableStateListOf(
-            ChatMessage("Hello!", Sender.CHARACTER),
-            ChatMessage("How are you?", Sender.USER),
-            ChatMessage("This is a placeholder for our conversation.", Sender.CHARACTER),
-            ChatMessage("I'm looking forward to our chat!", Sender.CHARACTER),
-            ChatMessage("Me too! What should we talk about?", Sender.USER)
-        )
+        mutableStateListOf<ChatMessage>().apply { addAll(initialChatMessages) }
     }
     var text by remember { mutableStateOf("") }
 
@@ -48,22 +77,20 @@ fun CharacterInteractionPage() {
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Character Interaction") },
-                actions = {
-                    IconButton(onClick = {
-                        viewMode = if (viewMode == ChatViewMode.REGULAR) ChatViewMode.VIRTUAL else ChatViewMode.REGULAR
-                    }) {
-                        Icon(
-                            imageVector = if (viewMode == ChatViewMode.REGULAR) Icons.Default.Person else Icons.Default.Forum,
-                            contentDescription = "Switch View"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
-            )
+     BasePage(
+        title = stringResource(id = "character_interaction"),
+        navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
+        onNavigationIconClick = onNavigateUp,
+        actions = {
+            IconButton(onClick = {
+                viewMode =
+                    if (viewMode == ChatViewMode.REGULAR) ChatViewMode.VIRTUAL else ChatViewMode.REGULAR
+            }) {
+                Icon(
+                    imageVector = if (viewMode == ChatViewMode.REGULAR) Icons.Default.Person else Icons.Default.Forum,
+                    contentDescription = stringResource(id = "switch_view")
+                )
+            }
         }
     ) { paddingValues ->
         when (viewMode) {
@@ -74,6 +101,7 @@ fun CharacterInteractionPage() {
                 onTextChange = { text = it },
                 onSendMessage = onSendMessage
             )
+
             ChatViewMode.VIRTUAL -> VirtualChatView(
                 modifier = Modifier.padding(paddingValues),
                 chatHistory = chatHistory,
@@ -118,7 +146,8 @@ fun VirtualChatView(
     onTextChange: (String) -> Unit,
     onSendMessage: () -> Unit
 ) {
-    val latestLlmMessage = chatHistory.lastOrNull { it.sender == Sender.CHARACTER }?.message ?: "..."
+    val latestLlmMessage =
+        chatHistory.lastOrNull { it.sender == Sender.CHARACTER }?.message ?: stringResource(id = "ellipsis")
 
     Box(modifier = Modifier.fillMaxSize()) {
         CharacterIllustrationBox(modifier = Modifier.fillMaxSize())
@@ -170,7 +199,7 @@ fun ChatInput(
             OutlinedTextField(
                 value = text,
                 onValueChange = onTextChange,
-                label = { Text("Message...") },
+                label = { Text(stringResource(id = "message_input_label")) },
                 modifier = Modifier.weight(1f),
                 colors = if (useTransparentStyle) {
                     TextFieldDefaults.colors(
@@ -190,7 +219,7 @@ fun ChatInput(
                 onClick = onSendMessage,
                 enabled = text.isNotBlank()
             ) {
-                Icon(Icons.Default.Send, contentDescription = "Send Message")
+                Icon(Icons.Default.Send, contentDescription = stringResource(id = "send_message"))
             }
         }
     }
@@ -199,9 +228,11 @@ fun ChatInput(
 @Composable
 fun ChatMessageBubble(chatMessage: ChatMessage) {
     val isUserMessage = chatMessage.sender == Sender.USER
-    val bubbleColor = if (isUserMessage) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
-    val avatarName = if (isUserMessage) "Me" else "AM"
-    val avatarBackgroundColor = if (isUserMessage) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+    val bubbleColor =
+        if (isUserMessage) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
+    val avatarName = if (isUserMessage) stringResource(id = "user_avatar_name") else stringResource(id = "character_avatar_name")
+    val avatarBackgroundColor =
+        if (isUserMessage) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
 
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -259,10 +290,10 @@ fun RegularChatViewPreview() {
     MaterialTheme {
         RegularChatView(
             chatHistory = listOf(
-                ChatMessage("Hello!", Sender.CHARACTER),
-                ChatMessage("How are you?", Sender.USER)
+                ChatMessage(stringResource(id = "chat_greeting_1"), Sender.CHARACTER),
+                ChatMessage(stringResource(id = "chat_greeting_2"), Sender.USER)
             ),
-            text = "Hi there!",
+            text = stringResource(id = "chat_preview_1"),
             onTextChange = {},
             onSendMessage = {}
         )
@@ -275,10 +306,10 @@ fun VirtualChatViewPreview() {
     MaterialTheme {
         VirtualChatView(
             chatHistory = listOf(
-                ChatMessage("This is a placeholder for our conversation.", Sender.CHARACTER),
-                ChatMessage("Me too! What should we talk about?", Sender.USER)
+                ChatMessage(stringResource(id = "chat_greeting_3"), Sender.CHARACTER),
+                ChatMessage(stringResource(id = "chat_greeting_5"), Sender.USER)
             ),
-            text = "Let's talk about something.",
+            text = stringResource(id = "chat_preview_2"),
             onTextChange = {},
             onSendMessage = {}
         )

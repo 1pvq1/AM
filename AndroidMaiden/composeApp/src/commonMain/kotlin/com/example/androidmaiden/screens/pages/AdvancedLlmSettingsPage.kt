@@ -15,6 +15,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.Res.stringResource
+import com.example.androidmaiden.viewModels.AdvancedLlmSettingsViewModel
+import com.example.androidmaiden.viewModels.rememberAdvancedLlmSettingsViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Preview
@@ -26,19 +29,16 @@ fun AdvancedLlmSettingsPagePreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AdvancedLlmSettingsPage(onNavigateBack: () -> Unit, viewModel: AdvancedLlmSettingsViewModel = rememberAdvancedLlmSettingsViewModel()) {
+fun AdvancedLlmSettingsPage(
+    onNavigateBack: () -> Unit,
+    viewModel: AdvancedLlmSettingsViewModel = rememberAdvancedLlmSettingsViewModel()
+) {
     val uiState by viewModel.uiState.collectAsState()
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Advanced LLM Settings") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
+
+    BasePage(
+        title = stringResource(id = "settings_advanced_llm_title"),
+        navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
+        onNavigationIconClick = onNavigateBack
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -54,9 +54,13 @@ fun AdvancedLlmSettingsPage(onNavigateBack: () -> Unit, viewModel: AdvancedLlmSe
                 onConnect = viewModel::connectToLocalLlm
             )
             Divider(modifier = Modifier.padding(vertical = 16.dp))
-            Text("Detailed LLM parameters and configurations will be set here.", style = MaterialTheme.typography.bodyLarge)
+            Text(
+                stringResource(id = "settings_advanced_llm_description"),
+                style = MaterialTheme.typography.bodyLarge
+            )
             // Placeholder for future settings
         }
+
     }
 }
 
@@ -70,19 +74,19 @@ private fun LocalLlmConnectionSection(
 ) {
     Column {
         Text(
-            "Connect to Local LLM",
+            stringResource(id = "settings_advanced_llm_local_title"),
             style = MaterialTheme.typography.titleLarge
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Enter the address of a local LLM service, such as LM Studio. The application will attempt to connect and verify the endpoint.",
+            stringResource(id = "settings_advanced_llm_local_description"),
             style = MaterialTheme.typography.bodyMedium
         )
         Spacer(Modifier.height(16.dp))
         OutlinedTextField(
             value = address,
             onValueChange = onAddressChange,
-            label = { Text("Local Service Address") },
+            label = { Text(stringResource(id = "settings_advanced_llm_local_address_label")) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(8.dp))
@@ -94,7 +98,7 @@ private fun LocalLlmConnectionSection(
             if (isConnecting) {
                 CircularProgressIndicator(modifier = Modifier.size(24.dp))
             } else {
-                Text("Connect")
+                Text(stringResource(id = "settings_advanced_llm_local_connect_button"))
             }
         }
         Spacer(Modifier.height(8.dp))

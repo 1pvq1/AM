@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.ButtonDisplayStyle
+import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.screens.settings.AboutSettingsGroup
 import com.example.androidmaiden.screens.settings.AppearanceSettingsGroup
 import com.example.androidmaiden.screens.settings.ChatPersonalizationSettingsGroup
@@ -35,8 +36,18 @@ enum class ThemeMode {
     LIGHT, DARK, SYSTEM
 }
 
-enum class Language {
-    FOLLOW_SYSTEM, ENGLISH, CHINESE
+enum class Language(val stringResId: String, val tag: String) {
+    FOLLOW_SYSTEM("settings_language_system", "system"),
+    ENGLISH("settings_language_english", "en"),
+    CHINESE("settings_language_chinese", "zh"),
+    RUSSIAN("settings_language_russian", "ru"),
+    FRENCH("settings_language_french", "fr"),
+    ARABIC("settings_language_arabic", "ar");
+
+    @Composable
+    fun getDisplayName(): String {
+        return stringResource(id = this.stringResId)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,8 +89,8 @@ fun SettingsScreen(
             onSearch = { isSearchActive = false },
             active = isSearchActive,
             onActiveChange = { isSearchActive = it },
-            placeholder = { Text("Search settings") },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+            placeholder = { Text(stringResource(id = "settings_search_placeholder")) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(id = "settings_search_icon_description")) },
             trailingIcon = {
                 if (isSearchActive) {
                     Icon(
@@ -88,7 +99,7 @@ fun SettingsScreen(
                                 false
                         },
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close search"
+                        contentDescription = stringResource(id = "settings_close_search_icon_description")
                     )
                 }
             },

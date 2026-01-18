@@ -3,16 +3,65 @@ package com.example.androidmaiden.views.panel
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.ui.icons.ToolbarIcon
 import com.example.androidmaiden.ui.icons.toolbarIcon
 import com.example.androidmaiden.views.fileSys.*
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 //class FileManager {
 //}
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun FileAnalysisToolbarPreview() {
+    Surface {
+        Row(
+            modifier = Modifier.padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            FileAnalysisToolbar(
+                viewMode = ViewMode.LIST,
+                onViewModeChange = {},
+                isAndroid = true,
+                sortMode = SortMode.NAME,
+                onSortModeChange = {},
+                sortOrder = SortOrder.ASC,
+                onSortOrderChange = {}
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun FAToolBarAndroidPreview() {
+    Surface {
+        Row(
+            modifier = Modifier.padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            FAToolBarAndroid(
+                viewMode = ViewMode.LIST,
+                onViewModeChange = {},
+                sortMode = SortMode.NAME,
+                onSortModeChange = {},
+                sortOrder = SortOrder.ASC,
+                onSortOrderChange = {},
+                useMock = true,
+                onUseMockChange = {},
+            )
+        }
+    }
+}
+
 @Composable
 fun FileAnalysisToolbar(
     viewMode: ViewMode,
@@ -20,7 +69,6 @@ fun FileAnalysisToolbar(
     isAndroid: Boolean,
     useMock: Boolean = true,
     onUseMockChange: (Boolean) -> Unit = {},
-    scrollBehavior: TopAppBarScrollBehavior? = null,
     sortMode: SortMode,
     onSortModeChange: (SortMode) -> Unit,
     sortOrder: SortOrder,                  // NEW
@@ -35,7 +83,6 @@ fun FileAnalysisToolbar(
             onSortModeChange = onSortModeChange,
             useMock = useMock,
             onUseMockChange = onUseMockChange,
-            scrollBehavior = scrollBehavior,
             sortOrder = sortOrder,
             onSortOrderChange = onSortOrderChange
         )
@@ -46,8 +93,8 @@ fun FileAnalysisToolbar(
 }
 
 
-@Composable
 @OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun FAToolBarAndroid(
     viewMode: ViewMode,
     onViewModeChange: (ViewMode) -> Unit,
@@ -56,34 +103,29 @@ fun FAToolBarAndroid(
     sortOrder: SortOrder,                  // NEW
     onSortOrderChange: (SortOrder) -> Unit,// NEW
     useMock: Boolean,
-    onUseMockChange: (Boolean) -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior?
+    onUseMockChange: (Boolean) -> Unit
 ) {
-    TopAppBar(
-        title = { Text("文件分析") }, actions = {
-            // 视图切换图标
-            ViewChange(
-                onViewModeChange = onViewModeChange, viewMode = viewMode, isAndroid = true
-            )
-
-            // 排序图标
-            SortBy(
-                sortModeChange = onSortModeChange,
-                sortOrder = sortOrder,
-                sortOrderChange = onSortOrderChange
-            )
-
-            // 模拟/真实数据切换
-            TooltipBox(
-                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                tooltip = { PlainTooltip { Text("切换模拟/真实数据") } },
-                state = rememberTooltipState()
-            ) {
-                Switch(checked = !useMock, onCheckedChange = { onUseMockChange(!useMock) })
-            }
-        },
-        scrollBehavior = scrollBehavior
+    // These actions are placed directly in the RowScope of the parent TopAppBar
+    // 视图切换图标
+    ViewChange(
+        onViewModeChange = onViewModeChange, viewMode = viewMode, isAndroid = true
     )
+
+    // 排序图标
+    SortBy(
+        sortModeChange = onSortModeChange,
+        sortOrder = sortOrder,
+        sortOrderChange = onSortOrderChange
+    )
+
+    // 模拟/真实数据切换
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+        tooltip = { PlainTooltip { Text(stringResource(id = "toggle_simulation_real_data")) } },
+        state = rememberTooltipState()
+    ) {
+        Switch(checked = !useMock, onCheckedChange = { onUseMockChange(!useMock) })
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -99,7 +141,7 @@ fun ViewChange(
         TooltipBox(
             positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
             tooltip = {
-                PlainTooltip { Text("切换视图模式") }
+                PlainTooltip { Text(stringResource(id = "toggle_view_mode")) }
             },
             state = tooltipState
         ) {
@@ -117,7 +159,7 @@ fun ViewChange(
                         ViewMode.GRID -> toolbarIcon(ToolbarIcon.GRID)!!
                         ViewMode.TREE -> toolbarIcon(ToolbarIcon.TREE)!!
                     },
-                    contentDescription = "切换视图为 ${viewMode.name}",
+                    contentDescription = stringResource(id = "toggle_view_to", viewMode.name),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -126,7 +168,7 @@ fun ViewChange(
         ViewMode.entries.forEach { mode ->
             TooltipBox(
                 positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                tooltip = { PlainTooltip { Text("切换到 ${mode.name}") } }, state = tooltipState
+                tooltip = { PlainTooltip { Text(stringResource(id = "switch_to", mode.name)) } }, state = tooltipState
             ) {
                 IconButton(onClick = { onViewModeChange(mode) }) {
                     Icon(
@@ -159,11 +201,11 @@ fun SortBy(
 
     TooltipBox(
         positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-        tooltip = { PlainTooltip { Text("选择排序方式") } },
+        tooltip = { PlainTooltip { Text(stringResource(id = "select_sort_method")) } },
         state = tooltipState
     ) {
         IconButton(onClick = { expanded = true }) {
-            Icon(toolbarIcon(ToolbarIcon.SORT)!!, contentDescription = "排序")
+            Icon(toolbarIcon(ToolbarIcon.SORT)!!, contentDescription = stringResource(id = "sort"))
         }
     }
 
@@ -179,7 +221,7 @@ fun SortBy(
         }
         Divider()
         DropdownMenuItem(
-            text = { Text(if (sortOrder == SortOrder.ASC) "升序" else "降序") },
+            text = { Text(if (sortOrder == SortOrder.ASC) stringResource(id = "ascending") else stringResource(id = "descending")) },
             onClick = {
                 val next = if (sortOrder == SortOrder.ASC) SortOrder.DESC else SortOrder.ASC
                 sortOrderChange(next)
@@ -187,62 +229,13 @@ fun SortBy(
             }
         )
         DropdownMenuItem(
-            text = { Text("文件夹优先") },
+            text = { Text(stringResource(id = "folders_first")) },
             onClick = {
                 // 可选：将 foldersFirst 也纳入 UI（如放在 ViewModel 中）
             }
         )
     }
 }
-
-//@Composable
-//fun SortBy(onSortModeChange: (SortMode) -> Unit) {
-//    var expanded by remember { mutableStateOf(false) }
-//    IconButton(onClick = { expanded = true }) {
-//        Icon(toolbarIcon(ToolbarIcon.SORT)!!, contentDescription = "排序")
-//    }
-//    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-//        SortMode.entries.forEach { mode ->
-//            DropdownMenuItem(text = { Text(mode.label) }, onClick = {
-//                onSortModeChange(mode)
-//                expanded = false
-//            })
-//        }
-//    }
-//}
-
-
-//@Composable
-//@OptIn(ExperimentalMaterial3Api::class)
-//private fun FAToolBarAndroid(
-//    onViewModeChange: (ViewMode) -> Unit,
-//    viewMode: ViewMode,
-//    onSortModeChange: (SortMode) -> Unit
-//) {
-//    Column {
-//        // 1. ✅ 安卓定制：TopAppBar
-//        TopAppBar(title = { Text("文件分析") })
-//
-//        // 2. 功能区
-//        Column(
-//            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
-//            verticalArrangement = Arrangement.spacedBy(8.dp)
-//        ) {
-//            // 视图切换按钮行
-//            ViewChange()
-//            Row(
-//                horizontalArrangement = Arrangement.spacedBy(8.dp),
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Text("排序：", style = MaterialTheme.typography.labelLarge)
-//                // 排序菜单
-//                SortBy(
-//                    onSortModeChange = onSortModeChange
-//                )
-//            }
-//        }
-//    }
-//}
 
 
 @Composable
@@ -265,7 +258,7 @@ private fun FAToolBarGeneral(
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("排序：")
+            Text(stringResource(id = "sort_by"))
             SortMode.entries.forEach { mode ->
                 FilterChip(
                     selected = sortMode == mode,

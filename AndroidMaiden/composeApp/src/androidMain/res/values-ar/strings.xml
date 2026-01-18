@@ -1,0 +1,127 @@
+<resources>
+    <!-- عام ومشترك -->
+    <string name="details">التفاصيل</string>
+    <string name="ellipsis">...</string>
+
+    <!-- صفحة التفاعل مع الشخصية -->
+    <string name="character_interaction">التفاعل مع الشخصية</string>
+    <string name="switch_view">تبديل العرض</string>
+    <string name="message_input_label">رسالة...</string>
+    <string name="send_message">إرسال رسالة</string>
+    <string name="user_avatar_name">أنا</string>
+    <string name="character_avatar_name">AM</string>
+
+    <!-- التفاعل مع الشخصية - رسائل الترحيب (لسجل الدردشة الأولي) -->
+    <string name="chat_greeting_1">أهلاً!</string>
+    <string name="chat_greeting_2">كيف حالك؟</string>
+    <string name="chat_greeting_3">هذا placeholder لمحادثتنا.</string>
+    <string name="chat_greeting_4">أتطلع إلى محادثتنا!</string>
+    <string name="chat_greeting_5">وأنا أيضاً! عن ماذا يجب أن نتحدث؟</string>
+
+    <!-- التفاعل مع الشخصية - رسائل المعاينة -->
+    <string name="chat_preview_1">مرحباً!</string>
+    <string name="chat_preview_2">دعنا نتحدث عن شيء ما.</string>
+
+    <!-- إدارة الملفات -->
+    <string name="file_management">إدارة الملفات</string>
+    <string name="file_management_description">تحليل وتصنيف وتنظيم وتنظيف نظام الملفات الخاص بك.</string>
+
+    <!-- إدارة الملفات - الميزات -->
+    <string name="analyze">تحليل</string>
+    <string name="analyze_description">مسح وتحليل بنية ملفات النظام.</string>
+    <string name="classify">تصنيف</string>
+    <string name="classify_description">وضع علامات وتصنيف تلقائي حسب النوع أو القاعدة.</string>
+    <string name="organize">تنظيم</string>
+    <string name="organize_description">تحسين بنية دليل المستخدم لتحسين قابلية القراءة.</string>
+    <string name="clean">تنظيف</string>
+    <string name="clean_description">تنظيف الملفات غير المجدية أو المكررة.</string>
+
+    <!-- صفحة تحليل الملفات -->
+    <string name="file_analysis">تحليل الملفات</string>
+    <string name="current_data_type_simulation">نوع البيانات الحالي: محاكاة (هيكل نظام ملفات Android)</string>
+    <string name="current_data_type_real">نوع البيانات الحالي: نظام ملفات حقيقي (Android)</string>
+    <string name="unknown_time">وقت غير معروف</string>
+    <string name="folder_details">%1$d مجلدات · %2$d ملفات · %3$s</string>
+
+    <!-- صفحة تحليل الملفات - شريط الأدوات -->
+    <string name="toggle_simulation_real_data">تبديل المحاكاة/البيانات الحقيقية</string>
+    <string name="toggle_view_mode">تبديل وضع العرض</string>
+    <string name="toggle_view_to">تبديل العرض إلى %1$s</string>
+    <string name="switch_to">التبديل إلى %1$s</string>
+    <string name="select_sort_method">اختر طريقة الفرز</string>
+    <string name="sort">فرز</string>
+    <string name="ascending">تصاعدي</string>
+    <string name="descending">تنازلي</string>
+    <string name="folders_first">المجلدات أولاً</string>
+    <string name="sort_by">فرز حسب:</string>
+
+    <!-- صفحات الإعدادات -->
+    <string name="settings_llm_title">إعدادات LLM</string>
+    <string name="settings_advanced_title">إعدادات متقدمة</string>
+
+    <!-- الإعدادات - صفحة LLM -->
+    <string name="settings_llm_model_version">إصدار النموذج</string>
+    <string name="settings_llm_default_model">النموذج الافتراضي</string>
+    <string name="settings_llm_api_key">مفتاح API</string>
+    <string name="settings_llm_api_key_placeholder">أدخل مفتاح API الخاص بك</string>
+    <string name="settings_llm_model_providers">مزودو النماذج</string>
+
+    <!-- الإعدادات - صفحة LLM المتقدمة -->
+    <string name="settings_advanced_llm_title">إعدادات LLM المتقدمة</string>
+    <string name="settings_advanced_llm_description">سيتم تعيين معلمات وتكوينات LLM المفصلة هنا.</string>
+    <string name="settings_advanced_llm_local_title">الاتصال بـ LLM المحلي</string>
+    <string name="settings_advanced_llm_local_description">أدخل عنوان خدمة LLM محلية، مثل LM Studio. سيحاول التطبيق الاتصال والتحقق من نقطة النهاية.</string>
+    <string name="settings_advanced_llm_local_address_label">عنوان الخدمة المحلية</string>
+    <string name="settings_advanced_llm_local_connect_button">اتصال</string>
+
+    <!-- الإعدادات - الصفحة الرئيسية -->
+    <string name="settings_search_placeholder">ابحث في الإعدادات</string>
+    <string name="settings_search_icon_description">بحث</string>
+    <string name="settings_close_search_icon_description">إغلاق البحث</string>
+
+    <!-- الإعدادات - صفحة حول -->
+    <string name="settings_about_title">حول</string>
+    <string name="settings_about_app_version">إصدار التطبيق</string>
+    <string name="settings_about_privacy_policy">سياسة الخصوصية</string>
+
+    <!-- الإعدادات - صفحة المظهر -->
+    <string name="settings_appearance_title">المظهر</string>
+    <string name="settings_appearance_theme">المظهر</string>
+    <string name="settings_appearance_theme_light">فاتح</string>
+    <string name="settings_appearance_theme_dark">داكن</string>
+    <string name="settings_appearance_theme_system">النظام</string>
+    <string name="settings_appearance_button_style">نمط عرض الزر</string>
+    <string name="settings_appearance_button_style_both">أيقونة ونص</string>
+    <string name="settings_appearance_button_style_icon_only">أيقونة فقط</string>
+    <string name="settings_appearance_button_style_text_only">نص فقط</string>
+
+    <!-- الإعدادات - صفحة تخصيص الدردشة -->
+    <string name="settings_chat_personalization_title">تخصيص الدردشة</string>
+    <string name="settings_chat_personalization_preview">معاينة</string>
+    <string name="settings_chat_personalization_background">خلفية الدردشة</string>
+    <string name="settings_chat_personalization_system_default">النظام الافتراضي</string>
+    <string name="settings_chat_personalization_choose_image">اختر صورة</string>
+    <string name="settings_chat_personalization_choose_from_gallery">اختر من المعرض</string>
+    <string name="settings_chat_personalization_your_avatar">صورتك الرمزية</string>
+    <string name="settings_chat_personalization_upload_avatar_image">تحميل صورة الأفاتار</string>
+
+    <!-- الإعدادات - صفحة اللغة -->
+    <string name="settings_language_title">اللغة</string>
+    <string name="settings_language_system">النظام</string>
+    <string name="settings_language_english">الإنجليزية</string>
+    <string name="settings_language_chinese">الصينية</string>
+    <string name="settings_language_russian">الروسية</string>
+    <string name="settings_language_french">الفرنسية</string>
+    <string name="settings_language_arabic">العربية</string>
+
+    <!-- الإعدادات - صفحة الشبكة -->
+    <string name="settings_network_title">الشبكة</string>
+    <string name="settings_network_description">أدخل عنوان URL للتحقق مما إذا كان يمكن الوصول إليه. هذا مفيد للتحقق من الاتصال بالخدمات الخارجية أو مزودي النماذج.</string>
+    <string name="settings_network_website_url_label">عنوان URL لموقع الويب</string>
+    <string name="settings_network_check_connectivity_button">تحقق من الاتصال</string>
+
+    <!-- الإعدادات - صفحة الإشعارات -->
+    <string name="settings_notifications_title">الإشعارات</string>
+    <string name="settings_notifications_enable_notifications">تمكين الإشعارات</string>
+    <string name="settings_notifications_description">تلقي تنبيهات بمواعيد المهام النهائية.</string>
+</resources>

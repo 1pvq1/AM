@@ -47,6 +47,8 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.generativeai)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
+            implementation(libs.androidx.lifecycle.runtimeCompose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -55,8 +57,6 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(projects.shared)
             implementation(libs.kotlinx.datetime)
             implementation(libs.material.icons.extended)

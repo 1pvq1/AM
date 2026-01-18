@@ -1,3 +1,128 @@
 <resources>
-    <string name="app_name">AndroidMaiden</string>
+    <!-- General & Common -->
+    <string name="app_name" translatable="false">AndroidMaiden</string>
+    <string name="details">Details</string>
+    <string name="ellipsis">...</string>
+
+    <!-- Character Interaction Page -->
+    <string name="character_interaction">Character Interaction</string>
+    <string name="switch_view">Switch View</string>
+    <string name="message_input_label">Message...</string>
+    <string name="send_message">Send Message</string>
+    <string name="user_avatar_name">Me</string>
+    <string name="character_avatar_name">AM</string>
+
+    <!-- Character Interaction - Greeting Messages (for initial chat history) -->
+    <string name="chat_greeting_1">Hello!</string>
+    <string name="chat_greeting_2">How are you?</string>
+    <string name="chat_greeting_3">This is a placeholder for our conversation.</string>
+    <string name="chat_greeting_4">I\'m looking forward to our chat!</string>
+    <string name="chat_greeting_5">Me too! What should we talk about?</string>
+
+    <!-- Character Interaction - Preview Messages -->
+    <string name="chat_preview_1">Hi there!</string>
+    <string name="chat_preview_2">Let\'s talk about something.</string>
+
+    <!-- File Management -->
+    <string name="file_management">File Management</string>
+    <string name="file_management_description">Analyze, classify, organize, and clean your file system.</string>
+
+    <!-- File Management - Features -->
+    <string name="analyze">Analyze</string>
+    <string name="analyze_description">Scan and analyze the file structure of the system.</string>
+    <string name="classify">Classify</string>
+    <string name="classify_description">Automatically tag and classify by type or rule.</string>
+    <string name="organize">Organize</string>
+    <string name="organize_description">Optimize the user\'s directory structure to improve readability.</string>
+    <string name="clean">Clean</string>
+    <string name="clean_description">Clean up useless or duplicate files.</string>
+
+    <!-- File Analysis Page -->
+    <string name="file_analysis">File Analysis</string>
+    <string name="current_data_type_simulation">Current data type: Simulation (Android file system structure)</string>
+    <string name="current_data_type_real">Current data type: Real file system (Android)</string>
+    <string name="unknown_time">Unknown time</string>
+    <string name="folder_details">%1$d folders · %2$d files · %3$s</string>
+
+    <!-- File Analysis Page - Toolbar -->
+    <string name="toggle_simulation_real_data">Toggle Simulation/Real Data</string>
+    <string name="toggle_view_mode">Toggle View Mode</string>
+    <string name="toggle_view_to">Toggle view to %1$s</string>
+    <string name="switch_to">Switch to %1$s</string>
+    <string name="select_sort_method">Select Sort Method</string>
+    <string name="sort">Sort</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="folders_first">Folders First</string>
+    <string name="sort_by">Sort by:</string>
+
+    <!-- Settings Pages -->
+    <string name="settings_llm_title">LLM Settings</string>
+    <string name="settings_advanced_title">Advanced Settings</string>
+
+    <!-- Settings - LLM Page -->
+    <string name="settings_llm_model_version">Model Version</string>
+    <string name="settings_llm_default_model">Default Model</string>
+    <string name="settings_llm_api_key">API Key</string>
+    <string name="settings_llm_api_key_placeholder">Enter your API key</string>
+    <string name="settings_llm_model_providers">Model Providers</string>
+
+    <!-- Settings - Advanced LLM Page -->
+    <string name="settings_advanced_llm_title">Advanced LLM Settings</string>
+    <string name="settings_advanced_llm_description">Detailed LLM parameters and configurations will be set here.</string>
+    <string name="settings_advanced_llm_local_title">Connect to Local LLM</string>
+    <string name="settings_advanced_llm_local_description">Enter the address of a local LLM service, such as LM Studio. The application will attempt to connect and verify the endpoint.</string>
+    <string name="settings_advanced_llm_local_address_label">Local Service Address</string>
+    <string name="settings_advanced_llm_local_connect_button">Connect</string>
+
+    <!-- Settings - Main Page -->
+    <string name="settings_search_placeholder">Search settings</string>
+    <string name="settings_search_icon_description">Search</string>
+    <string name="settings_close_search_icon_description">Close search</string>
+
+    <!-- Settings - About Page -->
+    <string name="settings_about_title">About</string>
+    <string name="settings_about_app_version">App Version</string>
+    <string name="settings_about_privacy_policy">Privacy Policy</string>
+
+    <!-- Settings - Appearance Page -->
+    <string name="settings_appearance_title">Appearance</string>
+    <string name="settings_appearance_theme">Theme</string>
+    <string name="settings_appearance_theme_light">Light</string>
+    <string name="settings_appearance_theme_dark">Dark</string>
+    <string name="settings_appearance_theme_system">System</string>
+    <string name="settings_appearance_button_style">Button Display Style</string>
+    <string name="settings_appearance_button_style_both">Both</string>
+    <string name="settings_appearance_button_style_icon_only">Icon Only</string>
+    <string name="settings_appearance_button_style_text_only">Text Only</string>
+
+    <!-- Settings - Chat Personalization Page -->
+    <string name="settings_chat_personalization_title">Chat Personalization</string>
+    <string name="settings_chat_personalization_preview">preview</string>
+    <string name="settings_chat_personalization_background">Chat Background</string>
+    <string name="settings_chat_personalization_system_default">System Default</string>
+    <string name="settings_chat_personalization_choose_image">Choose Image</string>
+    <string name="settings_chat_personalization_choose_from_gallery">Choose from gallery</string>
+    <string name="settings_chat_personalization_your_avatar">Your Avatar</string>
+    <string name="settings_chat_personalization_upload_avatar_image">Upload the Avatar image</string>
+
+    <!-- Settings - Language Page -->
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_system">System</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_chinese">Chinese</string>
+    <string name="settings_language_russian">Russian</string>
+    <string name="settings_language_french">French</string>
+    <string name="settings_language_arabic">Arabic</string>
+
+    <!-- Settings - Network Page -->
+    <string name="settings_network_title">Network</string>
+    <string name="settings_network_description">Enter a URL to check if it is reachable. This is useful for verifying connection to external services or model providers.</string>
+    <string name="settings_network_website_url_label">Website URL</string>
+    <string name="settings_network_check_connectivity_button">Check Connectivity</string>
+
+    <!-- Settings - Notifications Page -->
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_notifications_enable_notifications">Enable Notifications</string>
+    <string name="settings_notifications_description">Receive alerts for task deadlines</string>
 </resources>

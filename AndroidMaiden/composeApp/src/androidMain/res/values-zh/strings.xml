@@ -1,0 +1,127 @@
+<resources>
+    <!-- 常规和通用 -->
+    <string name="details">详情</string>
+    <string name="ellipsis">...</string>
+
+    <!-- 角色互动页面 -->
+    <string name="character_interaction">角色互动</string>
+    <string name="switch_view">切换视图</string>
+    <string name="message_input_label">消息...</string>
+    <string name="send_message">发送消息</string>
+    <string name="user_avatar_name">我</string>
+    <string name="character_avatar_name">AM</string>
+
+    <!-- 角色互动 - 问候消息 (用于初始聊天记录) -->
+    <string name="chat_greeting_1">你好！</string>
+    <string name="chat_greeting_2">你好吗？</string>
+    <string name="chat_greeting_3">这是一个占位符对话。</string>
+    <string name="chat_greeting_4">我非常期待我们的聊天！</string>
+    <string name="chat_greeting_5">我也是！我们该聊些什么呢？</string>
+
+    <!-- 角色互动 - 预览消息 -->
+    <string name="chat_preview_1">嗨！</string>
+    <string name="chat_preview_2">我们来聊点什么吧。</string>
+
+    <!-- 文件管理 -->
+    <string name="file_management">文件管理</string>
+    <string name="file_management_description">分析、分类、整理和清理您的文件系统。</string>
+
+    <!-- 文件管理 - 功能 -->
+    <string name="analyze">分析</string>
+    <string name="analyze_description">扫描并分析系统的文件结构。</string>
+    <string name="classify">分类</string>
+    <string name="classify_description">按类型或规则自动标记和分类。</string>
+    <string name="organize">整理</string>
+    <string name="organize_description">优化用户的目录结构以提高可读性。</string>
+    <string name="clean">清理</string>
+    <string name="clean_description">清理无用或重复的文件。</string>
+
+    <!-- 文件分析页面 -->
+    <string name="file_analysis">文件分析</string>
+    <string name="current_data_type_simulation">当前数据类型：模拟（安卓文件系统结构）</string>
+    <string name="current_data_type_real">当前数据类型：真实文件系统（安卓）</string>
+    <string name="unknown_time">未知时间</string>
+    <string name="folder_details">%1$d个文件夹 · %2$d个文件 · %3$s</string>
+
+    <!-- 文件分析页面 - 工具栏 -->
+    <string name="toggle_simulation_real_data">切换模拟/真实数据</string>
+    <string name="toggle_view_mode">切换视图模式</string>
+    <string name="toggle_view_to">切换视图到 %1$s</string>
+    <string name="switch_to">切换到 %1$s</string>
+    <string name="select_sort_method">选择排序方法</string>
+    <string name="sort">排序</string>
+    <string name="ascending">升序</string>
+    <string name="descending">降序</string>
+    <string name="folders_first">文件夹优先</string>
+    <string name="sort_by">排序方式：</string>
+
+    <!-- 设置页面 -->
+    <string name="settings_llm_title">LLM设置</string>
+    <string name="settings_advanced_title">高级设置</string>
+
+    <!-- 设置 - LLM页面 -->
+    <string name="settings_llm_model_version">模型版本</string>
+    <string name="settings_llm_default_model">默认模型</string>
+    <string name="settings_llm_api_key">API密钥</string>
+    <string name="settings_llm_api_key_placeholder">输入您的API密钥</string>
+    <string name="settings_llm_model_providers">模型提供商</string>
+
+    <!-- 设置 - 高级LLM页面 -->
+    <string name="settings_advanced_llm_title">高级LLM设置</string>
+    <string name="settings_advanced_llm_description">详细的LLM参数和配置将在此处设置。</string>
+    <string name="settings_advanced_llm_local_title">连接到本地LLM</string>
+    <string name="settings_advanced_llm_local_description">输入本地LLM服务的地址，例如LM Studio。应用程序将尝试连接并验证端点。</string>
+    <string name="settings_advanced_llm_local_address_label">本地服务地址</string>
+    <string name="settings_advanced_llm_local_connect_button">连接</string>
+
+    <!-- 设置 - 主页面 -->
+    <string name="settings_search_placeholder">搜索设置</string>
+    <string name="settings_search_icon_description">搜索</string>
+    <string name="settings_close_search_icon_description">关闭搜索</string>
+
+    <!-- 设置 - 关于页面 -->
+    <string name="settings_about_title">关于</string>
+    <string name="settings_about_app_version">应用版本</string>
+    <string name="settings_about_privacy_policy">隐私政策</string>
+
+    <!-- 设置 - 外观页面 -->
+    <string name="settings_appearance_title">外观</string>
+    <string name="settings_appearance_theme">主题</string>
+    <string name="settings_appearance_theme_light">浅色</string>
+    <string name="settings_appearance_theme_dark">深色</string>
+    <string name="settings_appearance_theme_system">系统</string>
+    <string name="settings_appearance_button_style">按钮显示样式</string>
+    <string name="settings_appearance_button_style_both">图标和文本</string>
+    <string name="settings_appearance_button_style_icon_only">仅图标</string>
+    <string name="settings_appearance_button_style_text_only">仅文本</string>
+
+    <!-- 设置 - 聊天个性化页面 -->
+    <string name="settings_chat_personalization_title">聊天个性化</string>
+    <string name="settings_chat_personalization_preview">预览</string>
+    <string name="settings_chat_personalization_background">聊天背景</string>
+    <string name="settings_chat_personalization_system_default">系统默认</string>
+    <string name="settings_chat_personalization_choose_image">选择图片</string>
+    <string name="settings_chat_personalization_choose_from_gallery">从图库选择</string>
+    <string name="settings_chat_personalization_your_avatar">你的头像</string>
+    <string name="settings_chat_personalization_upload_avatar_image">上传头像图片</string>
+
+    <!-- 设置 - 语言页面 -->
+    <string name="settings_language_title">语言</string>
+    <string name="settings_language_system">系统</string>
+    <string name="settings_language_english">英语</string>
+    <string name="settings_language_chinese">中文</string>
+    <string name="settings_language_russian">俄语</string>
+    <string name="settings_language_french">法语</string>
+    <string name="settings_language_arabic">阿拉伯语</string>
+
+    <!-- 设置 - 网络页面 -->
+    <string name="settings_network_title">网络</string>
+    <string name="settings_network_description">输入URL以检查其是否可达。这对于验证与外部服务或模型提供商的连接很有用。</string>
+    <string name="settings_network_website_url_label">网站URL</string>
+    <string name="settings_network_check_connectivity_button">检查连接性</string>
+
+    <!-- 设置 - 通知页面 -->
+    <string name="settings_notifications_title">通知</string>
+    <string name="settings_notifications_enable_notifications">启用通知</string>
+    <string name="settings_notifications_description">接收任务截止日期的提醒。</string>
+</resources>

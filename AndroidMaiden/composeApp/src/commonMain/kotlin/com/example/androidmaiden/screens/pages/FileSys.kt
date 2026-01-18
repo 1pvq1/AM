@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.Screen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -35,19 +36,19 @@ data class FileFeature(
 @Composable
 fun FilesScreen(onNavigate: (Screen) -> Unit) {
     val features = listOf(
-        FileFeature("分析", "扫描并分析系统下文件结构", Icons.Default.Analytics, Screen.FileAnalysis),
-        FileFeature("归类", "根据类型或规则自动标签与分类", Icons.Default.Style),
-        FileFeature("整理", "优化用户的目录结构，提升可读性", Icons.Default.CreateNewFolder),
-        FileFeature("清洁", "清理无用或重复文件", Icons.Default.CleaningServices)
+        FileFeature(stringResource(id = "analyze"), stringResource(id = "analyze_description"), Icons.Default.Analytics, Screen.FileAnalysis),
+        FileFeature(stringResource(id = "classify"), stringResource(id = "classify_description"), Icons.Default.Style),
+        FileFeature(stringResource(id = "organize"), stringResource(id = "organize_description"), Icons.Default.CreateNewFolder),
+        FileFeature(stringResource(id = "clean"), stringResource(id = "clean_description"), Icons.Default.CleaningServices)
     )
     val scrollState = rememberScrollState()
     Column(
         Modifier.fillMaxSize().padding(16.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("文件管理", style = MaterialTheme.typography.headlineMedium)
+        Text(stringResource(id = "file_management"), style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(8.dp))
-        Text("对您的文件系统进行分析、归类、整理和清洁。")
+        Text(stringResource(id = "file_management_description"))
 
         Spacer(Modifier.height(16.dp))
 
@@ -98,7 +99,7 @@ fun FileFeatureCard(feature: FileFeature, onClick: () -> Unit) {
             if (isClickable) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "Details",
+                    contentDescription = stringResource(id = "details"),
                     tint = MaterialTheme.colorScheme.outline
                 )
             }

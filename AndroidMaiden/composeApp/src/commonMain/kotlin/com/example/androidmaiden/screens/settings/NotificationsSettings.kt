@@ -20,17 +20,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.screens.SettingsGroup
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Preview
 @Composable
 fun NotificationsSettingsGroup() {
-    SettingsGroup(title = "Notifications") {
+    SettingsGroup(title = stringResource(id = "settings_notifications_title")) {
         NotificationSetting(
             icon = Icons.Default.Notifications,
-            title = "Enable Notifications",
-            description = "Receive alerts for task deadlines"
+            title = stringResource(id = "settings_notifications_enable_notifications"),
+            description = stringResource(id = "settings_notifications_description")
         )
     }
 }

@@ -1,4 +1,4 @@
-package com.example.androidmaiden.screens.pages
+package com.example.androidmaiden.viewModels
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel

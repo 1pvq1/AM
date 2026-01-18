@@ -3,6 +3,8 @@ package com.example.androidmaiden.screens.settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
+import com.example.androidmaiden.viewModels.LlmSettingsUiState
+import com.example.androidmaiden.viewModels.LlmSettingsViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -12,7 +14,14 @@ actual fun rememberLlmSettingsViewModel(): LlmSettingsViewModel {
 }
 
 actual class LlmSettingsViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(LlmSettingsUiState(models = listOf("iOS-Model-1", "iOS-Model-2")))
+    private val _uiState = MutableStateFlow(
+        LlmSettingsUiState(
+            models = listOf(
+                "iOS-Model-1",
+                "iOS-Model-2"
+            )
+        )
+    )
     actual val uiState = _uiState.asStateFlow()
 
     actual fun onApiKeyChange(apiKey: String) {}

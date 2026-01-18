@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.ButtonDisplayStyle
+import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.screens.SettingsGroup
 import com.example.androidmaiden.screens.ThemeMode
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -44,7 +45,7 @@ fun AppearanceSettingsGroup(
     buttonDisplayStyle: ButtonDisplayStyle,
     onButtonDisplayStyleChange: (ButtonDisplayStyle) -> Unit,
 ) {
-    SettingsGroup(title = "Appearance") {
+    SettingsGroup(title = stringResource(id = "settings_appearance_title")) {
         ThemeSetting(previewThemeMode, onThemePreview)
         Divider(modifier = Modifier.padding(vertical = 8.dp))
         ButtonDisplayStyleSetting(buttonDisplayStyle, onButtonDisplayStyleChange)
@@ -54,17 +55,19 @@ fun AppearanceSettingsGroup(
 @Composable
 private fun ThemeSetting(previewThemeMode: ThemeMode, onThemePreview: (ThemeMode) -> Unit) {
     val options = listOf(
-        ThemeMode.LIGHT to "Light", ThemeMode.DARK to "Dark", ThemeMode.SYSTEM to "System"
+        ThemeMode.LIGHT to stringResource(id = "settings_appearance_theme_light"),
+        ThemeMode.DARK to stringResource(id = "settings_appearance_theme_dark"),
+        ThemeMode.SYSTEM to stringResource(id = "settings_appearance_theme_system")
     )
 
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 Icons.Default.Palette,
-                contentDescription = "Theme",
+                contentDescription = stringResource(id = "settings_appearance_theme"),
                 modifier = Modifier.padding(end = 16.dp)
             )
-            Text("Theme", style = MaterialTheme.typography.bodyLarge)
+            Text(stringResource(id = "settings_appearance_theme"), style = MaterialTheme.typography.bodyLarge)
         }
         Spacer(modifier = Modifier.height(12.dp))
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
@@ -88,19 +91,19 @@ private fun ButtonDisplayStyleSetting(
     onStyleChange: (ButtonDisplayStyle) -> Unit
 ) {
     val options = listOf(
-        ButtonDisplayStyle.ICON_AND_TEXT to "Both",
-        ButtonDisplayStyle.ICON_ONLY to "Icon Only",
-        ButtonDisplayStyle.TEXT_ONLY to "Text Only"
+        ButtonDisplayStyle.ICON_AND_TEXT to stringResource(id = "settings_appearance_button_style_both"),
+        ButtonDisplayStyle.ICON_ONLY to stringResource(id = "settings_appearance_button_style_icon_only"),
+        ButtonDisplayStyle.TEXT_ONLY to stringResource(id = "settings_appearance_button_style_text_only")
     )
 
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 Icons.Default.Apps,
-                contentDescription = "Button Style",
+                contentDescription = stringResource(id = "settings_appearance_button_style"),
                 modifier = Modifier.padding(end = 16.dp)
             )
-            Text("Button Display Style", style = MaterialTheme.typography.bodyLarge)
+            Text(stringResource(id = "settings_appearance_button_style"), style = MaterialTheme.typography.bodyLarge)
         }
         Spacer(modifier = Modifier.height(12.dp))
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {

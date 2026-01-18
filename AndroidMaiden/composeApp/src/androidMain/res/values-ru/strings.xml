@@ -1,0 +1,127 @@
+<resources>
+    <!-- Общие и общие -->
+    <string name="details">Детали</string>
+    <string name="ellipsis">...</string>
+
+    <!-- Страница взаимодействия с персонажем -->
+    <string name="character_interaction">Взаимодействие с персонажем</string>
+    <string name="switch_view">Переключить вид</string>
+    <string name="message_input_label">Сообщение...</string>
+    <string name="send_message">Отправить сообщение</string>
+    <string name="user_avatar_name">Я</string>
+    <string name="character_avatar_name">AM</string>
+
+    <!-- Взаимодействие с персонажем - Приветственные сообщения (для начальной истории чата) -->
+    <string name="chat_greeting_1">Привет!</string>
+    <string name="chat_greeting_2">Как дела?</string>
+    <string name="chat_greeting_3">Это заполнитель для нашего разговора.</string>
+    <string name="chat_greeting_4">С нетерпением жду нашего чата!</string>
+    <string name="chat_greeting_5">Я тоже! О чем поговорим?</string>
+
+    <!-- Взаимодействие с персонажем - Предварительный просмотр сообщений -->
+    <string name="chat_preview_1">Привет!</string>
+    <string name="chat_preview_2">Давай о чем-нибудь поговорим.</string>
+
+    <!-- Управление файлами -->
+    <string name="file_management">Управление файлами</string>
+    <string name="file_management_description">Анализируйте, классифицируйте, упорядочивайте и очищайте вашу файловую систему.</string>
+
+    <!-- Управление файлами - Функции -->
+    <string name="analyze">Анализировать</string>
+    <string name="analyze_description">Сканирование и анализ файловой структуры системы.</string>
+    <string name="classify">Классифицировать</string>
+    <string name="classify_description">Автоматически помечать и классифицировать по типу или правилу.</string>
+    <string name="organize">Организовать</string>
+    <string name="organize_description">Оптимизируйте структуру каталогов пользователя для повышения читаемости.</string>
+    <string name="clean">Очистить</string>
+    <string name="clean_description">Очистить ненужные или дублирующиеся файлы.</string>
+
+    <!-- Страница анализа файлов -->
+    <string name="file_analysis">Анализ файлов</string>
+    <string name="current_data_type_simulation">Текущий тип данных: симуляция (структура файловой системы Android)</string>
+    <string name="current_data_type_real">Текущий тип данных: реальная файловая система (Android)</string>
+    <string name="unknown_time">Неизвестное время</string>
+    <string name="folder_details">%1$d папок · %2$d файлов · %3$s</string>
+
+    <!-- Страница анализа файлов - Панель инструментов -->
+    <string name="toggle_simulation_real_data">Переключить симуляцию/реальные данные</string>
+    <string name="toggle_view_mode">Переключить режим просмотра</string>
+    <string name="toggle_view_to">Переключить вид на %1$s</string>
+    <string name="switch_to">Переключиться на %1$s</string>
+    <string name="select_sort_method">Выбрать метод сортировки</string>
+    <string name="sort">Сортировать</string>
+    <string name="ascending">По возрастанию</string>
+    <string name="descending">По убыванию</string>
+    <string name="folders_first">Сначала папки</string>
+    <string name="sort_by">Сортировать по:</string>
+
+    <!-- Страницы настроек -->
+    <string name="settings_llm_title">Настройки LLM</string>
+    <string name="settings_advanced_title">Расширенные настройки</string>
+
+    <!-- Настройки - Страница LLM -->
+    <string name="settings_llm_model_version">Версия модели</string>
+    <string name="settings_llm_default_model">Модель по умолчанию</string>
+    <string name="settings_llm_api_key">Ключ API</string>
+    <string name="settings_llm_api_key_placeholder">Введите ваш ключ API</string>
+    <string name="settings_llm_model_providers">Поставщики моделей</string>
+
+    <!-- Настройки - Расширенная страница LLM -->
+    <string name="settings_advanced_llm_title">Расширенные настройки LLM</string>
+    <string name="settings_advanced_llm_description">Здесь будут установлены подробные параметры и конфигурации LLM.</string>
+    <string name="settings_advanced_llm_local_title">Подключиться к локальному LLM</string>
+    <string name="settings_advanced_llm_local_description">Введите адрес локальной службы LLM, например LM Studio. Приложение попытается подключиться и проверить конечную точку.</string>
+    <string name="settings_advanced_llm_local_address_label">Адрес локальной службы</string>
+    <string name="settings_advanced_llm_local_connect_button">Подключиться</string>
+
+    <!-- Настройки - Главная страница -->
+    <string name="settings_search_placeholder">Искать в настройках</string>
+    <string name="settings_search_icon_description">Поиск</string>
+    <string name="settings_close_search_icon_description">Закрыть поиск</string>
+
+    <!-- Настройки - Страница "О программе" -->
+    <string name="settings_about_title">О программе</string>
+    <string name="settings_about_app_version">Версия приложения</string>
+    <string name="settings_about_privacy_policy">Политика конфиденциальности</string>
+
+    <!-- Настройки - Страница внешнего вида -->
+    <string name="settings_appearance_title">Внешний вид</string>
+    <string name="settings_appearance_theme">Тема</string>
+    <string name="settings_appearance_theme_light">Светлая</string>
+    <string name="settings_appearance_theme_dark">Темная</string>
+    <string name="settings_appearance_theme_system">Системная</string>
+    <string name="settings_appearance_button_style">Стиль отображения кнопки</string>
+    <string name="settings_appearance_button_style_both">И значок, и текст</string>
+    <string name="settings_appearance_button_style_icon_only">Только значок</string>
+    <string name="settings_appearance_button_style_text_only">Только текст</string>
+
+    <!-- Настройки - Страница персонализации чата -->
+    <string name="settings_chat_personalization_title">Персонализация чата</string>
+    <string name="settings_chat_personalization_preview">предварительный просмотр</string>
+    <string name="settings_chat_personalization_background">Фон чата</string>
+    <string name="settings_chat_personalization_system_default">Системный по умолчанию</string>
+    <string name="settings_chat_personalization_choose_image">Выбрать изображение</string>
+    <string name="settings_chat_personalization_choose_from_gallery">Выбрать из галереи</string>
+    <string name="settings_chat_personalization_your_avatar">Ваш аватар</string>
+    <string name="settings_chat_personalization_upload_avatar_image">Загрузить изображение аватара</string>
+
+    <!-- Настройки - Страница языка -->
+    <string name="settings_language_title">Язык</string>
+    <string name="settings_language_system">Системный</string>
+    <string name="settings_language_english">Английский</string>
+    <string name="settings_language_chinese">Китайский</string>
+    <string name="settings_language_russian">Русский</string>
+    <string name="settings_language_french">Французский</string>
+    <string name="settings_language_arabic">Арабский</string>
+
+    <!-- Настройки - Страница сети -->
+    <string name="settings_network_title">Сеть</string>
+    <string name="settings_network_description">Введите URL-адрес, чтобы проверить, доступен ли он. Это полезно для проверки подключения к внешним службам или поставщикам моделей.</string>
+    <string name="settings_network_website_url_label">URL-адрес веб-сайта</string>
+    <string name="settings_network_check_connectivity_button">Проверить подключение</string>
+
+    <!-- Настройки - Страница уведомлений -->
+    <string name="settings_notifications_title">Уведомления</string>
+    <string name="settings_notifications_enable_notifications">Включить уведомления</string>
+    <string name="settings_notifications_description">Получать оповещения о сроках выполнения задач.</string>
+</resources>

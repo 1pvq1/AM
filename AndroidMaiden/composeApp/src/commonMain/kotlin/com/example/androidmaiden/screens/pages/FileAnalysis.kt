@@ -1,19 +1,36 @@
 package com.example.androidmaiden.screens.pages
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.mods.RequestStoragePermission
 import com.example.androidmaiden.mods.listFiles
 import com.example.androidmaiden.model.*
-import com.example.androidmaiden.ui.icons.*
+import com.example.androidmaiden.ui.icons.fileTypeIcon
+import com.example.androidmaiden.ui.icons.folderTypeIcon
 import com.example.androidmaiden.utils.formatDateTime
-import com.example.androidmaiden.views.fileSys.*
 import com.example.androidmaiden.views.eg.simFileNode
-import com.example.androidmaiden.views.panel.*
+import com.example.androidmaiden.views.fileSys.*
+import com.example.androidmaiden.views.panel.FileAnalysisToolbar
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -22,7 +39,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Preview(showBackground = true)
 @Composable
-fun FileAnalysisScreen() {
+fun FileAnalysisScreen(onNavigateUp: () -> Unit = {}) {
 
     var viewMode by remember { mutableStateOf(ViewMode.LIST) }
     var sortMode by remember { mutableStateOf(SortMode.NAME) }
@@ -35,28 +52,29 @@ fun FileAnalysisScreen() {
         nodeType = NodeType.FOLDER,
         folderType = FolderType.FOLDER,
         dataSource = DataSource.REAL,
-        children = listFiles("/storage/emulated/0"), // 公共存储根目录
+        children = listFiles("/storage/emulated/0"), // Public storage root
         lastModified = Clock.System.now().toEpochMilliseconds(),
-        description = "真实设备根目录",
+        description = "Real device root",
         path = "/storage/emulated/0"
     )
 
-    // ✅ 进入页面时触发权限请求
+    // Request storage permission when the page is entered
     RequestStoragePermission()
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-            .padding(8.dp),
-        topBar = {
+    BasePage(
+        title = stringResource(id = "file_analysis"),
+        navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
+        onNavigationIconClick = onNavigateUp,
+        scrollBehavior = scrollBehavior,
+        actions = {
             FileAnalysisToolbar(
                 viewMode = viewMode,
                 onViewModeChange = { viewMode = it },
                 useMock = useMock,
                 onUseMockChange = { useMock = it },
-                scrollBehavior = scrollBehavior,
-                isAndroid = true, // ✅ 这里可以用 expect/actual 或 Build check
+                isAndroid = true, // TODO: Replace with expect/actual or Build check
                 sortMode = sortMode,
                 onSortModeChange = { sortMode = it },
                 sortOrder = sortOrder,
@@ -68,10 +86,11 @@ fun FileAnalysisScreen() {
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
+                .padding(8.dp)
         ) {
             Text(
-                if (useMock) "当前展示数据类型：教学模拟用（Android 文件系统结构）"
-                else "当前展示数据类型：真实文件系统（Android）",
+                if (useMock) stringResource(id = "current_data_type_simulation")
+                else stringResource(id = "current_data_type_real"),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.outline,
                 modifier = Modifier.padding(16.dp)
@@ -79,12 +98,12 @@ fun FileAnalysisScreen() {
 
             Spacer(Modifier.height(16.dp))
 
-            // 根据 sortMode 对文件排序
+            // Sort files based on sortMode
             val sortedRoot = root.copy(
                 children = root.sortedChildren(mode = sortMode, order = sortOrder)
             )
 
-            // 根据视图模式渲染
+            // Render based on view mode
             when (viewMode) {
                 ViewMode.LIST -> FileListView(sortedRoot)
                 ViewMode.GRID -> FileGridView(sortedRoot)
@@ -114,12 +133,12 @@ fun FileItem(node: FileNode, modifier: Modifier = Modifier) {
                         color = MaterialTheme.colorScheme.outline
                     )
                 }
-                val timeText = node.lastModified?.let { formatDateTime(it) } ?: "未知时间"
+                val timeText = node.lastModified?.let { formatDateTime(it) } ?: stringResource(id = "unknown_time")
                 if (node.isFolder) {
                     val folderCount = node.children.count { it.isFolder }
                     val fileCount = node.children.count { !it.isFolder }
                     Text(
-                        "$folderCount 文件夹 · $fileCount 文件 · $timeText",
+                        stringResource(id = "folder_details", folderCount, fileCount, timeText),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.secondary
                     )

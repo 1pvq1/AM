@@ -16,25 +16,26 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.screens.SettingsGroup
-import com.example.androidmaiden.screens.pages.rememberAdvancedLlmSettingsViewModel
+import com.example.androidmaiden.viewModels.rememberAdvancedLlmSettingsViewModel
 
 @Composable
 fun NetworkSettingsGroup() {
     val viewModel = rememberAdvancedLlmSettingsViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
-    SettingsGroup("Network") {
+    SettingsGroup(stringResource(id = "settings_network_title")) {
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             Text(
-                "Enter a URL to check if it is reachable. This is useful for verifying connection to external services or model providers.",
+                stringResource(id = "settings_network_description"),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
             OutlinedTextField(
                 value = uiState.websiteUrl,
                 onValueChange = viewModel::onWebsiteUrlChange,
-                label = { Text("Website URL") },
+                label = { Text(stringResource(id = "settings_network_website_url_label")) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(8.dp))
@@ -46,7 +47,7 @@ fun NetworkSettingsGroup() {
                 if (uiState.isCheckingWebsite) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp))
                 } else {
-                    Text("Check Connectivity")
+                    Text(stringResource(id = "settings_network_check_connectivity_button"))
                 }
             }
             Spacer(Modifier.height(8.dp))

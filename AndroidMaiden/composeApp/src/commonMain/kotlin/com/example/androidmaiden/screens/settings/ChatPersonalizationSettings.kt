@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.screens.SettingsGroup
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -43,7 +44,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun ChatPersonalizationSettingsGroup() {
     var chatBgColor by remember { mutableStateOf(Color.Transparent) }
 
-    SettingsGroup(title = "Chat Personalization") {
+    SettingsGroup(title = stringResource(id = "settings_chat_personalization_title")) {
         ChatPreview(backgroundColor = if (chatBgColor == Color.Transparent) MaterialTheme.colorScheme.surface else chatBgColor)
         Divider(modifier = Modifier.padding(vertical = 8.dp))
         ChatBackgroundSetting(
@@ -81,7 +82,7 @@ private fun ChatPreview(backgroundColor: Color) {
                 color = MaterialTheme.colorScheme.secondaryContainer
             ) {}
             Text(
-                "preview",
+                stringResource(id = "settings_chat_personalization_preview"),
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
                     .padding(4.dp).align(Alignment.End)
@@ -104,10 +105,10 @@ private fun ChatBackgroundSetting(selectedColor: Color, onColorSelected: (Color)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 Icons.Default.Wallpaper,
-                contentDescription = "Chat Background",
+                contentDescription = stringResource(id = "settings_chat_personalization_background"),
                 modifier = Modifier.padding(end = 16.dp)
             )
-            Text("Chat Background", style = MaterialTheme.typography.bodyLarge)
+            Text(stringResource(id = "settings_chat_personalization_background"), style = MaterialTheme.typography.bodyLarge)
         }
         Spacer(modifier = Modifier.height(12.dp))
         Row(
@@ -129,7 +130,7 @@ private fun ChatBackgroundSetting(selectedColor: Color, onColorSelected: (Color)
                     if (color == Color.Transparent) {
                         Icon(
                             Icons.Default.BrightnessAuto,
-                            contentDescription = "System Default",
+                            contentDescription = stringResource(id = "settings_chat_personalization_system_default"),
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -143,10 +144,10 @@ private fun ChatBackgroundSetting(selectedColor: Color, onColorSelected: (Color)
         ) {
             Icon(
                 Icons.Default.Image,
-                contentDescription = "Choose Image",
+                contentDescription = stringResource(id = "settings_chat_personalization_choose_image"),
                 modifier = Modifier.padding(end = 8.dp)
             )
-            Text("Choose from gallery")
+            Text(stringResource(id = "settings_chat_personalization_choose_from_gallery"))
         }
     }
 }
@@ -164,10 +165,10 @@ private fun UserAvatarSetting() {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     Icons.Default.AccountCircle,
-                    contentDescription = "Your Avatar",
+                    contentDescription = stringResource(id = "settings_chat_personalization_your_avatar"),
                     modifier = Modifier.padding(end = 16.dp)
                 )
-                Text("Your Avatar", style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(id = "settings_chat_personalization_your_avatar"), style = MaterialTheme.typography.bodyLarge)
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -178,7 +179,7 @@ private fun UserAvatarSetting() {
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Text(
-                            text = "Me",
+                            text = stringResource(id = "user_avatar_name"),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onPrimary
                         )
@@ -186,7 +187,7 @@ private fun UserAvatarSetting() {
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Button(onClick = { /* TODO: Handle avatar upload */ }) {
-                    Text("Upload the Avatar image")
+                    Text(stringResource(id = "settings_chat_personalization_upload_avatar_image"))
                 }
             }
         }
