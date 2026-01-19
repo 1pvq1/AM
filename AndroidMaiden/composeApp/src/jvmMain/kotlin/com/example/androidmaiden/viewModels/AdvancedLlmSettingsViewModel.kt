@@ -1,14 +1,12 @@
-package com.example.androidmaiden.screens.pages
+package com.example.androidmaiden.viewModels
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.androidmaiden.viewModels.AdvancedLlmSettingsUiState
-import com.example.androidmaiden.viewModels.AdvancedLlmSettingsViewModel
 import io.ktor.client.*
 import io.ktor.client.engine.java.*
 import io.ktor.client.request.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -19,8 +17,9 @@ actual fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel 
     return remember { AdvancedLlmSettingsViewModel() }
 }
 
-actual class AdvancedLlmSettingsViewModel : ViewModel() {
+actual class AdvancedLlmSettingsViewModel {
 
+    private val viewModelScope = CoroutineScope(Dispatchers.IO)
     private val _uiState = MutableStateFlow(AdvancedLlmSettingsUiState())
     actual val uiState = _uiState.asStateFlow()
 

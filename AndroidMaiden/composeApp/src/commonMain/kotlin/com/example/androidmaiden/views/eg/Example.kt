@@ -15,9 +15,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.views.character.CharacterLayout
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 class Example {
 }
+
+@Preview
+@Composable
+fun CommonUITaskPanelPreview() {
+    CommonUIBarCharacterSection(
+        onShowDialogChange = {},
+        showDialog = false,
+        onLayoutChange = {},
+        layout = CharacterLayout.Horizontal
+    )
+}
+
 
 @Composable
 fun CommonUIBarCharacterSection(
@@ -26,28 +39,32 @@ fun CommonUIBarCharacterSection(
     onLayoutChange: (CharacterLayout) -> Unit,
     layout: CharacterLayout
 ) {
-    // 显示切换按钮
-    Button(onClick = { onShowDialogChange(!showDialog) }) {
-        Text(if (showDialog) "\uD83D\uDCAC只显示人物" else "\uD83D\uDC64显示人物+对话")
-    }
+    Column {
+        // 显示切换按钮
+        Button(onClick = { onShowDialogChange(!showDialog) }) {
+            Text(if (showDialog) "\uD83D\uDCAC只显示人物" else "\uD83D\uDC64显示人物+对话")
+        }
 
-    if (showDialog) {
-        // 布局切换按钮
-        Button(onClick = {
-            onLayoutChange(
-                if (layout == CharacterLayout.Horizontal) CharacterLayout.Vertical
-                else CharacterLayout.Horizontal
-            )
-        }) {
-            Text("\uD83D\uDD04切换布局")
+        if (showDialog) {
+            // 布局切换按钮
+            Button(onClick = {
+                onLayoutChange(
+                    if (layout == CharacterLayout.Horizontal) CharacterLayout.Vertical
+                    else CharacterLayout.Horizontal
+                )
+            }) {
+                Text("\uD83D\uDD04切换布局")
+            }
+        }
+        // 预留开发中按钮
+        OutlinedButton(onClick = { /* TODO: 开发中功能 */ }) {
+            Text("\uD83D\uDEE0开发中…")
         }
     }
-    // 预留开发中按钮
-    OutlinedButton(onClick = { /* TODO: 开发中功能 */ }) {
-        Text("\uD83D\uDEE0开发中…")
-    }
+
 }
 
+@Preview
 @Composable
 fun CommonUITaskPanel() {
     Column(

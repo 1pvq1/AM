@@ -1,22 +1,24 @@
 package com.example.androidmaiden.viewModels
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.remember
 import com.example.androidmaiden.data.SettingsHolder
 import com.example.androidmaiden.data.validateApiKey
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 actual fun rememberLlmSettingsViewModel(): LlmSettingsViewModel {
-    return viewModel()
+    return remember { LlmSettingsViewModel() }
 }
 
-actual class LlmSettingsViewModel : ViewModel() {
+actual class LlmSettingsViewModel {
+
+    private val viewModelScope = CoroutineScope(Dispatchers.IO)
 
     private val _uiState = MutableStateFlow(
         LlmSettingsUiState(

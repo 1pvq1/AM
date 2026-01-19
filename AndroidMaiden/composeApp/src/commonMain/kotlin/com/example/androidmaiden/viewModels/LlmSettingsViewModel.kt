@@ -1,7 +1,6 @@
 package com.example.androidmaiden.viewModels
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 data class LlmSettingsUiState(
@@ -15,8 +14,8 @@ data class LlmSettingsUiState(
 @Composable
 expect fun rememberLlmSettingsViewModel(): LlmSettingsViewModel
 
-expect class LlmSettingsViewModel() : ViewModel {
+expect class LlmSettingsViewModel() {
     val uiState: StateFlow<LlmSettingsUiState>
     fun onApiKeyChange(apiKey: String)
-    fun loadModels()
+    fun validateApiKey()
 }

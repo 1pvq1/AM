@@ -6,7 +6,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 
 @Composable
-actual fun ShowDialogButton(showDialog: Boolean, onToggle: () -> Unit) {
+fun ShowDialogButton(showDialog: Boolean, onToggle: () -> Unit) {
     StyledButton(
         onClick = onToggle,
         icon = if (showDialog) Icons.AutoMirrored.Filled.Chat else Icons.Filled.Person,
@@ -16,7 +16,7 @@ actual fun ShowDialogButton(showDialog: Boolean, onToggle: () -> Unit) {
 }
 
 @Composable
-actual fun SwitchLayoutButton(enabled: Boolean, onSwitch: () -> Unit) {
+fun SwitchLayoutButton(enabled: Boolean, onSwitch: () -> Unit) {
     StyledButton(
         onClick = onSwitch,
         enabled = enabled,
@@ -27,7 +27,7 @@ actual fun SwitchLayoutButton(enabled: Boolean, onSwitch: () -> Unit) {
 }
 
 @Composable
-actual fun DevButton() {
+fun DevButton() {
     StyledButton(
         onClick = { /* TODO */ },
         icon = Icons.Filled.Build,

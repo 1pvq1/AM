@@ -1,7 +1,6 @@
 package com.example.androidmaiden.viewModels
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 data class AdvancedLlmSettingsUiState(
@@ -16,7 +15,7 @@ data class AdvancedLlmSettingsUiState(
 @Composable
 expect fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel
 
-expect class AdvancedLlmSettingsViewModel() : ViewModel {
+expect class AdvancedLlmSettingsViewModel() {
     val uiState: StateFlow<AdvancedLlmSettingsUiState>
 
     fun onWebsiteUrlChange(url: String)

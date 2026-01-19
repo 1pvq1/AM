@@ -1,7 +1,6 @@
 package com.example.androidmaiden.viewModels
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.ktor.client.*
@@ -11,10 +10,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 actual fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel {
-    return remember { AdvancedLlmSettingsViewModel() }
+    return viewModel()
 }
 
 actual class AdvancedLlmSettingsViewModel : ViewModel() {
