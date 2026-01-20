@@ -43,6 +43,7 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
+
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
@@ -125,6 +126,25 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.example.androidmaiden"
             packageVersion = "1.0.0"
+
+//  To change the icon of the packaged executable (e.g., .exe on Windows or .dmg on macOS)
+
+            // Global icon setting
+//            iconFile.set(project.file("src/desktopMain/resources/icon.ico"))
+            
+            // Platform-specific overrides
+//            windows {
+//                iconFile.set(project.file("icons/windows.ico"))
+//            }
+//            macOS {
+//                iconFile.set(project.file("icons/macos.icns"))
+                // Optional: set icon via JVM argument for macOS dock
+//                freeCompilerArgs += listOf("-Xdock:icon=icons/macos.icns")
+//            }
+//            linux {
+//                iconFile.set(project.file("icons/linux.png"))
+//            }
+
         }
     }
 }
