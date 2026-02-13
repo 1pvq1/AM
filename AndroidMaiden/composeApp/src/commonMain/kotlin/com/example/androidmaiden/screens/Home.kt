@@ -79,7 +79,7 @@ fun CharacterSection() {
 fun TaskSection() {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "今日任务",
+            text = "Daily tasks",
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(bottom = 8.dp)
         )

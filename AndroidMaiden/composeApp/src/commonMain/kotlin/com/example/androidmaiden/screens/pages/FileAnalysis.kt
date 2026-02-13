@@ -1,38 +1,24 @@
 package com.example.androidmaiden.screens.pages
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.mods.RequestStoragePermission
-import com.example.androidmaiden.mods.listFiles
 import com.example.androidmaiden.model.*
 import com.example.androidmaiden.ui.icons.fileTypeIcon
 import com.example.androidmaiden.ui.icons.folderTypeIcon
 import com.example.androidmaiden.utils.formatDateTime
-import com.example.androidmaiden.views.eg.simFileNode
+import com.example.androidmaiden.viewmodel.FileScannerViewModel
 import com.example.androidmaiden.views.fileSys.*
 import com.example.androidmaiden.views.panel.FileAnalysisToolbar
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 
@@ -44,19 +30,26 @@ fun FileAnalysisScreen(onNavigateUp: () -> Unit = {}) {
     var viewMode by remember { mutableStateOf(ViewMode.LIST) }
     var sortMode by remember { mutableStateOf(SortMode.NAME) }
     var sortOrder by remember { mutableStateOf(SortOrder.ASC) }
-    var useMock by remember { mutableStateOf(true) }
+//    var useMock by remember { mutableStateOf(true) }
 
-    val root = if (useMock) simFileNode()
-    else FileNode(
-        name = "/",
-        nodeType = NodeType.FOLDER,
-        folderType = FolderType.FOLDER,
-        dataSource = DataSource.REAL,
-        children = listFiles("/storage/emulated/0"), // Public storage root
-        lastModified = Clock.System.now().toEpochMilliseconds(),
-        description = "Real device root",
-        path = "/storage/emulated/0"
-    )
+//    val root = if (useMock) simFileNode()
+//    else FileNode(
+//        name = "/",
+//        nodeType = NodeType.FOLDER,
+//        folderType = FolderType.FOLDER,
+//        dataSource = DataSource.REAL,
+//        children = listFiles("/storage/emulated/0"),
+//        lastModified = Clock.System.now().toEpochMilliseconds(),
+//        description = "Real device root",
+//        path = "/storage/emulated/0"
+//    )
+
+    val vm = remember { FileScannerViewModel() }
+    var useMock = vm.useMock
+    LaunchedEffect(Unit) { vm.loadRoot(useMock) }
+    val root = vm.fileTree
+    val isLoading = vm.isLoading
+    val loadError = vm.loadError
 
     // Request storage permission when the page is entered
     RequestStoragePermission()
@@ -73,7 +66,8 @@ fun FileAnalysisScreen(onNavigateUp: () -> Unit = {}) {
                 viewMode = viewMode,
                 onViewModeChange = { viewMode = it },
                 useMock = useMock,
-                onUseMockChange = { useMock = it },
+//                onUseMockChange = { useMock = it },
+                onUseMockChange = {  vm.toggleSource() },
                 isAndroid = true, // TODO: Replace with expect/actual or Build check
                 sortMode = sortMode,
                 onSortModeChange = { sortMode = it },
@@ -98,16 +92,41 @@ fun FileAnalysisScreen(onNavigateUp: () -> Unit = {}) {
 
             Spacer(Modifier.height(16.dp))
 
-            // Sort files based on sortMode
-            val sortedRoot = root.copy(
-                children = root.sortedChildren(mode = sortMode, order = sortOrder)
-            )
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
 
-            // Render based on view mode
-            when (viewMode) {
-                ViewMode.LIST -> FileListView(sortedRoot)
-                ViewMode.GRID -> FileGridView(sortedRoot)
-                ViewMode.TREE -> FileTreeView(sortedRoot)
+                loadError != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = loadError,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+                root != null -> {
+                    // Sort files based on sortMode
+                    val sortedRoot = root.copy(
+                        children = root.sortedChildren(mode = sortMode, order = sortOrder)
+                    )
+
+                    // Render based on view mode
+                    when (viewMode) {
+                        ViewMode.LIST -> FileListView(sortedRoot)
+                        ViewMode.GRID -> FileGridView(sortedRoot)
+                        ViewMode.TREE -> FileTreeView(sortedRoot)
+                    }
+                }
             }
         }
     }
@@ -133,7 +152,8 @@ fun FileItem(node: FileNode, modifier: Modifier = Modifier) {
                         color = MaterialTheme.colorScheme.outline
                     )
                 }
-                val timeText = node.lastModified?.let { formatDateTime(it) } ?: stringResource(id = "unknown_time")
+                val timeText = node.lastModified?.let { formatDateTime(it) }
+                    ?: stringResource(id = "unknown_time")
                 if (node.isFolder) {
                     val folderCount = node.children.count { it.isFolder }
                     val fileCount = node.children.count { !it.isFolder }

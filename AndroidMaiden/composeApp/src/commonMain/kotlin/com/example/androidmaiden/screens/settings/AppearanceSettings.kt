@@ -1,14 +1,10 @@
 package com.example.androidmaiden.screens.settings
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.ButtonDisplayStyle
 import com.example.androidmaiden.Res.stringResource
@@ -77,7 +74,18 @@ private fun ThemeSetting(previewThemeMode: ThemeMode, onThemePreview: (ThemeMode
                     onClick = { onThemePreview(mode) },
                     shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size)
                 ) {
-                    Text(label)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = when (mode) {
+                                ThemeMode.LIGHT -> Icons.Filled.LightMode
+                                ThemeMode.DARK -> Icons.Filled.DarkMode
+                                ThemeMode.SYSTEM -> Icons.Filled.SettingsBrightness
+                            },
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp).padding(end = 4.dp)
+                        )
+                        Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
                 }
             }
         }
@@ -111,9 +119,28 @@ private fun ButtonDisplayStyleSetting(
                 SegmentedButton(
                     selected = currentStyle == style,
                     onClick = { onStyleChange(style) },
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size)
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                    modifier = Modifier
+                        .height(48.dp)
+                        .weight(1f) // Distribute evenly
                 ) {
-                    Text(label)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = when (style) {
+                                ButtonDisplayStyle.ICON_AND_TEXT -> Icons.Filled.Apps
+                                ButtonDisplayStyle.ICON_ONLY -> Icons.Filled.Star // pick suitable icon
+                                ButtonDisplayStyle.TEXT_ONLY -> Icons.Filled.FontDownload
+                            },
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp).padding(end = 4.dp)
+                        )
+                        Text(
+                            text = label,
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
         }

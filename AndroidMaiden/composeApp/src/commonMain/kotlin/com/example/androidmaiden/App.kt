@@ -10,22 +10,26 @@ import com.example.androidmaiden.screens.*
 import com.example.androidmaiden.screens.pages.AdvancedLlmSettingsPage
 import com.example.androidmaiden.screens.pages.CharacterInteractionPage
 import com.example.androidmaiden.screens.pages.FileAnalysisScreen
+import com.example.androidmaiden.screens.pages.FileClassifyScreen
 import com.example.androidmaiden.screens.pages.FilesScreen
 import com.example.androidmaiden.screens.pages.TodoPage
 import com.example.androidmaiden.ui.AppNavigationBar
+import com.example.androidmaiden.viewmodel.FileScannerViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-// 定义导航目的地
+// Define dst for navigator
 sealed class Screen(val title: String) {
-    object Home : Screen("首页")
-    object Skills : Screen("技能")
-    object Settings : Screen("设置")
-    object Files : Screen("文件管理")
-    object FileAnalysis : Screen("文件分析")
-    object Todo : Screen("待办事项")
-    object CharacterInteraction : Screen("人物交流")
-    object AdvancedLlmSettings : Screen("高级LLM设置")
+    object Home : Screen("Home")
+    object Skills : Screen("Skills")
+    object Settings : Screen("Settings")
+    object Files : Screen("File Management")
+    object FileAnalysis : Screen("File Analysis")
+    object FileClassify : Screen("File Classify")
+    object Todo : Screen("Todo Lists")
+    object CharacterInteraction : Screen("Chat with AI")
+    object AdvancedLlmSettings : Screen("Advanced LLM Settings")
 }
+
 @Preview
 @Composable
 fun App() {
@@ -39,6 +43,7 @@ fun App() {
     }
 
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
+
 
     CompositionLocalProvider(LocalButtonDisplayStyle provides buttonDisplayStyle) {
         MaterialTheme(colorScheme = if (isDarkTheme) darkColorScheme() else lightColorScheme()) {
@@ -74,7 +79,14 @@ fun App() {
                         })
 
                         is Screen.FileAnalysis -> FileAnalysisScreen()
+                        is Screen.FileClassify -> FileClassifyScreen(
+                            categories = TODO(),
+                            onCategoryClick = TODO(),
+                            onBack = TODO()
+                        )
+
                         is Screen.Todo -> TodoPage()
+
                         is Screen.CharacterInteraction -> CharacterInteractionPage()
                         is Screen.AdvancedLlmSettings -> AdvancedLlmSettingsPage(onNavigateBack = {
                             currentScreen = Screen.Settings

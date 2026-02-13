@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.viewModels.TodoViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data class TodoItem(
@@ -20,13 +21,12 @@ data class TodoItem(
     val isChecked: Boolean
 )
 
+@Preview(showBackground = true)
 @Composable
-fun TodoPage() {
-    val todoItems = remember { mutableStateListOf<TodoItem>() }
-    var newTodoText by remember { mutableStateOf("") }
-    var showEditDialog by remember { mutableStateOf(false) }
-    var itemToEdit by remember { mutableStateOf<TodoItem?>(null) }
-    var nextId by remember { mutableStateOf(0L) }
+fun TodoPage(viewModel: TodoViewModel = remember { TodoViewModel() }) {
+    val todoItems = viewModel.items
+    val newTodoText = viewModel.newText
+    val itemToEdit = viewModel.itemToEdit
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp)
@@ -39,69 +39,125 @@ fun TodoPage() {
         ) {
             OutlinedTextField(
                 value = newTodoText,
-                onValueChange = { newTodoText = it },
+                onValueChange = { viewModel.onNewTextChanged(it) },
                 label = { Text("New Task") },
                 modifier = Modifier.weight(1f),
                 singleLine = true
             )
             Spacer(modifier = Modifier.width(8.dp))
             Button(
-                onClick = {
-                    if (newTodoText.isNotBlank()) {
-                        todoItems.add(
-                            TodoItem(
-                                id = nextId++,
-                                text = newTodoText,
-                                isChecked = false
-                            )
-                        )
-                        newTodoText = ""
-                    }
-                },
+                onClick = viewModel::addItem,
                 enabled = newTodoText.isNotBlank()
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Task")
             }
         }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            itemsIndexed(todoItems, key = { _, item -> item.id }) { index, item ->
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            itemsIndexed(todoItems, key = { _, item -> item.id }) { _, item ->
                 TodoListItem(
                     item = item,
-                    onCheckedChange = { isChecked ->
-                        todoItems[index] = item.copy(isChecked = isChecked)
-                    },
-                    onDelete = { todoItems.remove(item) },
-                    onEdit = {
-                        itemToEdit = item
-                        showEditDialog = true
-                    }
+                    onCheckedChange = { checked -> viewModel.toggleChecked(item, checked) },
+                    onDelete = { viewModel.deleteItem(item) },
+                    onEdit = { viewModel.startEdit(item) }
                 )
                 HorizontalDivider()
             }
         }
     }
 
-    if (showEditDialog && itemToEdit != null) {
+    itemToEdit?.let { item ->
         EditTodoDialog(
-            item = itemToEdit!!,
-            onDismiss = {
-                showEditDialog = false
-                itemToEdit = null
-            },
-            onSave = { newText ->
-                val index = todoItems.indexOf(itemToEdit)
-                if (index != -1) {
-                    todoItems[index] = itemToEdit!!.copy(text = newText)
-                }
-                showEditDialog = false
-                itemToEdit = null
-            }
+            item = item,
+            onDismiss = viewModel::cancelEdit,
+            onSave = { newText -> viewModel.updateItem(item, newText) }
         )
     }
 }
+
+//@Preview
+//@Composable
+//fun TodoPage() {
+//    val todoItems = remember { mutableStateListOf<TodoItem>() }
+//    var newTodoText by remember { mutableStateOf("") }
+//    var showEditDialog by remember { mutableStateOf(false) }
+//    var itemToEdit by remember { mutableStateOf<TodoItem?>(null) }
+//    var nextId by remember { mutableStateOf(0L) }
+//
+//    Column(
+//        modifier = Modifier.fillMaxSize().padding(16.dp)
+//    ) {
+//        Text("Todo List", style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(bottom = 16.dp))
+//
+//        Row(
+//            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            OutlinedTextField(
+//                value = newTodoText,
+//                onValueChange = { newTodoText = it },
+//                label = { Text("New Task") },
+//                modifier = Modifier.weight(1f),
+//                singleLine = true
+//            )
+//            Spacer(modifier = Modifier.width(8.dp))
+//            Button(
+//                onClick = {
+//                    if (newTodoText.isNotBlank()) {
+//                        todoItems.add(
+//                            TodoItem(
+//                                id = nextId++,
+//                                text = newTodoText,
+//                                isChecked = false
+//                            )
+//                        )
+//                        newTodoText = ""
+//                    }
+//                },
+//                enabled = newTodoText.isNotBlank()
+//            ) {
+//                Icon(Icons.Default.Add, contentDescription = "Add Task")
+//            }
+//        }
+//
+//        LazyColumn(
+//            modifier = Modifier.fillMaxSize()
+//        ) {
+//            itemsIndexed(todoItems, key = { _, item -> item.id }) { index, item ->
+//                TodoListItem(
+//                    item = item,
+//                    onCheckedChange = { isChecked ->
+//                        todoItems[index] = item.copy(isChecked = isChecked)
+//                    },
+//                    onDelete = { todoItems.remove(item) },
+//                    onEdit = {
+//                        itemToEdit = item
+//                        showEditDialog = true
+//                    }
+//                )
+//                HorizontalDivider()
+//            }
+//        }
+//    }
+//
+//    if (showEditDialog && itemToEdit != null) {
+//        EditTodoDialog(
+//            item = itemToEdit!!,
+//            onDismiss = {
+//                showEditDialog = false
+//                itemToEdit = null
+//            },
+//            onSave = { newText ->
+//                val index = todoItems.indexOf(itemToEdit)
+//                if (index != -1) {
+//                    todoItems[index] = itemToEdit!!.copy(text = newText)
+//                }
+//                showEditDialog = false
+//                itemToEdit = null
+//            }
+//        )
+//    }
+//}
 
 @Composable
 fun TodoListItem(
@@ -138,6 +194,15 @@ fun TodoListItem(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun EditTodoDialogPreview() {
+    EditTodoDialog(
+        item = TodoItem(id = 1L, text = "Preview Task", isChecked = false),
+        onDismiss = {},
+        onSave = {}
+    )
+}
 @Composable
 fun EditTodoDialog(
     item: TodoItem,
@@ -175,8 +240,3 @@ fun EditTodoDialog(
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun TodoPagePreview() {
-    TodoPage()
-}
