@@ -9,6 +9,8 @@ import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.ui.icons.ToolbarIcon
 import com.example.androidmaiden.ui.icons.toolbarIcon
+import com.example.androidmaiden.utils.SortMode
+import com.example.androidmaiden.utils.SortOrder
 import com.example.androidmaiden.views.fileSys.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
 

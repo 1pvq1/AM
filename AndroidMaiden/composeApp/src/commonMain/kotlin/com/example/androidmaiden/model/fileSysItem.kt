@@ -1,21 +1,10 @@
 package com.example.androidmaiden.model
 
-// Todo： future
-//enum class FileType {
-//    FOLDER, DOCUMENT, IMAGE, MUSIC, VIDEO, OTHER
-//}
-
-//oldFileNode{
-//    val type: NodeType,
-//    val isMock: Boolean = true,
-//    val isDirectory: Boolean,
-//    val type: FileType = if (isDirectory) FileType.FOLDER else FileType.OTHER,
-//}
-
-// 文件夹类别，用于显示特定文件夹图标以区分不同于默认文件夹图标
+// Folder categories that display specific folder icons to distinguish them from the default folder icons
 enum class FolderType {
     FOLDER, DOCUMENT, IMAGE, MUSIC, VIDEO, OTHER
 }
+
 enum class NodeType { FILE, FOLDER }
 enum class DataSource { MOCK, REAL }
 
@@ -24,11 +13,11 @@ enum class DataSource { MOCK, REAL }
  */
 data class FileNode(
     val name: String,
-    val size: Long? = null,            // 文件字节大小；文件夹可为 null
-    val lastModified: Long? = null,    // epoch millis；不可得时为 null
-    val nodeType: NodeType,            // ✅ 用于排序逻辑
-    val folderType: FolderType = FolderType.FOLDER, // ✅ 用于 UI 图标显示
-    val description: String = "",      // 用于教学说明
+    val size: Long? = null,            // file size; folders can be null
+    val lastModified: Long? = null,    // epoch millis；It is null when it cannot be obtained
+    val nodeType: NodeType,            // Used for sorting logic
+    val folderType: FolderType = FolderType.FOLDER, // Used for UI icon display
+    val description: String = "",      // For instructional instructions
     val dataSource: DataSource = DataSource.MOCK,
     val children: List<FileNode> = emptyList(),
     val path: String? = null

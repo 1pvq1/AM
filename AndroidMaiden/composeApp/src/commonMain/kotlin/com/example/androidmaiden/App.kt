@@ -11,8 +11,12 @@ import com.example.androidmaiden.screens.pages.AdvancedLlmSettingsPage
 import com.example.androidmaiden.screens.pages.CharacterInteractionPage
 import com.example.androidmaiden.screens.pages.FileAnalysisScreen
 import com.example.androidmaiden.screens.pages.FileClassifyScreen
+import com.example.androidmaiden.screens.pages.FileCategory
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import com.example.androidmaiden.screens.pages.FilesScreen
 import com.example.androidmaiden.screens.pages.TodoPage
+import com.example.androidmaiden.screens.pages.getSampleCategories
 import com.example.androidmaiden.ui.AppNavigationBar
 import com.example.androidmaiden.viewmodel.FileScannerViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -78,11 +82,19 @@ fun App() {
                             currentScreen = screen
                         })
 
-                        is Screen.FileAnalysis -> FileAnalysisScreen()
+                        is Screen.FileAnalysis -> FileAnalysisScreen(onNavigateUp = {
+                            currentScreen = Screen.Files
+                        })
+
                         is Screen.FileClassify -> FileClassifyScreen(
-                            categories = TODO(),
-                            onCategoryClick = TODO(),
-                            onBack = TODO()
+                            categories = getSampleCategories(),
+                            onCategoryClick = { category ->
+                                // The screen will show a simple list dialog on click; keep this hook for future navigation.
+                                println("Clicked category: ${category.name}")
+                            },
+                            onBack = {
+                                currentScreen = Screen.Files
+                            }
                         )
 
                         is Screen.Todo -> TodoPage()

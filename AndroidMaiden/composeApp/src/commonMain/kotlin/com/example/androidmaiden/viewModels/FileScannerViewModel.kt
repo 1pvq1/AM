@@ -27,6 +27,9 @@ class FileScannerViewModel {
     var useMock by mutableStateOf(true)
         private set
 
+    /**
+     *  Only for the screen: File Analysis Screen
+     * */
     fun toggleSource(){
         useMock = !useMock
         loadRoot(useMock)

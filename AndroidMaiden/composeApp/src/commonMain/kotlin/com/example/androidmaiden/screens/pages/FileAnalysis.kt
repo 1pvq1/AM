@@ -14,7 +14,10 @@ import com.example.androidmaiden.mods.RequestStoragePermission
 import com.example.androidmaiden.model.*
 import com.example.androidmaiden.ui.icons.fileTypeIcon
 import com.example.androidmaiden.ui.icons.folderTypeIcon
+import com.example.androidmaiden.utils.SortMode
+import com.example.androidmaiden.utils.SortOrder
 import com.example.androidmaiden.utils.formatDateTime
+import com.example.androidmaiden.utils.sortedChildren
 import com.example.androidmaiden.viewmodel.FileScannerViewModel
 import com.example.androidmaiden.views.fileSys.*
 import com.example.androidmaiden.views.panel.FileAnalysisToolbar
@@ -31,18 +34,6 @@ fun FileAnalysisScreen(onNavigateUp: () -> Unit = {}) {
     var sortMode by remember { mutableStateOf(SortMode.NAME) }
     var sortOrder by remember { mutableStateOf(SortOrder.ASC) }
 //    var useMock by remember { mutableStateOf(true) }
-
-//    val root = if (useMock) simFileNode()
-//    else FileNode(
-//        name = "/",
-//        nodeType = NodeType.FOLDER,
-//        folderType = FolderType.FOLDER,
-//        dataSource = DataSource.REAL,
-//        children = listFiles("/storage/emulated/0"),
-//        lastModified = Clock.System.now().toEpochMilliseconds(),
-//        description = "Real device root",
-//        path = "/storage/emulated/0"
-//    )
 
     val vm = remember { FileScannerViewModel() }
     var useMock = vm.useMock

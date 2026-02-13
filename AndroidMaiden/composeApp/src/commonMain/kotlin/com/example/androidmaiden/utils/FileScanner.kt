@@ -39,10 +39,30 @@ fun FileNode.totalSizeByType(): Map<String, Long> {
 fun FileNode.extensionGroup(): String {
     val name = this.name.lowercase()
     return when {
-        name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".gif") -> "Images"
-        name.endsWith(".mp4") || name.endsWith(".avi") || name.endsWith(".mkv") -> "Videos"
-        name.endsWith(".pdf") || name.endsWith(".doc") || name.endsWith(".docx") -> "Documents"
-        name.endsWith(".apk") -> "APKs"
+        // Images
+        name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".gif") ||
+            name.endsWith(".webp") || name.endsWith(".bmp") || name.endsWith(".heic") || name.endsWith(".heif") -> "Images"
+
+        // Videos
+        name.endsWith(".mp4") || name.endsWith(".avi") || name.endsWith(".mkv") || name.endsWith(".mov") ||
+            name.endsWith(".wmv") || name.endsWith(".webm") || name.endsWith(".m4v") -> "Videos"
+
+        // Audio
+        name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".flac") || name.endsWith(".aac") ||
+            name.endsWith(".m4a") || name.endsWith(".ogg") || name.endsWith(".opus") -> "Audio"
+
+        // Documents
+        name.endsWith(".pdf") || name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".xls") ||
+            name.endsWith(".xlsx") || name.endsWith(".ppt") || name.endsWith(".pptx") || name.endsWith(".txt") ||
+            name.endsWith(".md") || name.endsWith(".rtf") -> "Documents"
+
+        // Application packages
+        name.endsWith(".apk") || name.endsWith(".aab") -> "APKs"
+
+        // Archives
+        name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z") || name.endsWith(".tar") ||
+            name.endsWith(".gz") || name.endsWith(".bz2") || name.endsWith(".xz") -> "Archives"
+
         else -> "Others"
     }
 }
