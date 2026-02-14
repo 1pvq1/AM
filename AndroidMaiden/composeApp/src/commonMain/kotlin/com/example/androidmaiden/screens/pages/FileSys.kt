@@ -1,6 +1,11 @@
 package com.example.androidmaiden.screens.pages
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -9,14 +14,15 @@ import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.Style
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.Screen
+import com.example.androidmaiden.ui.BaseCard
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -53,56 +59,16 @@ fun FilesScreen(onNavigate: (Screen) -> Unit) {
         Spacer(Modifier.height(16.dp))
 
         features.forEach { feature ->
-            FileFeatureCard(feature = feature, onClick = { feature.screen?.let(onNavigate) })
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FileFeatureCard(feature: FileFeature, onClick: () -> Unit) {
-    val isClickable = feature.screen != null
-    val cardColors = if (isClickable) {
-        CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-    } else {
-        CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-    }
-
-    Card(
-        onClick = { if (isClickable) onClick() },
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp, hoveredElevation = 4.dp, pressedElevation = 1.dp),
-        colors = cardColors
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            Icon(
-                imageVector = feature.icon,
-                contentDescription = null, // Decorative
-                modifier = Modifier.size(40.dp),
-                tint = if (isClickable) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            val isClickable = feature.screen != null
+            BaseCard(
+                title = feature.title,
+                description = feature.description,
+                icon = feature.icon,
+                onClick = { feature.screen?.let(onNavigate) },
+                isClickable = isClickable,
+                trailingIcon = if (isClickable) Icons.AutoMirrored.Filled.ArrowForward else null,
+                iconTint = MaterialTheme.colorScheme.secondary
             )
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = feature.title, style = MaterialTheme.typography.titleLarge)
-                Text(
-                    text = feature.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (isClickable) 1f else 0.6f)
-                )
-            }
-
-            if (isClickable) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = stringResource(id = "details"),
-                    tint = MaterialTheme.colorScheme.outline
-                )
-            }
         }
     }
 }

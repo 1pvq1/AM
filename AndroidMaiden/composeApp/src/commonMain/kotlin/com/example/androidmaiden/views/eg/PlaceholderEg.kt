@@ -84,3 +84,13 @@ fun PlaceholderCard(
         }
     }
 }
+
+@Preview
+@Composable
+fun PlaceholderScreenPreview() {
+    PlaceholderScreen(
+        title = "Sample Title",
+        description = "This is a sample description for the placeholder screen.",
+        actions = listOf("Action 1", "Action 2")
+    )
+}

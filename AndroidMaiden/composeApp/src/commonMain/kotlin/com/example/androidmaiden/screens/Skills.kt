@@ -1,18 +1,27 @@
 package com.example.androidmaiden.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Screen
+import com.example.androidmaiden.ui.BaseCard
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data class Feature(
@@ -61,41 +70,12 @@ fun SkillsPage(onNavigate: (Screen) -> Unit = {}) {
 @Composable
 fun FeatureCard(feature: Feature, onClick: () -> Unit) {
     val isClickable = feature.screen != null
-    Card(
-        onClick = { if (isClickable) onClick() },
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp, hoveredElevation = 4.dp, pressedElevation = 1.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Icon(
-                imageVector = feature.icon,
-                contentDescription = null, // Decorative
-                modifier = Modifier.size(40.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = feature.title, style = MaterialTheme.typography.titleLarge)
-                Text(
-                    text = feature.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            // Only those devices with a jump function will display the "Details" button.
-            if (isClickable) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "Details",
-                    tint = MaterialTheme.colorScheme.outline
-                )
-            }
-        }
-    }
+    BaseCard(
+        title = feature.title,
+        description = feature.description,
+        icon = feature.icon,
+        onClick = onClick,
+        isClickable = isClickable,
+        trailingIcon = if (isClickable) Icons.AutoMirrored.Filled.ArrowForward else null
+    )
 }

@@ -1,6 +1,5 @@
 package com.example.androidmaiden.screens.pages
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,7 +22,7 @@ data class FileCategory(
 //@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FileClassifyScreen(
+fun FileClassifyPage(
     categories: List<FileCategory>,
     onCategoryClick: (FileCategory) -> Unit = {},
     onBack: () -> Unit = {}
@@ -146,7 +145,7 @@ fun FileCategoryCard(category: FileCategory, onClick: () -> Unit) {
 @Composable
 fun FileClassifyScreenPreview() {
     val sampleCategories = getSampleCategories()
-    FileClassifyScreen(
+    FileClassifyPage(
         categories = sampleCategories,
         onBack = {},
         onCategoryClick = {}
