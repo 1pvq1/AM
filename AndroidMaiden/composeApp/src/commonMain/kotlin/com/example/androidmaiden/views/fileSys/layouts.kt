@@ -13,15 +13,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.model.FileNode
 import com.example.androidmaiden.screens.pages.FileItem
-import com.example.androidmaiden.ui.icons.folderTypeIcon
+import com.example.androidmaiden.ui.icons.folderIcon
+import com.example.androidmaiden.views.eg.simFileNode
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.collections.chunked
 import kotlin.collections.forEach
 
 enum class ViewMode { LIST, GRID, TREE }
 
-
+@Preview
 @Composable
-fun FileListView(root: FileNode) {
+fun FileListView(root: FileNode = simFileNode()) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item{Text("List 视图")}
         items(root.children) { node ->
@@ -30,8 +32,9 @@ fun FileListView(root: FileNode) {
     }
 }
 
+@Preview
 @Composable
-fun FileGridView(root: FileNode) {
+fun FileGridView(root: FileNode = simFileNode()) {
     // 如果用 Compose Multiplatform，可以用 LazyVerticalGrid
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -46,8 +49,9 @@ fun FileGridView(root: FileNode) {
     }
 }
 
+@Preview
 @Composable
-fun FileTreeView(root: FileNode) {
+fun FileTreeView(root: FileNode = simFileNode()) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -70,7 +74,7 @@ fun FileTreeNode(node: FileNode, indent: Int) {
             }, verticalAlignment = Alignment.CenterVertically
         ) {
             // 图标
-            folderTypeIcon(node.folderType)?.let { icon ->
+            folderIcon(node.folderType)?.let { icon ->
                 Icon(
                     imageVector = icon,
                     contentDescription = node.name,

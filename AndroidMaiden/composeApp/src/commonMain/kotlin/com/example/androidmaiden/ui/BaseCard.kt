@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,6 +21,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.ui.tooling.preview.Preview
+
+@Preview
+@Composable
+fun BaseCardPreview() {
+    BaseCard(
+        title = "Title",
+        description = "Description",
+        icon = Icons.Default.Home,
+        onClick = {},
+        isClickable = true,
+        trailingIcon = Icons.Default.ArrowForward
+    )
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

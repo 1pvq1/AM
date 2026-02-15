@@ -26,7 +26,7 @@ import com.example.androidmaiden.ui.BaseCard
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun FileSysScreenPreview() {
     FilesScreen { }

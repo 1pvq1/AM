@@ -13,8 +13,8 @@ import com.example.androidmaiden.screens.pages.FileAnalysisScreen
 import com.example.androidmaiden.screens.pages.FileClassifyPage
 import com.example.androidmaiden.screens.pages.FilesScreen
 import com.example.androidmaiden.screens.pages.TodoPage
-import com.example.androidmaiden.screens.pages.getSampleCategories
 import com.example.androidmaiden.ui.AppNavigationBar
+import com.example.androidmaiden.views.eg.getSampleCategories
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // Define dst for navigator

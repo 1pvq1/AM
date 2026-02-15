@@ -1,8 +1,18 @@
 package com.example.androidmaiden.views.eg
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Videocam
 import com.example.androidmaiden.model.FileNode
 import com.example.androidmaiden.model.FolderType
 import com.example.androidmaiden.model.NodeType
+import com.example.androidmaiden.screens.pages.FileCategory
 
 // 模拟文件结构
 fun simFileNode(): FileNode {
@@ -247,3 +257,15 @@ fun simFileNode(): FileNode {
     )
 }
 
+fun getSampleCategories(): List<FileCategory> = listOf(
+    FileCategory("Images", Icons.Default.Image, 245, 512),
+    FileCategory("Videos", Icons.Default.Videocam, 87, 2048),
+    FileCategory("Audio", Icons.Default.MusicNote, 64, 980),
+    FileCategory("Documents", Icons.Default.Description, 120, 314),
+    FileCategory("APKs", Icons.Default.Android, 32, 822),
+    FileCategory("Archives", Icons.Default.Archive, 18, 420),
+    FileCategory("Others", Icons.Default.Folder, 53, 141),
+
+    FileCategory("Large Files", Icons.Default.Folder, 18, 7290),
+    FileCategory("Recent", Icons.Default.Schedule, 53, 141)
+)

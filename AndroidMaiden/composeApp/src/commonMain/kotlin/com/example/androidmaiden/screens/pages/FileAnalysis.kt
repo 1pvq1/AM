@@ -12,8 +12,8 @@ import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.mods.RequestStoragePermission
 import com.example.androidmaiden.model.*
-import com.example.androidmaiden.ui.icons.fileTypeIcon
-import com.example.androidmaiden.ui.icons.folderTypeIcon
+import com.example.androidmaiden.ui.icons.fileIcon
+import com.example.androidmaiden.ui.icons.folderIcon
 import com.example.androidmaiden.utils.SortMode
 import com.example.androidmaiden.utils.SortOrder
 import com.example.androidmaiden.utils.formatDateTime
@@ -127,9 +127,9 @@ fun FileAnalysisScreen(onNavigateUp: () -> Unit = {}) {
 @Composable
 fun FileItem(node: FileNode, modifier: Modifier = Modifier) {
     val icon = if (node.isFolder) {
-        folderTypeIcon(node.folderType)
+        folderIcon(node.folderType)
     } else {
-        fileTypeIcon(node.name)
+        fileIcon(node.name)
     }
 
     ListItem(
