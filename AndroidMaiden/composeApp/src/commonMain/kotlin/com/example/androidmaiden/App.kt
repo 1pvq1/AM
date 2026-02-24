@@ -14,7 +14,6 @@ import com.example.androidmaiden.screens.pages.FileClassifyPage
 import com.example.androidmaiden.screens.pages.FilesScreen
 import com.example.androidmaiden.screens.pages.TodoPage
 import com.example.androidmaiden.ui.AppNavigationBar
-import com.example.androidmaiden.views.eg.getSampleCategories
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // Define dst for navigator
@@ -83,11 +82,6 @@ fun App() {
                         })
 
                         is Screen.FileClassify -> FileClassifyPage(
-                            categories = getSampleCategories(),
-                            onCategoryClick = { category ->
-                                // The screen will show a simple list dialog on click; keep this hook for future navigation.
-                                println("Clicked category: ${category.name}")
-                            },
                             onBack = {
                                 currentScreen = Screen.Files
                             }

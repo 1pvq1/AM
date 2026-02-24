@@ -80,7 +80,6 @@ fun CharacterInteractionPage(onNavigateUp: () -> Unit = {}) {
      BasePage(
         title = stringResource(id = "character_interaction"),
         navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
-        onNavigationIconClick = onNavigateUp,
         actions = {
             IconButton(onClick = {
                 viewMode =

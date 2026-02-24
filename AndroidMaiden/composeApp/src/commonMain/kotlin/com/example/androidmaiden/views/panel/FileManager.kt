@@ -88,7 +88,7 @@ fun FileAnalysisToolbar(
             onSortOrderChange = onSortOrderChange
         )
     } else {
-        // ✅ 通用实现：上下两行
+        // ✅ General implementation: top and bottom lines
         FAToolBarGeneral(viewMode, onViewModeChange, sortMode, onSortModeChange)
     }
 }
@@ -116,7 +116,7 @@ fun FAToolBarAndroid(
         isAndroid = true
     )
 
-    // 模拟/真实数据切换
+    // Simulation/Real Data Switch
     TooltipBox(
         positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
         tooltip = { PlainTooltip { Text(stringResource(id = "toggle_simulation_real_data")) } },

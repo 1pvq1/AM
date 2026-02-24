@@ -257,15 +257,15 @@ fun simFileNode(): FileNode {
     )
 }
 
-fun getSampleCategories(): List<FileCategory> = listOf(
-    FileCategory("Images", Icons.Default.Image, 245, 512),
-    FileCategory("Videos", Icons.Default.Videocam, 87, 2048),
-    FileCategory("Audio", Icons.Default.MusicNote, 64, 980),
-    FileCategory("Documents", Icons.Default.Description, 120, 314),
-    FileCategory("APKs", Icons.Default.Android, 32, 822),
-    FileCategory("Archives", Icons.Default.Archive, 18, 420),
-    FileCategory("Others", Icons.Default.Folder, 53, 141),
-
-    FileCategory("Large Files", Icons.Default.Folder, 18, 7290),
-    FileCategory("Recent", Icons.Default.Schedule, 53, 141)
-)
+//fun getSampleCategories(): List<FileCategory> = listOf(
+//    FileCategory("Images", Icons.Default.Image, count = 245, totalSizeMb = 512),
+//    FileCategory("Videos", Icons.Default.Videocam, 87, 2048),
+//    FileCategory("Audio", Icons.Default.MusicNote, 64, 980),
+//    FileCategory("Documents", Icons.Default.Description, 120, 314),
+//    FileCategory("APKs", Icons.Default.Android, 32, 822),
+//    FileCategory("Archives", Icons.Default.Archive, 18, 420),
+//    FileCategory("Others", Icons.Default.Folder, 53, 141),
+//
+//    FileCategory("Large Files", Icons.Default.Folder, 18, 7290),
+//    FileCategory("Recent", Icons.Default.Schedule, 53, 141)
+//)

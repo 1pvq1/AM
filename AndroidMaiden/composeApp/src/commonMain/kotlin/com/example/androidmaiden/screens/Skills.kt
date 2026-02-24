@@ -8,11 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Forum
-import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,8 +36,9 @@ fun SkillsPage(onNavigate: (Screen) -> Unit = {}) {
         Feature(1, "任务管理", "添加、完成、删除任务", Icons.Default.Checklist, Screen.Todo),
         Feature(2, "人物交流", "展示立绘和对话框", Icons.Default.Forum, Screen.CharacterInteraction),
         Feature(3, "主题搭配", "自定义界面风格", Icons.Default.Palette),
-        Feature(4, "统计分析", "任务完成度统计", Icons.Default.BarChart),
-        Feature(5, "文件管理 ", "分析，归类，整理，清洁", Icons.Default.Folder, Screen.Files)
+        Feature(4, "统计分析", "综合信息统计", Icons.Default.BarChart),
+        Feature(5, "文件管理 ", "分析，归类，整理，清洁", Icons.Default.Folder, Screen.Files),
+        Feature(6, "硬件管理 ", "识别、维护、配置、检测硬件", Icons.Default.Hardware)
     )
     val scrollState = rememberScrollState()
     Column(

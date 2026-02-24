@@ -75,7 +75,7 @@ fun FileAnalysisScreen(onNavigateUp: () -> Unit = {}) {
         ) {
             Text(
                 if (useMock) stringResource(id = "current_data_type_simulation")
-                else stringResource(id = "current_data_type_real"),
+                else stringResource(id = "current_data_type_real") + "\nScanned path: ${root?.path ?: "Device Root"}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.outline,
                 modifier = Modifier.padding(16.dp)
