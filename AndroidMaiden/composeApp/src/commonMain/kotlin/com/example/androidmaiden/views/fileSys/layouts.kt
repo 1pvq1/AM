@@ -11,7 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.androidmaiden.model.FileNode
+import com.example.androidmaiden.model.FileSysNode
 import com.example.androidmaiden.screens.pages.FileItem
 import com.example.androidmaiden.ui.icons.folderIcon
 import com.example.androidmaiden.views.eg.simFileNode
@@ -23,7 +23,7 @@ enum class ViewMode { LIST, GRID, TREE }
 
 @Preview
 @Composable
-fun FileListView(root: FileNode = simFileNode()) {
+fun FileListView(root: FileSysNode = simFileNode()) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item{Text("List 视图")}
         items(root.children) { node ->
@@ -34,7 +34,7 @@ fun FileListView(root: FileNode = simFileNode()) {
 
 @Preview
 @Composable
-fun FileGridView(root: FileNode = simFileNode()) {
+fun FileGridView(root: FileSysNode = simFileNode()) {
     // 如果用 Compose Multiplatform，可以用 LazyVerticalGrid
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -51,7 +51,7 @@ fun FileGridView(root: FileNode = simFileNode()) {
 
 @Preview
 @Composable
-fun FileTreeView(root: FileNode = simFileNode()) {
+fun FileTreeView(root: FileSysNode = simFileNode()) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -64,7 +64,7 @@ fun FileTreeView(root: FileNode = simFileNode()) {
 }
 
 @Composable
-fun FileTreeNode(node: FileNode, indent: Int) {
+fun FileTreeNode(node: FileSysNode, indent: Int) {
     var expanded by remember { mutableStateOf(false) }
 
     Column {

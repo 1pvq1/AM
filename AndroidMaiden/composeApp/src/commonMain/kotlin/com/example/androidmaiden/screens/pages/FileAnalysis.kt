@@ -42,9 +42,6 @@ fun FileAnalysisScreen(onNavigateUp: () -> Unit = {}) {
     val isLoading = vm.isLoading
     val loadError = vm.loadError
 
-    // Request storage permission when the page is entered
-    RequestStoragePermission()
-
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     BasePage(
@@ -125,7 +122,7 @@ fun FileAnalysisScreen(onNavigateUp: () -> Unit = {}) {
 
 
 @Composable
-fun FileItem(node: FileNode, modifier: Modifier = Modifier) {
+fun FileItem(node: FileSysNode, modifier: Modifier = Modifier) {
     val icon = if (node.isFolder) {
         folderIcon(node.folderType)
     } else {

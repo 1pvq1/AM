@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.Screen
+import com.example.androidmaiden.mods.RequestStoragePermission
 import com.example.androidmaiden.ui.BaseCard
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -48,6 +49,10 @@ fun FilesScreen(onNavigate: (Screen) -> Unit) {
         FileFeature(stringResource(id = "clean"), stringResource(id = "clean_description"), Icons.Default.CleaningServices)
     )
     val scrollState = rememberScrollState()
+
+    // Request storage permission when the page is entered
+    RequestStoragePermission()
+
     Column(
         Modifier.fillMaxSize().padding(16.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp)

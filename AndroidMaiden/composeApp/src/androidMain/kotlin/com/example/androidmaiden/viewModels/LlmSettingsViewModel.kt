@@ -40,7 +40,9 @@ actual class LlmSettingsViewModel : ViewModel() {
                 val isValid = validateApiKey(key)
                 if (isValid) {
                     SettingsHolder.apiKey = key
-                    val models = listOf("gemini-1.5-pro-latest", "gemini-1.5-flash-latest", "gemini-1.0-pro")
+                    val version = 2.5
+                    val llmSize = listOf("pro", "flash","flash lite")
+                    val models = listOf("gemini$version-$llmSize", "gemini-$version-$llmSize", "gemini-$version-$llmSize")
                     _uiState.update {
                         it.copy(
                             models = models,

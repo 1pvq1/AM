@@ -53,7 +53,6 @@ fun SkillsPage(onNavigate: (Screen) -> Unit = {}) {
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-
         // Render feature cards
         features.forEach { feature ->
             FeatureCard(feature) {

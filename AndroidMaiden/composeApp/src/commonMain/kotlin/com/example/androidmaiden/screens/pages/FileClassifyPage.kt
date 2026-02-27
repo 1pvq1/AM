@@ -5,35 +5,25 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.androidmaiden.model.FileNode
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.room.util.TableInfo
+import com.example.androidmaiden.model.*
 import com.example.androidmaiden.utils.*
-import com.example.androidmaiden.viewmodel.FileScannerViewModel
+import com.example.androidmaiden.viewmodel.*
 import com.example.androidmaiden.views.fileSys.ViewMode
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 
-data class FileCategory(
-    val name: String,
-    val icon: ImageVector,
-    val type: String,
-    val count: Int? = null,
-    val totalSizeMb: Long? = null,
-    val files: List<FileNode> = emptyList()
-)
-
-private val defaultCategories = listOf(
+/* val initialCategories = listOf(
     FileCategory("Images", Icons.Default.Image, "Images"),
     FileCategory("Videos", Icons.Default.Videocam, "Videos"),
     FileCategory("Audio", Icons.Default.MusicNote, "Audio"),
@@ -43,63 +33,47 @@ private val defaultCategories = listOf(
     FileCategory("Large Files (> 50MB)", Icons.Default.DiscFull, "LargeFiles"),
     FileCategory("Recent Files (Last 7 Days)", Icons.Default.Schedule, "RecentFiles"),
     FileCategory("Other", Icons.AutoMirrored.Filled.InsertDriveFile, "Other")
-)
+)*/
 
-private suspend fun calculateCategoryDetails(
-    root: FileNode,
-    baseCategories: List<FileCategory>
-): List<FileCategory> = withContext(Dispatchers.Default) {
-    val files = root.flatten().filter { !it.isFolder }
-    val counts = root.countByType()
-    val sizes = root.totalSizeByType()
+// Instead of a hardcoded list, use the central definitions for the initial UI state, see in vm
 
-    val updated = baseCategories.map { category ->
-        when (category.type) {
-            "LargeFiles" -> {
-                val largeFiles = root.getLargeFiles(thresholdMb = 50)
-                val sizeMb = largeFiles.sumOf { it.size ?: 0L } / (1024 * 1024)
-                category.copy(count = largeFiles.size, totalSizeMb = sizeMb, files = largeFiles)
-            }
-
-            "RecentFiles" -> {
-                val recentFiles = root.getRecentFiles(withinMillis = 7 * 24 * 60 * 60 * 1000)
-                val sizeMb = recentFiles.sumOf { it.size ?: 0L } / (1024 * 1024)
-                category.copy(count = recentFiles.size, totalSizeMb = sizeMb, files = recentFiles)
-            }
-
-            else -> { // Standard file types including "Other"
-                val filesForCategory = files.filter { it.extensionGroup() == category.type }
-                val count = counts[category.type] ?: 0
-                val sizeMb = (sizes[category.type] ?: 0L) / (1024 * 1024)
-                category.copy(count = count, totalSizeMb = sizeMb, files = filesForCategory)
-            }
-        }
-    }
-    updated // No longer sorting to preserve section order
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+//fun FileClassifyPage(
+//    onBack: () -> Unit = {}, viewModel: PersistentFileViewModel = koinViewModel()
+//) {
 fun FileClassifyPage(onBack: () -> Unit = {}) {
-    val vm = remember { FileScannerViewModel() }
-    var categories by remember { mutableStateOf(defaultCategories) }
-    var viewMode by remember { mutableStateOf(ViewMode.LIST) } // Default View state
+//    var categories by remember { mutableStateOf(initialCategories) }
+//    var viewMode by remember { mutableStateOf(ViewMode.LIST) } // Default View state
+//    var selectedCategory by remember { mutableStateOf<FileCategory?>(null) }
+//    val vm = remember { FileScannerViewModel() }
 
-    LaunchedEffect(Unit) { // Load real data
-        vm.loadRoot(useMock = false)
-    }
+//    val isLoading = vm.isLoading
+//    val loadError = vm.loadError
+//    val fileTree = vm.fileTree
 
-    val isLoading = vm.isLoading
-    val loadError = vm.loadError
-    val fileTree = vm.fileTree
+//    LaunchedEffect(fileTree) {
+//        if (fileTree != null) {
+//            categories = calculateCategoryDetails(fileTree, initialCategories)
+//        }
+//    }
 
-    LaunchedEffect(fileTree) {
-        if (fileTree != null) {
-            categories = calculateCategoryDetails(fileTree, defaultCategories)
-        }
-    }
+    val vm: PersistentFileViewModel = koinViewModel()
 
+
+    // 1. Observe pre-calculated categories from the VM
+    val categories by vm.categories.collectAsState()
+    val isSyncing by vm.isSyncing.collectAsState()
+
+    var viewMode by remember { mutableStateOf(ViewMode.LIST) }
     var selectedCategory by remember { mutableStateOf<FileCategory?>(null) }
+
+    // 2. Trigger incremental sync once on startup
+    LaunchedEffect(Unit) { // Load real data
+//        vm.loadRoot(useMock = false)
+        vm.startSync()
+    }
 
     if (selectedCategory != null) {
         FileListPage(
@@ -108,13 +82,17 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
             onBack = { selectedCategory = null }
         )
     } else {
+        val scannedPath = vm.currentScannedPath.collectAsState()
         Scaffold(
             topBar = {
                 TopAppBar(
                     title = { Text("Classify Files") },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
                         }
                     },
                     actions = {
@@ -132,41 +110,28 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
                 )
             }
         ) { padding ->
-            Column(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-            ) {
-                if (fileTree != null) {
-                    Text(
-                        text = "Scanned path: ${fileTree.path ?: "Device Root"}",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
-                }
-                Box(
-                    modifier = Modifier.weight(1f)
-                ) {
-
+//            selectedCategory = fileSysNodeCategory(padding, viewMode, categories, selectedCategory)
+            Column(modifier = Modifier.fillMaxSize()) {
+//                Text(
+//                    text = "Scanned path: $scannedPath",
+//                    style = MaterialTheme.typography.labelMedium,
+//                    color = MaterialTheme.colorScheme.outline,
+//                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+//                )
+                Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+                    // 3. Render the categories directly
                     if (viewMode == ViewMode.LIST) {
                         CategoryListView(categories) { selectedCategory = it }
                     } else {
                         CategoryGridView(categories) { selectedCategory = it }
                     }
 
-                    when {
-                        isLoading && fileTree == null -> {
-                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                        }
-
-                        loadError != null -> {
-                            Text(
-                                text = "Error: $loadError",
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
+                    // 4. Show loading indicator only during the initial scan or background sync
+                    if (isSyncing && categories.isEmpty()) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }
@@ -174,21 +139,73 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
     }
 }
 
+//@Composable
+//private fun fileSysNodeCategory(
+//    padding: PaddingValues,
+//    viewMode: ViewMode,
+//    categories: List<FileCategory>,
+//    selectedCategory: FileCategory?
+//): FileCategory? {
+//    var selectedCategory1 = selectedCategory
+//    Column(
+//        modifier = Modifier
+//            .padding(padding)
+//            .fillMaxSize()
+//    ) {
+//        if (fileTree != null) {
+//            Text(
+//                text = "Scanned path: ${fileTree.path ?: "Device Root"}",
+//                style = MaterialTheme.typography.labelMedium,
+//                color = MaterialTheme.colorScheme.outline,
+//                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+//            )
+//        }
+//        Box(
+//            modifier = Modifier.weight(1f)
+//        ) {
+//
+//            if (viewMode == ViewMode.LIST) {
+//                CategoryListView(categories) { selectedCategory1 = it }
+//            } else {
+//                CategoryGridView(categories) { selectedCategory1 = it }
+//            }
+//
+//            when {
+//                isLoading && fileTree == null -> {
+//                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+//                }
+//
+//                loadError != null -> {
+//                    Text(
+//                        text = "Error: $loadError",
+//                        color = MaterialTheme.colorScheme.error,
+//                        modifier = Modifier.align(Alignment.Center)
+//                    )
+//                }
+//            }
+//        }
+//    }
+//    return selectedCategory1
+//}
+
 // --- List Layout ---
 @Composable
 private fun CategoryListView(categories: List<FileCategory>, onSelect: (FileCategory) -> Unit) {
+    val commonType = categories.subList(0, 6)
+    val sizeAndDateType = categories.subList(6, 8)
+    val otherType = categories.subList(8, categories.size)
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item { SectionHeader("Common Types") }
-        items(categories.subList(0, 6)) { FileCategoryCard(it, onClick = { onSelect(it) }) }
+        items(commonType) { FileCategoryCard(it, onClick = { onSelect(it) }) }
 
         item { SectionHeader("Size and Date") }
-        items(categories.subList(6, 8)) { FileCategoryCard(it, onClick = { onSelect(it) }) }
+        items(sizeAndDateType) { FileCategoryCard(it, onClick = { onSelect(it) }) }
 
         item { SectionHeader("Other") }
-        items(categories.subList(8, categories.size)) {
+        items(otherType) {
             FileCategoryCard(
                 it,
                 onClick = { onSelect(it) })
@@ -199,6 +216,10 @@ private fun CategoryListView(categories: List<FileCategory>, onSelect: (FileCate
 // --- Compact Grid Layout ---
 @Composable
 private fun CategoryGridView(categories: List<FileCategory>, onSelect: (FileCategory) -> Unit) {
+    val commonType = categories.subList(0, 6)
+    val sizeAndDateType = categories.subList(6, 8)
+    val otherType = categories.subList(8, categories.size)
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(16.dp),
@@ -206,13 +227,13 @@ private fun CategoryGridView(categories: List<FileCategory>, onSelect: (FileCate
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item(span = { GridItemSpan(2) }) { SectionHeader("Common Types") }
-        items(categories.subList(0, 6)) { FileCategoryStrip(it, onClick = { onSelect(it) }) }
+        items(commonType) { FileCategoryStrip(it, onClick = { onSelect(it) }) }
 
         item(span = { GridItemSpan(2) }) { SectionHeader("Size and Date") }
-        items(categories.subList(6, 8)) { FileCategoryStrip(it, onClick = { onSelect(it) }) }
+        items(sizeAndDateType) { FileCategoryStrip(it, onClick = { onSelect(it) }) }
 
         item(span = { GridItemSpan(2) }) { SectionHeader("Other") }
-        items(categories.subList(8, categories.size)) {
+        items(otherType) {
             FileCategoryStrip(
                 it,
                 onClick = { onSelect(it) })
@@ -314,8 +335,22 @@ private fun FileCategoryCard(category: FileCategory, onClick: () -> Unit) {
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun FileClassifyPagePreview() {
     FileClassifyPage()
 }
+
+@Preview
+@Composable
+fun CategoryListViewPreview() {
+    CategoryListView(initialCategories) {}
+}
+
+@Preview
+@Composable
+fun CategoryGridViewPreview() {
+    CategoryGridView(initialCategories) {}
+}
+

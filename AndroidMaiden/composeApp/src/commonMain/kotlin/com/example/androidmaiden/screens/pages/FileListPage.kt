@@ -19,14 +19,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.androidmaiden.model.FileNode
+import com.example.androidmaiden.model.FileSysNode
 import com.example.androidmaiden.views.fileSys.ViewMode
 import coil3.compose.AsyncImage // Assuming Coil is used for images/icons
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FileListPage(categoryName: String, files: List<FileNode>, onBack: () -> Unit) {
+fun FileListPage(categoryName: String, files: List<FileSysNode>, onBack: () -> Unit) {
     // 1. Determine Initial View Mode based on Category Name/Type
     val initialMode = remember(categoryName) {
         when {
@@ -64,7 +64,9 @@ fun FileListPage(categoryName: String, files: List<FileNode>, onBack: () -> Unit
                         IconButton(onClick = { showSortMenu = true }) {
                             Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "Sort")
                         }
-                        DropdownMenu(expanded = showSortMenu, onDismissRequest = { showSortMenu = false }) {
+                        DropdownMenu(
+                            expanded = showSortMenu,
+                            onDismissRequest = { showSortMenu = false }) {
                             DropdownMenuItem(
                                 text = { Text("Sort by Name") },
                                 onClick = { sortOrder = SortOrder.NAME; showSortMenu = false },
@@ -90,25 +92,45 @@ fun FileListPage(categoryName: String, files: List<FileNode>, onBack: () -> Unit
             )
         }
     ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
-            if (viewMode == ViewMode.LIST) {
-                FileListView(sortedFiles)
-            } else {
-                FileGridView(sortedFiles, isImageCategory = categoryName.contains("Images"))
+        if (files.isEmpty()) {
+            // If you see this, the list being passed from the VM is empty
+            Box(
+                modifier = Modifier.fillMaxSize().padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No files found in $categoryName")
+            }
+        } else {
+            Box(modifier = Modifier.padding(padding)) {
+                if (viewMode == ViewMode.LIST) {
+                    FileListView(sortedFiles)
+                } else {
+                    FileGridView(sortedFiles, isImageCategory = categoryName.contains("Images"))
+                }
             }
         }
     }
 }
 
 @Composable
-private fun FileListView(files: List<FileNode>) {
+private fun FileListView(files: List<FileSysNode>) {
     LazyColumn {
         items(files) { file ->
             ListItem(
-                headlineContent = { Text(file.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                headlineContent = {
+                    Text(
+                        file.name,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 supportingContent = { Text("${(file.size ?: 0L) / 1024} KB • ${file.path ?: ""}") },
                 leadingContent = {
-                    Icon(Icons.Default.InsertDriveFile, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    Icon(
+                        Icons.Default.InsertDriveFile,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
@@ -117,7 +139,7 @@ private fun FileListView(files: List<FileNode>) {
 }
 
 @Composable
-private fun FileGridView(files: List<FileNode>, isImageCategory: Boolean) {
+private fun FileGridView(files: List<FileSysNode>, isImageCategory: Boolean) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = if (isImageCategory) 120.dp else 100.dp),
         contentPadding = PaddingValues(12.dp),
@@ -126,10 +148,17 @@ private fun FileGridView(files: List<FileNode>, isImageCategory: Boolean) {
     ) {
         items(files) { file ->
             Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                        alpha = 0.3f
+                    )
+                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(8.dp)
+                ) {
                     if (isImageCategory) {
                         // Image Thumbnail Placeholder
                         AsyncImage(

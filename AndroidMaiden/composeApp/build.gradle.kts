@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
@@ -30,16 +31,17 @@ kotlin {
 
     jvm()
 
-    js {
-        browser()
-        binaries.executable()
-    }
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-        binaries.executable()
-    }
+    /*Room does not support Web yet*/
+//    js {
+//        browser()
+//        binaries.executable()
+//    }
+//
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs {
+//        browser()
+//        binaries.executable()
+//    }
 
     sourceSets {
         androidMain.dependencies {
@@ -50,6 +52,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.generativeai)
+            implementation(libs.koin.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -65,11 +68,16 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.coil.compose)
-
+            implementation(libs.androidx.room.runtime) // Caching
+            implementation(libs.androidx.datastore.preferences) // UI Settings
+            implementation(libs.androidx.sqlite.bundled) // Required for shared driver
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
         }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
@@ -117,6 +125,13 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    // Add for each platform you support, u actually run the DB on
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    add("kspJvm", libs.androidx.room.compiler) // For Desktop
+//    add("kspJs", libs.androidx.room.compiler)
+//    add("kspWasmJs", libs.androidx.room.compiler)
 }
 
 compose.desktop {

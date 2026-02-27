@@ -14,7 +14,9 @@ actual fun RequestStoragePermission() {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        // 这里可以检查哪些权限被授予
+            // Here you can check which permissions are granted
+        val granted = permissions.entries.all { it.value }
+        if (granted) { /* Proceed */ }
     }
 
     LaunchedEffect(Unit) {
@@ -30,4 +32,5 @@ actual fun RequestStoragePermission() {
             ))
         }
     }
+
 }

@@ -8,14 +8,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.io.*
-import kotlinx.io.files.FileNotFoundException
+import kotlinx.io.files.*
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 
-class FileScannerViewModel {
+class FileScannerViewModel() {
 
-    var fileTree by mutableStateOf<FileNode?>(null)
+    val rootPath = "/storage/emulated/0" // Public storage root
+
+    var fileTree by mutableStateOf<FileSysNode?>(null)
         private set
 
     var isLoading by mutableStateOf(false)
@@ -48,8 +50,8 @@ class FileScannerViewModel {
             try {
                 val result = if (useMock) simFileNode()
                 else {
-                    val children = listFiles("/storage/emulated/0") // Public storage root
-                    FileNode(
+                    val children = listFiles(rootPath)
+                    FileSysNode(
                         name = "/",
                         nodeType = NodeType.FOLDER,
                         folderType = FolderType.FOLDER,
