@@ -9,7 +9,7 @@ An android secreatary, assistanat.
 
 | Home & Interaction | Siklls Area | File Management | File Classify |
 | :---: | :---: | :---: | :---: |
-| ![Placeholder](Docs\screenshots\home.png) | ![Placeholder](Docs\screenshots\skills.png) | ![ Placeholder](Docs\screenshots\FileM.png) | ![Placeholder](Docs\screenshots\FileMC.png) |
+| ![Home](Docs/screenshots/home.png) | ![Skills](Docs/screenshots/skills.png) | ![FileM](Docs/screenshots/FileM.png) | ![FileMC](Docs/screenshots/FileMC.png) |
 | *Character Chat & Main Dashboard* | *Funcs Overview* | *File Management* | File Classify |
 
 ---
