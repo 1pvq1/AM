@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Screen
 import com.example.androidmaiden.ui.BaseCard
+import com.example.androidmaiden.Res.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data class Feature(
@@ -33,12 +34,45 @@ data class Feature(
 fun SkillsPage(onNavigate: (Screen) -> Unit = {}) {
     // Feature list with icons
     val features = listOf(
-        Feature(1, "任务管理", "添加、完成、删除任务", Icons.Default.Checklist, Screen.Todo),
-        Feature(2, "人物交流", "展示立绘和对话框", Icons.Default.Forum, Screen.CharacterInteraction),
-        Feature(3, "主题搭配", "自定义界面风格", Icons.Default.Palette),
-        Feature(4, "统计分析", "综合信息统计", Icons.Default.BarChart),
-        Feature(5, "文件管理 ", "分析，归类，整理，清洁", Icons.Default.Folder, Screen.Files),
-        Feature(6, "硬件管理 ", "识别、维护、配置、检测硬件", Icons.Default.Hardware)
+        Feature(
+            1,
+            stringResource(id = "skills_task_mgmt_title"),
+            stringResource(id = "skills_task_mgmt_desc"),
+            Icons.Default.Checklist,
+            Screen.Todo
+        ),
+        Feature(
+            2,
+            stringResource(id = "skills_char_interaction_title"),
+            stringResource(id = "skills_char_interaction_desc"),
+            Icons.Default.Forum,
+            Screen.CharacterInteraction
+        ),
+        Feature(
+            3,
+            stringResource(id = "skills_theme_title"),
+            stringResource(id = "skills_theme_desc"),
+            Icons.Default.Palette
+        ),
+        Feature(
+            4,
+            stringResource(id = "skills_stats_title"),
+            stringResource(id = "skills_stats_desc"),
+            Icons.Default.BarChart
+        ),
+        Feature(
+            5,
+            stringResource(id = "skills_file_mgmt_title"),
+            stringResource(id = "skills_file_mgmt_desc"),
+            Icons.Default.Folder,
+            Screen.Files
+        ),
+        Feature(
+            6,
+            stringResource(id = "skills_hw_mgmt_title"),
+            stringResource(id = "skills_hw_mgmt_desc"),
+            Icons.Default.Hardware
+        )
     )
     val scrollState = rememberScrollState()
     Column(
@@ -49,7 +83,7 @@ fun SkillsPage(onNavigate: (Screen) -> Unit = {}) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "技能区",
+            text = stringResource(id = "skills_title"),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 8.dp)
         )

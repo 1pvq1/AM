@@ -4,6 +4,35 @@
     <string name="details">Details</string>
     <string name="ellipsis">...</string>
 
+    <!-- Navigation Bar -->
+    <string name="nav_home">Home</string>
+    <string name="nav_skills">Skills</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Home Page -->
+    <string name="home_greeting_default">\"Welcome back, Master! What are the arrangements?\"</string>
+    <string name="home_daily_tasks">Daily tasks</string>
+    <string name="home_other_features">Other functions</string>
+    <string name="home_announcement">Announcement</string>
+    <string name="home_announcement_placeholder">Announcements, statistics, and event entries can be placed here.</string>
+    <string name="home_testing_area">Testing Area</string>
+    <string name="home_click_me">Click me!</string>
+
+    <!-- Skills Page -->
+    <string name="skills_title">Skills Area</string>
+    <string name="skills_task_mgmt_title">Task Management</string>
+    <string name="skills_task_mgmt_desc">Add, complete, delete tasks</string>
+    <string name="skills_char_interaction_title">Character Interaction</string>
+    <string name="skills_char_interaction_desc">Display character art and dialog boxes</string>
+    <string name="skills_theme_title">Theme Matching</string>
+    <string name="skills_theme_desc">Customize interface style</string>
+    <string name="skills_stats_title">Statistical Analysis</string>
+    <string name="skills_stats_desc">Comprehensive information statistics</string>
+    <string name="skills_file_mgmt_title">File Management</string>
+    <string name="skills_file_mgmt_desc">Analyze, classify, organize, clean</string>
+    <string name="skills_hw_mgmt_title">Hardware Management</string>
+    <string name="skills_hw_mgmt_desc">Identify, maintain, configure, detect hardware</string>
+
     <!-- Character Interaction Page -->
     <string name="character_interaction">Character Interaction</string>
     <string name="switch_view">Switch View</string>

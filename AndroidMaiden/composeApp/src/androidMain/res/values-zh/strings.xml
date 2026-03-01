@@ -3,6 +3,35 @@
     <string name="details">详情</string>
     <string name="ellipsis">...</string>
 
+    <!-- 导航栏 -->
+    <string name="nav_home">首页</string>
+    <string name="nav_skills">技能</string>
+    <string name="nav_settings">设置</string>
+
+    <!-- 主页 -->
+    <string name="home_greeting_default">\"欢迎回来，主人！请问有什么安排？\"</string>
+    <string name="home_daily_tasks">每日任务</string>
+    <string name="home_other_features">其他功能区</string>
+    <string name="home_announcement">公告</string>
+    <string name="home_announcement_placeholder">这里可以放公告、统计信息、活动入口等。</string>
+    <string name="home_testing_area">测试区域</string>
+    <string name="home_click_me">点我！</string>
+
+    <!-- 技能页面 -->
+    <string name="skills_title">技能区</string>
+    <string name="skills_task_mgmt_title">任务管理</string>
+    <string name="skills_task_mgmt_desc">添加、完成、删除任务</string>
+    <string name="skills_char_interaction_title">人物交流</string>
+    <string name="skills_char_interaction_desc">展示立绘和对话框</string>
+    <string name="skills_theme_title">主题搭配</string>
+    <string name="skills_theme_desc">自定义界面风格</string>
+    <string name="skills_stats_title">统计分析</string>
+    <string name="skills_stats_desc">综合信息统计</string>
+    <string name="skills_file_mgmt_title">文件管理</string>
+    <string name="skills_file_mgmt_desc">分析，归类，整理，清洁</string>
+    <string name="skills_hw_mgmt_title">硬件管理</string>
+    <string name="skills_hw_mgmt_desc">识别、维护、配置、检测硬件</string>
+
     <!-- 角色互动页面 -->
     <string name="character_interaction">角色互动</string>
     <string name="switch_view">切换视图</string>

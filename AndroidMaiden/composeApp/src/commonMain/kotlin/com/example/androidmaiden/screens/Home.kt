@@ -22,6 +22,9 @@ import com.example.androidmaiden.ui.ShowDialogButton
 import com.example.androidmaiden.ui.SwitchLayoutButton
 import com.example.androidmaiden.views.character.*
 import com.example.androidmaiden.views.panel.PanelOfTask
+import org.jetbrains.compose.resources.stringResource
+import androidmaiden.composeapp.generated.resources.*
+import com.example.androidmaiden.Res.stringResource
 
 @Preview
 @Composable
@@ -35,7 +38,7 @@ fun HomeScreen() {
         item { CharacterSection() }
         item { TaskSection() }
         item { OtherSection() }
-        item { TestingEg() }
+
     }
 }
 
@@ -43,7 +46,7 @@ fun HomeScreen() {
 fun CharacterSection() {
     var showDialog by remember { mutableStateOf(true) }
     var layout by remember { mutableStateOf(CharacterLayout.Vertical) }
-    val dialogText = "\"欢迎回来，主人！请问有什么安排？\""
+    val dialogText = stringResource(id = "home_greeting_default")
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -79,7 +82,7 @@ fun CharacterSection() {
 fun TaskSection() {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Daily tasks",
+            text = stringResource(id = "home_daily_tasks"),
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -93,7 +96,7 @@ fun TaskSection() {
 fun OtherSection() {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "其他功能区",
+            text = stringResource(id = "home_other_features"),
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -103,13 +106,13 @@ fun OtherSection() {
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "公告",
+                    text = stringResource(id= "home_announcement"),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onTertiaryContainer
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "这里可以放公告、统计信息、活动入口等。",
+                    stringResource(id = "home_announcement_placeholder"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onTertiaryContainer
                 )
@@ -118,38 +121,7 @@ fun OtherSection() {
     }
 }
 
-@Composable
-private fun TestingEg() {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "Testing Area",
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        Card(modifier = Modifier.fillMaxWidth()) {
-            var showContent by remember { mutableStateOf(false) }
-            Column(
-                modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Button(onClick = { showContent = !showContent }) {
-                    Text("Click me!")
-                }
-                AnimatedVisibility(showContent) {
-                    val greeting = remember { Greeting().greet() }
-                    Column(
-                        modifier = Modifier.padding(top = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Image(painterResource(Res.drawable.compose_multiplatform), null)
-                        Spacer(Modifier.height(16.dp))
-                        Text("Compose: $greeting")
-                    }
-                }
-            }
-        }
-    }
-}
+
 
 @Composable
 private fun BarCharacterSection(

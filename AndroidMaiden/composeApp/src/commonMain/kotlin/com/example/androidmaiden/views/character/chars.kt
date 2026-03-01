@@ -1,6 +1,7 @@
 package com.example.androidmaiden.views.character
 
 import androidmaiden.composeapp.generated.resources.Res
+import androidmaiden.composeapp.generated.resources.am_bit
 import androidmaiden.composeapp.generated.resources.char_androidMaiden_full
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -43,7 +44,7 @@ fun charPreviewItems() = listOf(
 @Composable
 fun CharacterIllustration(modifier: Modifier = Modifier) {
     Image(
-        painter = painterResource(Res.drawable.char_androidMaiden_full), // TODO: 换成角色立绘资源
+        painter = painterResource(Res.drawable.am_bit), // TODO: 换成角色立绘资源
         contentDescription = "角色展示",
         contentScale = ContentScale.Fit, // This will ensure the image fits and is not cropped
         modifier = modifier

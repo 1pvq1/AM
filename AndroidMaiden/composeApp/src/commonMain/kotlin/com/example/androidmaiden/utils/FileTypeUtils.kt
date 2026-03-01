@@ -37,7 +37,7 @@ object FileTypeUtils {
         }
     }
 
-    // 1. Central source of truth for categories
+    // 1. Central source of truth for categories`
     val categoryDefinitions = listOf(
         CategoryDef("Images", Icons.Default.Image, "Images"),
         CategoryDef("Videos", Icons.Default.Videocam, "Videos"),

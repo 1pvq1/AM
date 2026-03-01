@@ -1,52 +1,76 @@
 <resources>
-    <!-- Général et Commun -->
+    <!-- General & Common -->
     <string name="details">Détails</string>
     <string name="ellipsis">...</string>
 
-    <!-- Page d'interaction avec le personnage -->
-    <string name="character_interaction">Interaction avec le personnage</string>
+    <!-- Home Page -->
+    <string name="home_greeting_default">\"Bon retour, Maître ! Quels sont les projets ?\"</string>
+    <string name="home_daily_tasks">Tâches quotidiennes</string>
+    <string name="home_other_features">Zone d\'autres fonctions</string>
+    <string name="home_announcement">Annonce</string>
+    <string name="home_announcement_placeholder">Les annonces, les statistiques et les entrées d\'événements peuvent être placées ici.</string>
+    <string name="home_testing_area">Zone de test</string>
+    <string name="home_click_me">Cliquez-moi !</string>
+
+    <!-- Skills Page -->
+    <string name="skills_title">Zone de compétences</string>
+    <string name="skills_task_mgmt_title">Gestion des tâches</string>
+    <string name="skills_task_mgmt_desc">Ajouter, terminer, supprimer des tâches</string>
+    <string name="skills_char_interaction_title">Interaction de personnages</string>
+    <string name="skills_char_interaction_desc">Afficher les illustrations et les boîtes de dialogue</string>
+    <string name="skills_theme_title">Correspondance de thème</string>
+    <string name="skills_theme_desc">Personnaliser le style de l\'interface</string>
+    <string name="skills_stats_title">Analyse statistique</string>
+    <string name="skills_stats_desc">Statistiques d\'informations complètes</string>
+    <string name="skills_file_mgmt_title">Gestion des fichiers</string>
+    <string name="skills_file_mgmt_desc">Analyser, classer, organiser, nettoyer</string>
+    <string name="skills_hw_mgmt_title">Gestion du matériel</string>
+    <string name="skills_hw_mgmt_desc">Identifier, maintenir, configurer, détecter le matériel</string>
+
+    <!-- Character Interaction Page -->
+    <string name="character_interaction">Interaction de personnage</string>
     <string name="switch_view">Changer de vue</string>
     <string name="message_input_label">Message...</string>
     <string name="send_message">Envoyer le message</string>
     <string name="user_avatar_name">Moi</string>
     <string name="character_avatar_name">AM</string>
 
-    <!-- Interaction avec le personnage - Messages d'accueil (pour l'historique de discussion initial) -->
+    <!-- Character Interaction - Greeting Messages (for initial chat history) -->
     <string name="chat_greeting_1">Bonjour !</string>
     <string name="chat_greeting_2">Comment allez-vous ?</string>
     <string name="chat_greeting_3">Ceci est un espace réservé pour notre conversation.</string>
-    <string name="chat_greeting_4">J\'attends avec impatience notre discussion !</string>
+    <string name="chat_greeting_4">J\'ai hâte de discuter avec vous !</string>
     <string name="chat_greeting_5">Moi aussi ! De quoi devrions-nous parler ?</string>
 
-    <!-- Interaction avec le personnage - Messages de prévisualisation -->
+    <!-- Character Interaction - Preview Messages -->
     <string name="chat_preview_1">Salut !</string>
     <string name="chat_preview_2">Parlons de quelque chose.</string>
 
-    <!-- Gestion des fichiers -->
+    <!-- File Management -->
     <string name="file_management">Gestion des fichiers</string>
     <string name="file_management_description">Analysez, classez, organisez et nettoyez votre système de fichiers.</string>
 
-    <!-- Gestion des fichiers - Fonctionnalités -->
+    <!-- File Management - Features -->
     <string name="analyze">Analyser</string>
-    <string name="analyze_description">Scannez et analysez la structure des fichiers du système.</string>
+    <string name="analyze_description">Scanner et analyser la structure des fichiers du système.</string>
     <string name="classify">Classer</string>
-    <string name="classify_description">Marquez et classez automatiquement par type ou par règle.</string>
+    <string name="classify_description">Étiqueter et classer automatiquement par type ou par règle.</string>
     <string name="organize">Organiser</string>
-    <string name="organize_description">Optimisez la structure des répertoires de l\'utilisateur pour améliorer la lisibilité.</string>
+    <string name="organize_description">Optimiser la structure du répertoire de l\'utilisateur pour améliorer la lisibilité.</string>
     <string name="clean">Nettoyer</string>
-    <string name="clean_description">Nettoyez les fichiers inutiles ou en double.</string>
+    <string name="clean_description">Nettoyer les fichiers inutiles ou en double.</string>
 
-    <!-- Page d'analyse de fichiers -->
-    <string name="file_analysis">Analyse de fichiers</string>
+    <!-- File Analysis Page -->
+    <string name="file_analysis">Analyse des fichiers</string>
     <string name="current_data_type_simulation">Type de données actuel : Simulation (structure du système de fichiers Android)</string>
     <string name="current_data_type_real">Type de données actuel : Système de fichiers réel (Android)</string>
     <string name="unknown_time">Heure inconnue</string>
     <string name="folder_details">%1$d dossiers · %2$d fichiers · %3$s</string>
 
-    <!-- Page d'analyse de fichiers - Barre d'outils -->
-    <string name="toggle_simulation_real_data">Basculer entre simulation/données réelles</string>
-    <string name="toggle_view_mode">Changer le mode d\'affichage</string>
-    <string name="toggle_view_to">Changer l\'affichage pour %1$s</string>
+    <!-- File Analysis Page - Toolbar -->
+    <string name="toggle_simulation_real_data">Basculer entre Simulation/Données réelles</string>
+    <string name="toggle_view_mode">Basculer le mode d\'affichage</string>
+    <string name="toggle_view_to">Changer de vue pour %1$s</string>
     <string name="switch_to">Passer à %1$s</string>
     <string name="select_sort_method">Sélectionner la méthode de tri</string>
     <string name="sort">Trier</string>
@@ -55,18 +79,18 @@
     <string name="folders_first">Dossiers en premier</string>
     <string name="sort_by">Trier par :</string>
 
-    <!-- Pages de paramètres -->
+    <!-- Settings Pages -->
     <string name="settings_llm_title">Paramètres LLM</string>
     <string name="settings_advanced_title">Paramètres avancés</string>
 
-    <!-- Paramètres - Page LLM -->
+    <!-- Settings - LLM Page -->
     <string name="settings_llm_model_version">Version du modèle</string>
     <string name="settings_llm_default_model">Modèle par défaut</string>
     <string name="settings_llm_api_key">Clé API</string>
     <string name="settings_llm_api_key_placeholder">Entrez votre clé API</string>
     <string name="settings_llm_model_providers">Fournisseurs de modèles</string>
 
-    <!-- Paramètres - Page LLM avancée -->
+    <!-- Settings - Advanced LLM Page -->
     <string name="settings_advanced_llm_title">Paramètres LLM avancés</string>
     <string name="settings_advanced_llm_description">Les paramètres et configurations détaillés du LLM seront définis ici.</string>
     <string name="settings_advanced_llm_local_title">Se connecter au LLM local</string>
@@ -74,38 +98,38 @@
     <string name="settings_advanced_llm_local_address_label">Adresse du service local</string>
     <string name="settings_advanced_llm_local_connect_button">Se connecter</string>
 
-    <!-- Paramètres - Page principale -->
+    <!-- Settings - Main Page -->
     <string name="settings_search_placeholder">Rechercher dans les paramètres</string>
     <string name="settings_search_icon_description">Rechercher</string>
     <string name="settings_close_search_icon_description">Fermer la recherche</string>
 
-    <!-- Paramètres - Page À propos -->
+    <!-- Settings - About Page -->
     <string name="settings_about_title">À propos</string>
     <string name="settings_about_app_version">Version de l\'application</string>
     <string name="settings_about_privacy_policy">Politique de confidentialité</string>
 
-    <!-- Paramètres - Page d'apparence -->
+    <!-- Settings - Appearance Page -->
     <string name="settings_appearance_title">Apparence</string>
     <string name="settings_appearance_theme">Thème</string>
     <string name="settings_appearance_theme_light">Clair</string>
     <string name="settings_appearance_theme_dark">Sombre</string>
     <string name="settings_appearance_theme_system">Système</string>
     <string name="settings_appearance_button_style">Style d\'affichage des boutons</string>
-    <string name="settings_appearance_button_style_both">Icône et texte</string>
+    <string name="settings_appearance_button_style_both">Les deux</string>
     <string name="settings_appearance_button_style_icon_only">Icône uniquement</string>
     <string name="settings_appearance_button_style_text_only">Texte uniquement</string>
 
-    <!-- Paramètres - Page de personnalisation du chat -->
+    <!-- Settings - Chat Personalization Page -->
     <string name="settings_chat_personalization_title">Personnalisation du chat</string>
     <string name="settings_chat_personalization_preview">aperçu</string>
-    <string name="settings_chat_personalization_background">Arrière-plan du chat</string>
-    <string name="settings_chat_personalization_system_default">Système par défaut</string>
+    <string name="settings_chat_personalization_background">Fond de chat</string>
+    <string name="settings_chat_personalization_system_default">Défaut système</string>
     <string name="settings_chat_personalization_choose_image">Choisir une image</string>
     <string name="settings_chat_personalization_choose_from_gallery">Choisir dans la galerie</string>
     <string name="settings_chat_personalization_your_avatar">Votre avatar</string>
     <string name="settings_chat_personalization_upload_avatar_image">Télécharger l\'image de l\'avatar</string>
 
-    <!-- Paramètres - Page de langue -->
+    <!-- Settings - Language Page -->
     <string name="settings_language_title">Langue</string>
     <string name="settings_language_system">Système</string>
     <string name="settings_language_english">Anglais</string>
@@ -114,14 +138,14 @@
     <string name="settings_language_french">Français</string>
     <string name="settings_language_arabic">Arabe</string>
 
-    <!-- Paramètres - Page réseau -->
+    <!-- Settings - Network Page -->
     <string name="settings_network_title">Réseau</string>
-    <string name="settings_network_description">Entrez une URL pour vérifier si elle est accessible. Ceci est utile pour vérifier la connexion aux services externes ou aux fournisseurs de modèles.</string>
+    <string name="settings_network_description">Entrez une URL pour vérifier si elle est accessible. Ceci est utile pour vérifier la connexion à des services externes ou des fournisseurs de modèles.</string>
     <string name="settings_network_website_url_label">URL du site Web</string>
     <string name="settings_network_check_connectivity_button">Vérifier la connectivité</string>
 
-    <!-- Paramètres - Page de notifications -->
+    <!-- Settings - Notifications Page -->
     <string name="settings_notifications_title">Notifications</string>
     <string name="settings_notifications_enable_notifications">Activer les notifications</string>
-    <string name="settings_notifications_description">Recevoir des alertes pour les délais des tâches.</string>
+    <string name="settings_notifications_description">Recevoir des alertes pour les échéances des tâches</string>
 </resources>

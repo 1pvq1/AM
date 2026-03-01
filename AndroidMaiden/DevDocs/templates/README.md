@@ -1,5 +1,4 @@
-# AndroidMaiden (AM)
-An android secreatary, assistanat.
+# 🤖 AndroidMaiden
 
 **AndroidMaiden** is a modern, cross-platform assistant application built with **Kotlin Multiplatform (KMP)** and **Compose Multiplatform**. It combines an AI-powered character interaction system with powerful system utilities like file management and task tracking, aiming to be your "Digital Maiden" on Android, Desktop, and beyond.
 
@@ -7,10 +6,10 @@ An android secreatary, assistanat.
 
 ## 📸 Screenshots
 
-| Home & Interaction | Siklls Area | File Management | File Classify |
-| :---: | :---: | :---: | :---: |
-| ![Placeholder](Docs\screenshots\home.png) | ![Placeholder](Docs\screenshots\skills.png) | ![ Placeholder](Docs\screenshots\FileM.png) | ![Placeholder](Docs\screenshots\FileMC.png) |
-| *Character Chat & Main Dashboard* | *Funcs Overview* | *File Management* | File Classify |
+| Home & Interaction | File Management | Task & Settings |
+| :---: | :---: | :---: |
+| ![Home Placeholder](https://via.placeholder.com/200x400?text=Home+Screen) | ![File Explorer Placeholder](https://via.placeholder.com/200x400?text=File+Explorer) | ![Todo Placeholder](https://via.placeholder.com/200x400?text=Todo+List) |
+| *Character Chat & Main Dashboard* | *Advanced File Classification* | *Task Management & Customization* |
 
 ---
 
