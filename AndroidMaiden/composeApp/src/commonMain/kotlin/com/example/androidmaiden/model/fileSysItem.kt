@@ -8,14 +8,17 @@ enum class FolderType {
 }
 
 enum class NodeType { FILE, FOLDER }
+
+/**
+ * Experimental feature intended only for specific pages (analysis page),
+ * and should not currently be used elsewhere.
+ * */
 enum class DataSource { MOCK, REAL }
 
 
 // Define a stable structure for Category definitions
 data class CategoryDef(
-    val name: String,
-    val icon: ImageVector,
-    val type: String
+    val name: String, val icon: ImageVector, val type: String
 )
 
 /**

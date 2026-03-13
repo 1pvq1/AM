@@ -13,11 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.util.TableInfo
 import com.example.androidmaiden.model.*
-import com.example.androidmaiden.utils.*
 import com.example.androidmaiden.viewmodel.*
+import com.example.androidmaiden.views.SectionHeader
 import com.example.androidmaiden.views.fileSys.ViewMode
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -40,9 +38,6 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-//fun FileClassifyPage(
-//    onBack: () -> Unit = {}, viewModel: PersistentFileViewModel = koinViewModel()
-//) {
 fun FileClassifyPage(onBack: () -> Unit = {}) {
 //    var categories by remember { mutableStateOf(initialCategories) }
 //    var viewMode by remember { mutableStateOf(ViewMode.LIST) } // Default View state
@@ -61,7 +56,6 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
 
     val vm: PersistentFileViewModel = koinViewModel()
 
-
     // 1. Observe pre-calculated categories from the VM
     val categories by vm.categories.collectAsState()
     val isSyncing by vm.isSyncing.collectAsState()
@@ -76,7 +70,7 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
     }
 
     if (selectedCategory != null) {
-        FileListPage(
+        FilesListPage(
             categoryName = selectedCategory!!.name,
             files = selectedCategory!!.files,
             onBack = { selectedCategory = null }
@@ -110,7 +104,6 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
                 )
             }
         ) { padding ->
-//            selectedCategory = fileSysNodeCategory(padding, viewMode, categories, selectedCategory)
             Column(modifier = Modifier.fillMaxSize()) {
 //                Text(
 //                    text = "Scanned path: $scannedPath",
@@ -138,55 +131,6 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
         }
     }
 }
-
-//@Composable
-//private fun fileSysNodeCategory(
-//    padding: PaddingValues,
-//    viewMode: ViewMode,
-//    categories: List<FileCategory>,
-//    selectedCategory: FileCategory?
-//): FileCategory? {
-//    var selectedCategory1 = selectedCategory
-//    Column(
-//        modifier = Modifier
-//            .padding(padding)
-//            .fillMaxSize()
-//    ) {
-//        if (fileTree != null) {
-//            Text(
-//                text = "Scanned path: ${fileTree.path ?: "Device Root"}",
-//                style = MaterialTheme.typography.labelMedium,
-//                color = MaterialTheme.colorScheme.outline,
-//                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-//            )
-//        }
-//        Box(
-//            modifier = Modifier.weight(1f)
-//        ) {
-//
-//            if (viewMode == ViewMode.LIST) {
-//                CategoryListView(categories) { selectedCategory1 = it }
-//            } else {
-//                CategoryGridView(categories) { selectedCategory1 = it }
-//            }
-//
-//            when {
-//                isLoading && fileTree == null -> {
-//                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-//                }
-//
-//                loadError != null -> {
-//                    Text(
-//                        text = "Error: $loadError",
-//                        color = MaterialTheme.colorScheme.error,
-//                        modifier = Modifier.align(Alignment.Center)
-//                    )
-//                }
-//            }
-//        }
-//    }
-//    return selectedCategory1
-//}
 
 // --- List Layout ---
 @Composable
@@ -278,21 +222,7 @@ private fun FileCategoryStrip(category: FileCategory, onClick: () -> Unit) {
     }
 }
 
-@Composable
-private fun SectionHeader(title: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
-        )
-        HorizontalDivider()
-    }
-}
+
 
 @Composable
 private fun FileCategoryCard(category: FileCategory, onClick: () -> Unit) {

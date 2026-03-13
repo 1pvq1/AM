@@ -2,6 +2,7 @@ package com.example.androidmaiden
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -42,19 +43,25 @@ fun App() {
     }
 
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
-
+    var isNavigationBarVisible by remember { mutableStateOf(true) }
 
     CompositionLocalProvider(LocalButtonDisplayStyle provides buttonDisplayStyle) {
         MaterialTheme(colorScheme = if (isDarkTheme) darkColorScheme() else lightColorScheme()) {
             Scaffold(
                 bottomBar = {
-                    AppNavigationBar(
-                        currentScreen = currentScreen,
-                        onScreenSelected = { screen -> currentScreen = screen }
-                    )
+                    if (isNavigationBarVisible) {
+                        AppNavigationBar(
+                            currentScreen = currentScreen,
+                            onScreenSelected = { screen ->
+                                currentScreen = screen
+                                // Reset nav bar visibility when switching screens
+                                isNavigationBarVisible = true
+                            }
+                        )
+                    }
                 }
             ) { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
+                Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
                     when (currentScreen) {
                         is Screen.Home -> HomeScreen()
                         is Screen.Settings -> SettingsScreen(
@@ -89,7 +96,15 @@ fun App() {
 
                         is Screen.Todo -> TodoPage()
 
-                        is Screen.CharacterInteraction -> CharacterInteractionPage()
+                        is Screen.CharacterInteraction -> CharacterInteractionPage(
+                            onFullScreenChange = { isFullScreen: Boolean ->
+                                isNavigationBarVisible = !isFullScreen
+                            },
+                            onNavigateUp = {
+                                currentScreen = Screen.Home
+                                isNavigationBarVisible = true
+                            }
+                        )
                         is Screen.AdvancedLlmSettings -> AdvancedLlmSettingsPage(onNavigateBack = {
                             currentScreen = Screen.Settings
                         })

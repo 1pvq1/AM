@@ -4,13 +4,16 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -20,17 +23,26 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
+ * Enum class representing the different types of TopAppBars available in Material 3.
+ */
+enum class AppBarType {
+    SMALL, MEDIUM, LARGE, CENTER_ALIGNED
+}
+
+/**
  * A base composable for creating pages with a consistent layout.
  *
- * This composable provides a `Scaffold` with a `MediumTopAppBar` that can be configured
+ * This composable provides a `Scaffold` with a configurable `TopAppBar` that can be configured
  * to collapse on scroll. It allows for customization of the title, navigation icon,
  * and actions in the app bar.
  *
  * @param title The title to be displayed in the `TopAppBar`.
+ * @param modifier The modifier to be applied to the `Scaffold`.
  * @param navigationIcon The `ImageVector` for the navigation icon. If null, no icon is shown.
  * @param onNavigationIconClick The lambda to be executed when the navigation icon is clicked.
  * @param actions A composable lambda for adding actions to the `TopAppBar`.
  * @param scrollBehavior A `TopAppBarScrollBehavior` to control the collapsing behavior of the app bar.
+ * @param appBarType The type of `TopAppBar` to display. Defaults to `AppBarType.MEDIUM`.
  * @param content A composable lambda that defines the main content of the page.
  *                It receives `PaddingValues` to apply appropriate padding from the `Scaffold`.
  */
@@ -43,6 +55,7 @@ fun BasePage(
     onNavigationIconClick: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null,
+    appBarType: AppBarType = AppBarType.MEDIUM,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val scaffoldModifier = if (scrollBehavior != null) {
@@ -50,28 +63,64 @@ fun BasePage(
     } else {
         modifier
     }
+
+    val titleContent = @Composable { Text(title) }
+    val navIconContent: @Composable () -> Unit = {
+        if (navigationIcon != null && onNavigationIconClick != null) {
+            IconButton(onClick = onNavigationIconClick) {
+                Icon(
+                    imageVector = navigationIcon,
+                    contentDescription = "Navigation Icon"
+                )
+            }
+        }
+    }
+
     Scaffold(
         modifier = scaffoldModifier,
         topBar = {
-            MediumTopAppBar(
-                title = { Text(title) },
-                navigationIcon = {
-                    if (navigationIcon != null && onNavigationIconClick != null) {
-                        IconButton(onClick = onNavigationIconClick) {
-                            Icon(
-                                imageVector = navigationIcon,
-                                contentDescription = "Navigation Icon"
-                            )
-                        }
-                    }
-                },
-                actions = actions,
-                scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
+            when (appBarType) {
+                AppBarType.SMALL -> TopAppBar(
+                    title = titleContent,
+                    navigationIcon = navIconContent,
+                    actions = actions,
+                    scrollBehavior = scrollBehavior,
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                        scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
+                    )
                 )
-            )
+                AppBarType.MEDIUM -> MediumTopAppBar(
+                    title = titleContent,
+                    navigationIcon = navIconContent,
+                    actions = actions,
+                    scrollBehavior = scrollBehavior,
+                    colors = TopAppBarDefaults.mediumTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                        scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
+                    )
+                )
+                AppBarType.LARGE -> LargeTopAppBar(
+                    title = titleContent,
+                    navigationIcon = navIconContent,
+                    actions = actions,
+                    scrollBehavior = scrollBehavior,
+                    colors = TopAppBarDefaults.largeTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                        scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
+                    )
+                )
+                AppBarType.CENTER_ALIGNED -> CenterAlignedTopAppBar(
+                    title = titleContent,
+                    navigationIcon = navIconContent,
+                    actions = actions,
+                    scrollBehavior = scrollBehavior,
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                        scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
+                    )
+                )
+            }
         }
     ) { paddingValues ->
         content(paddingValues)

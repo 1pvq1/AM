@@ -18,6 +18,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material.icons.filled.FullscreenExit
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Send
@@ -29,17 +32,16 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidmaiden.Res.stringResource
+import com.example.androidmaiden.viewModels.CharacterInteractionViewModel
 import com.example.androidmaiden.views.character.CharacterIllustrationBox
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -52,9 +54,11 @@ enum class ChatViewMode { REGULAR, VIRTUAL }
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun CharacterInteractionPage(onNavigateUp: () -> Unit = {}) {
-    var viewMode by remember { mutableStateOf(ChatViewMode.REGULAR) }
-
+fun CharacterInteractionPage(
+    onFullScreenChange: (Boolean) -> Unit = {},
+    onNavigateUp: () -> Unit = {},
+    viewModel: CharacterInteractionViewModel = viewModel { CharacterInteractionViewModel() }
+) {
     // Load strings for initial chat history
     val initialChatMessages = listOf(
         ChatMessage(stringResource(id = "chat_greeting_1"), Sender.CHARACTER),
@@ -64,50 +68,62 @@ fun CharacterInteractionPage(onNavigateUp: () -> Unit = {}) {
         ChatMessage(stringResource(id = "chat_greeting_5"), Sender.USER)
     )
 
-    val chatHistory = remember {
-        mutableStateListOf<ChatMessage>().apply { addAll(initialChatMessages) }
-    }
-    var text by remember { mutableStateOf("") }
-
-    val onSendMessage = {
-        if (text.isNotBlank()) {
-            chatHistory.add(ChatMessage(text, Sender.USER))
-            text = ""
-            // TODO: Implement character response logic
-        }
+    LaunchedEffect(Unit) {
+        viewModel.initChat(initialChatMessages)
     }
 
-     BasePage(
+    BasePage(
         title = stringResource(id = "character_interaction"),
-        navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
+        appBarType = AppBarType.SMALL,
+        scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
         actions = {
+            // Chat History Button
+            IconButton(onClick = { /* TODO: Show chat history */ }) {
+                Icon(
+                    imageVector = Icons.Default.History,
+                    contentDescription = "Chat History"
+                )
+            }
+            // Full Screen Button
             IconButton(onClick = {
-                viewMode =
-                    if (viewMode == ChatViewMode.REGULAR) ChatViewMode.VIRTUAL else ChatViewMode.REGULAR
+                viewModel.onFullScreenToggle(onFullScreenChange)
             }) {
                 Icon(
-                    imageVector = if (viewMode == ChatViewMode.REGULAR) Icons.Default.Person else Icons.Default.Forum,
+                    imageVector = if (viewModel.isFullScreen) Icons.Default.FullscreenExit else Icons.Default.Fullscreen,
+                    contentDescription = "Full Screen"
+                )
+            }
+            // View Mode Switch Button
+            IconButton(onClick = {
+                val newMode = if (viewModel.viewMode == ChatViewMode.REGULAR) ChatViewMode.VIRTUAL else ChatViewMode.REGULAR
+                viewModel.onViewModeChange(newMode)
+            }) {
+                Icon(
+                    imageVector = if (viewModel.viewMode == ChatViewMode.REGULAR) Icons.Default.Person else Icons.Default.Forum,
                     contentDescription = stringResource(id = "switch_view")
                 )
             }
-        }
+        },
+        modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
-        when (viewMode) {
-            ChatViewMode.REGULAR -> RegularChatView(
-                modifier = Modifier.padding(paddingValues),
-                chatHistory = chatHistory,
-                text = text,
-                onTextChange = { text = it },
-                onSendMessage = onSendMessage
-            )
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            when (viewModel.viewMode) {
+                ChatViewMode.REGULAR -> RegularChatView(
+                    modifier = Modifier.fillMaxSize(),
+                    chatHistory = viewModel.chatHistory,
+                    text = viewModel.text,
+                    onTextChange = { viewModel.onTextChanged(it) },
+                    onSendMessage = { viewModel.sendMessage() }
+                )
 
-            ChatViewMode.VIRTUAL -> VirtualChatView(
-                modifier = Modifier.padding(paddingValues),
-                chatHistory = chatHistory,
-                text = text,
-                onTextChange = { text = it },
-                onSendMessage = onSendMessage
-            )
+                ChatViewMode.VIRTUAL -> VirtualChatView(
+                    modifier = Modifier.fillMaxSize(),
+                    chatHistory = viewModel.chatHistory,
+                    text = viewModel.text,
+                    onTextChange = { viewModel.onTextChanged(it) },
+                    onSendMessage = { viewModel.sendMessage() }
+                )
+            }
         }
     }
 }
@@ -148,7 +164,7 @@ fun VirtualChatView(
     val latestLlmMessage =
         chatHistory.lastOrNull { it.sender == Sender.CHARACTER }?.message ?: stringResource(id = "ellipsis")
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         CharacterIllustrationBox(modifier = Modifier.fillMaxSize())
         Column(
             modifier = modifier.fillMaxSize(),
@@ -192,7 +208,7 @@ fun ChatInput(
         color = if (useTransparentStyle) Color.Transparent else MaterialTheme.colorScheme.surface
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(

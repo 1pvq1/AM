@@ -25,7 +25,7 @@ enum class ViewMode { LIST, GRID, TREE }
 @Composable
 fun FileListView(root: FileSysNode = simFileNode()) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        item{Text("List 视图")}
+        item{Text("List view")}
         items(root.children) { node ->
             FileItem(node)
         }
@@ -35,12 +35,12 @@ fun FileListView(root: FileSysNode = simFileNode()) {
 @Preview
 @Composable
 fun FileGridView(root: FileSysNode = simFileNode()) {
-    // 如果用 Compose Multiplatform，可以用 LazyVerticalGrid
+    // If you use Compose Multiplatform, you can use LazyVerticalGrid
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text("Grid 视图")
+        Text("Grid view")
         root.children.chunked(2).forEach { row ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 row.forEach { node -> FileItem(node, Modifier.weight(1f)) }
@@ -55,7 +55,7 @@ fun FileTreeView(root: FileSysNode = simFileNode()) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        item{Text("Tree 视图")}
+        item{Text("Tree view")}
 
         item {
             FileTreeNode(node = root, indent = 0)
@@ -73,7 +73,6 @@ fun FileTreeNode(node: FileSysNode, indent: Int) {
                 if (node.isFolder) expanded = !expanded
             }, verticalAlignment = Alignment.CenterVertically
         ) {
-            // 图标
             folderIcon(node.folderType)?.let { icon ->
                 Icon(
                     imageVector = icon,
@@ -84,10 +83,9 @@ fun FileTreeNode(node: FileSysNode, indent: Int) {
 
             Spacer(Modifier.width(8.dp))
 
-            // 名称
             Text(node.name, style = MaterialTheme.typography.bodyLarge)
 
-            // 展开/折叠指示符
+            // Expand/Collapse Indicator
             if (node.isFolder) {
                 Spacer(Modifier.width(8.dp))
                 Text(
@@ -98,7 +96,7 @@ fun FileTreeNode(node: FileSysNode, indent: Int) {
             }
         }
 
-        // 子节点
+        // subnode
         if (expanded && node.children.isNotEmpty()) {
             node.children.forEach { child ->
                 FileTreeNode(child, indent + 1)

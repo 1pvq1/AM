@@ -91,7 +91,7 @@ We welcome contributions! Whether it's fixing bugs, adding new file analysis mod
 
 ## 📄 License
 
-This project is licensed under the **MIT License**. See the [LICENSE](../LICENSE) file for details.
+This project is licensed under the **Apache License**. See the [LICENSE](../LICENSE) file for details.
 
 ---
 *Generated with ❤️ by the AndroidMaiden Team*

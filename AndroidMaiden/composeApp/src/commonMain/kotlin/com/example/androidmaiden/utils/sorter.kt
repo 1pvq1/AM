@@ -6,9 +6,10 @@ import com.example.androidmaiden.model.NodeType
 
 //class sorter {
 //}
+/*Some experimental toy features should not be used for formal functionality implementation unless requested by the developers.*/
 
 enum class SortMode(val label: String) {
-    NAME("名称"), DATE("日期"), SIZE("大小")
+    NAME("name"), DATE("date"), SIZE("size")
 }
 enum class SortOrder { ASC, DESC }
 

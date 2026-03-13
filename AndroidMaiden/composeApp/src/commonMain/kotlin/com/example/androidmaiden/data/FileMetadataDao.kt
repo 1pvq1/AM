@@ -22,6 +22,12 @@ interface FileMetadataDao {
     @Query("DELETE FROM file_metadata WHERE path = :path")
     suspend fun deleteByPath(path: String)
 
+    @Query("DELETE FROM file_metadata WHERE path IN (:paths)")
+    suspend fun deleteByPaths(paths: List<String>)
+
+    @Query("SELECT path FROM file_metadata WHERE parentPath = :path")
+    suspend fun getPathsByParent(path: String): List<String>
+
     @Query("SELECT lastModified FROM file_metadata WHERE path = :path LIMIT 1")
     suspend fun getStoredTimestamp(path: String): Long?
 

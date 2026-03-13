@@ -40,11 +40,10 @@ class AndroidFileSystemScanner(
         // 1. Check if the folder has changed since the last scan
         val storedTimestamp = fileDao.getStoredTimestamp(path)
 
-        // If timestamps match, we skip scanning the children of this directory
+        // Even if timestamps match, we MUST check for deletions in this directory.
+        // Some file operations (especially external ones) don't always update the parent folder's timestamp.
         if (storedTimestamp != null && storedTimestamp == currentTimestamp) {
-            // We still need to recurse into subdirectories because a child
-            // deep in the tree might have changed without affecting this parent's timestamp.
-            // However, listFiles() is skipped for this specific level's file entries.
+            cleanupDeletedFiles(directory)
             scanSubDirectoriesOnly(directory)
             return
         }
@@ -52,6 +51,18 @@ class AndroidFileSystemScanner(
         // 2. If it's new or changed, list the children
         val children = directory.listFiles() ?: return
         val metadataList = mutableListOf<FileMetadata>()
+        
+        // --- DELETION SYNC ---
+        // Get all paths currently stored in DB for this directory
+        val storedPaths = fileDao.getPathsByParent(path)
+        val currentChildPaths = children.map { it.absolutePath }.toSet()
+        
+        // Identify paths in DB that are no longer on disk
+        val deletedPaths = storedPaths.filter { it !in currentChildPaths }
+        if (deletedPaths.isNotEmpty()) {
+            fileDao.deleteByPaths(deletedPaths)
+        }
+        // ---------------------
 
         for (child in children) {
             metadataList.add(
@@ -71,13 +82,12 @@ class AndroidFileSystemScanner(
             }
         }
 
-        // 4. Persistence: Batch upsert the children to Room。
-        // Batch update the database for this specific folder
+        // 4. Persistence: Batch upsert the children to Room
         if (metadataList.isNotEmpty()) {
             fileDao.upsertFiles(metadataList)
         }
 
-        // 5. Update the directory's own timestamp in the DB so we can skip it next time
+        // 5. Update the directory's own timestamp in the DB
         fileDao.upsertFiles(listOf(
             FileMetadata(
                 path = path,
@@ -88,6 +98,22 @@ class AndroidFileSystemScanner(
                 parentPath = directory.parent ?: ""
             )
         ))
+    }
+
+    /**
+     * Checks files in the DB for a directory that hasn't changed its timestamp,
+     * ensuring that files deleted externally are removed from the app's database.
+     */
+    private suspend fun cleanupDeletedFiles(directory: File) {
+        val path = directory.absolutePath
+        val storedPaths = fileDao.getPathsByParent(path)
+        
+        // Filter for paths that no longer exist physically
+        val deletedPaths = storedPaths.filter { !File(it).exists() }
+        
+        if (deletedPaths.isNotEmpty()) {
+            fileDao.deleteByPaths(deletedPaths)
+        }
     }
 
     /**

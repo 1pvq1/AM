@@ -18,8 +18,8 @@ data class PreviewItem(
 )
 
 /**
- * 开发预览函数，仅用于 Studio Live Edit / Preview
- * 不会在实际应用中调用
+ * Development preview functions, only for Studio Live Edit / Preview
+ * Will not be called in the actual application
  */
 @Preview(showBackground = true, widthDp = 800, heightDp = 1000)
 @Composable

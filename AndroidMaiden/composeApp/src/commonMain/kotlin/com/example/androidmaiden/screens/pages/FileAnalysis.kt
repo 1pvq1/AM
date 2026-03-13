@@ -36,7 +36,7 @@ fun FileAnalysisScreen(onNavigateUp: () -> Unit = {}) {
 //    var useMock by remember { mutableStateOf(true) }
 
     val vm = remember { FileScannerViewModel() }
-    var useMock = vm.useMock
+    val useMock = vm.useMock
     LaunchedEffect(Unit) { vm.loadRoot(useMock) }
     val root = vm.fileTree
     val isLoading = vm.isLoading
