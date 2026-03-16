@@ -85,6 +85,53 @@
     <string name="folders_first">Folders First</string>
     <string name="sort_by">Sort by:</string>
 
+    <!-- Simulated File System (simFileSys.kt) -->
+    <string name="file_sys_root_desc">Android 12 File System Root</string>
+    <string name="file_sys_storage_desc">General storage entry (Internal/External/Mounted volumes)</string>
+    <string name="file_sys_emulated_desc">Emulated mount point for internal storage</string>
+    <string name="file_sys_user_home_desc">User home directory (/sdcard points here)</string>
+    <string name="file_sys_android_data_desc">App data directory (data, media, obb)</string>
+    <string name="file_sys_app_private_data_desc">App private data (restricted by sandbox and permissions)</string>
+    <string name="file_sys_app_media_data_desc">App media data (indexed)</string>
+    <string name="file_sys_obb_desc">Large resource packs (games, etc.)</string>
+    <string name="file_sys_download_desc">Downloaded files</string>
+    <string name="file_sys_documents_desc">Document files</string>
+    <string name="file_sys_dcim_desc">Camera content</string>
+    <string name="file_sys_pictures_desc">Pictures and screenshots</string>
+    <string name="file_sys_screenshots_desc">Screenshots (some devices in Pictures/Screenshots)</string>
+    <string name="file_sys_movies_desc">Video files</string>
+    <string name="file_sys_music_desc">Music files</string>
+    <string name="file_sys_podcasts_desc">Podcast audio</string>
+    <string name="file_sys_ringtones_desc">Ringtones</string>
+    <string name="file_sys_alarms_desc">Alarm sounds</string>
+    <string name="file_sys_notifications_desc">Notification sounds</string>
+    <string name="file_sys_recordings_desc">Recordings</string>
+    <string name="file_sys_external_storage_desc">External/Removable storage volumes (SD card/USB, Volume ID)</string>
+    <string name="file_sys_sdcard_link_desc">Symbolic link to /storage/emulated/0 (User home)</string>
+    <string name="file_sys_data_partition_desc">App and system data partition</string>
+    <string name="file_sys_installed_apks_desc">APKs of installed apps (permission protected)</string>
+    <string name="file_sys_user_data_root_desc">User-separated app data root (e.g., /data/user/0)</string>
+    <string name="file_sys_direct_boot_desc">Direct Boot domain (small amount of data available before device unlock)</string>
+    <string name="file_sys_media_map_desc">Media data (mapped with emulated storage)</string>
+    <string name="file_sys_system_config_desc">System-level configuration and state data</string>
+    <string name="file_sys_system_partition_desc">System partition (framework, system apps, libs, bin)</string>
+    <string name="file_sys_system_ext_desc">System extension partition (AOSP + device extensions)</string>
+    <string name="file_sys_product_desc">Product-layer system components (device/market specific)</string>
+    <string name="file_sys_vendor_desc">Vendor partition (drivers, HAL, vendor components)</string>
+    <string name="file_sys_odm_desc">ODM partition (hardware adaptation, vendor customization)</string>
+    <string name="file_sys_apex_desc">APEX package mount point (modular system components)</string>
+    <string name="file_sys_linker_config_desc">Linker configuration (runtime library search paths)</string>
+    <string name="file_sys_etc_desc">System configuration (SELinux, hosts, etc.)</string>
+    <string name="file_sys_proc_desc">Kernel and process information (virtual file system, generated on read)</string>
+    <string name="file_sys_sys_desc">Device/driver status (sysfs)</string>
+    <string name="file_sys_dev_desc">Device nodes (hardware interfaces)</string>
+    <string name="file_sys_mnt_desc">Mount points (including runtime mode wrappers)</string>
+    <string name="file_sys_cache_desc">System cache directory</string>
+    <string name="file_sys_metadata_desc">Device metadata partition (Encryption/Provisioning, etc.)</string>
+    <string name="file_sys_persist_desc">Persistent calibration data (Sensors/Baseband, device dependent)</string>
+    <string name="file_sys_oem_desc">OEM partition (reserved on some devices)</string>
+    <string name="file_sys_config_desc">System/Kernel configuration (device specific)</string>
+
     <!-- Settings Pages -->
     <string name="settings_llm_title">LLM Settings</string>
     <string name="settings_advanced_title">Advanced Settings</string>

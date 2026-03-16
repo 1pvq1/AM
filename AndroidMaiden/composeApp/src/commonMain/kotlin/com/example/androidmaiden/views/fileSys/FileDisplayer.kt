@@ -1,0 +1,383 @@
+package com.example.androidmaiden.views.fileSys
+
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import coil3.compose.AsyncImage
+import com.example.androidmaiden.model.FileSysNode
+import com.example.androidmaiden.utils.FileTypeUtils
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
+
+/**
+ * Enhanced file previewer.
+ * Features:
+ * 1. Image: Zoom, Rotate (Manual & Gesture), Drag (with auto-reset), and Full-screen toggle.
+ * 2. Media: Video/Audio playback simulation.
+ * 3. Navigation: Shows parent folder name in title.
+ * 4. Actions: Bottom action bar for tools like rotation.
+ */
+@Composable
+fun FilePreviewOverlay(
+    file: FileSysNode,
+    onDismiss: () -> Unit
+) {
+    val category = remember(file.name) { FileTypeUtils.getExtensionType(file.name) }
+    
+    var isUiVisible by remember { mutableStateOf(true) }
+    var isBottomBarVisible by remember { mutableStateOf(false) }
+    var rotation by remember { mutableFloatStateOf(0f) }
+    var isVisible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) { isVisible = true }
+
+    val parentFolder = remember(file.path) {
+        val path = file.path?.replace("\\", "/") ?: ""
+        path.substringBeforeLast("/", "").substringAfterLast("/", "").ifBlank { "Root" }
+    }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = fadeIn(tween(300)) + scaleIn(initialScale = 0.8f, animationSpec = tween(300)),
+            exit = fadeOut(tween(200)) + scaleOut(targetScale = 0.8f, animationSpec = tween(200))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+            ) {
+                // Main Content
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    when (category) {
+                        "Images" -> ImagePreview(file, rotation) { 
+                            isUiVisible = !isUiVisible 
+                            if (!isUiVisible) isBottomBarVisible = false
+                        }
+                        "Videos" -> VideoPreview(file)
+                        "Audio" -> AudioPreview(file)
+                        else -> GenericPreview(file)
+                    }
+                }
+
+                // Top Toolbar
+                AnimatedVisibility(
+                    visible = isUiVisible,
+                    enter = slideInVertically { -it } + fadeIn(),
+                    exit = slideOutVertically { -it } + fadeOut()
+                ) {
+                    Surface(
+                        color = Color.Black.copy(alpha = 0.6f),
+                        modifier = Modifier.fillMaxWidth().statusBarsPadding()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(onClick = onDismiss) {
+                                Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
+                            }
+                            Text(
+                                text = parentFolder,
+                                color = Color.White,
+                                style = MaterialTheme.typography.titleMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
+                            )
+                            
+                            IconButton(onClick = { isBottomBarVisible = !isBottomBarVisible }) {
+                                Icon(
+                                    imageVector = if (isBottomBarVisible) Icons.Default.ExpandMore else Icons.Default.MoreVert,
+                                    contentDescription = "More",
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Bottom Action Bar
+                AnimatedVisibility(
+                    visible = isUiVisible && isBottomBarVisible,
+                    enter = slideInVertically { it } + fadeIn(),
+                    exit = slideOutVertically { it } + fadeOut(),
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                ) {
+                    Surface(
+                        color = Color.Black.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+                        modifier = Modifier.fillMaxWidth().navigationBarsPadding()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (category == "Images") {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    IconButton(
+                                        onClick = { rotation = (rotation + 90f) % 360f },
+                                        modifier = Modifier.size(48.dp).background(Color.White.copy(0.1f), CircleShape)
+                                    ) {
+                                        Icon(Icons.AutoMirrored.Filled.RotateRight, null, tint = Color.White)
+                                    }
+                                    Text("Rotate", color = Color.White, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(top = 4.dp))
+                                }
+                            }
+                            // Add more actions here if needed
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* ISSUES:
+* 1. abnormal dragging after rotation, Slide in the opposite direction
+* 2. On the phone, the system-level top status bar and bottom system navigation bar do not fade out accordingly.
+* */
+@Composable
+private fun ImagePreview(file: FileSysNode, manualRotation: Float, onToggleUi: () -> Unit) {
+    var scale by remember { mutableFloatStateOf(1f) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
+    var gestureRotation by remember { mutableFloatStateOf(0f) }
+    
+    val totalRotation = manualRotation + gestureRotation
+    
+    val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
+        scale = (scale * zoomChange).coerceIn(1f, 5f)
+        gestureRotation += rotationChange
+        
+        // Fix for abnormal dragging after rotation:
+        // Translate the screen-space offset delta into the layer's local coordinate system.
+        val angleRad = -totalRotation * (PI / 180f).toFloat()
+        val cosA = cos(angleRad)
+        val sinA = sin(angleRad)
+        
+        val rotatedOffset = Offset(
+            x = offsetChange.x * cosA - offsetChange.y * sinA,
+            y = offsetChange.x * sinA + offsetChange.y * cosA
+        )
+        offset += rotatedOffset
+    }
+
+    // Auto-reset when zoomed out
+    LaunchedEffect(scale) {
+        if (scale <= 1f) {
+            val startOffset = offset
+            val startGestureRotation = gestureRotation
+            animate(0f, 1f, animationSpec = tween(400, easing = FastOutSlowInEasing)) { value, _ ->
+                offset = Offset(
+                    lerp(startOffset.x, 0f, value),
+                    lerp(startOffset.y, 0f, value)
+                )
+                gestureRotation = lerp(startGestureRotation, 0f, value)
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = { onToggleUi() },
+                    onDoubleTap = {
+                        if (scale > 1f) {
+                            scale = 1f
+                            // offset and gestureRotation will be reset by LaunchedEffect
+                        } else {
+                            scale = 2.5f
+                        }
+                    }
+                )
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        AsyncImage(
+            model = file.path,
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    translationX = offset.x
+                    translationY = offset.y
+                    rotationZ = totalRotation
+                }
+                .transformable(state = state),
+            contentScale = ContentScale.Fit
+        )
+    }
+}
+
+private fun lerp(start: Float, stop: Float, fraction: Float): Float {
+    return (1 - fraction) * start + fraction * stop
+}
+
+@Composable
+private fun VideoPreview(file: FileSysNode) {
+    var isPlaying by remember { mutableStateOf(false) }
+    var progress by remember { mutableFloatStateOf(0f) }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            AsyncImage(
+                model = file.path,
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth().aspectRatio(16/9f),
+                contentScale = ContentScale.Fit
+            )
+            IconButton(
+                onClick = { isPlaying = !isPlaying },
+                modifier = Modifier.size(72.dp)
+            ) {
+                Icon(
+                    imageVector = if (isPlaying) Icons.Default.PauseCircleFilled else Icons.Default.PlayCircleFilled,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    tint = Color.White.copy(alpha = 0.8f)
+                )
+            }
+        }
+        
+        Spacer(Modifier.height(32.dp))
+        
+        Slider(
+            value = progress,
+            onValueChange = { progress = it },
+            modifier = Modifier.padding(horizontal = 32.dp),
+            colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Color.White)
+        )
+        
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { progress = (progress - 0.1f).coerceAtLeast(0f) }) {
+                Icon(Icons.Default.Replay10, null, tint = Color.White)
+            }
+            IconButton(onClick = { isPlaying = !isPlaying }) {
+                Icon(if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow, null, tint = Color.White, modifier = Modifier.size(32.dp))
+            }
+            IconButton(onClick = { progress = (progress + 0.1f).coerceAtMost(1f) }) {
+                Icon(Icons.Default.Forward10, null, tint = Color.White)
+            }
+        }
+    }
+}
+
+@Composable
+private fun AudioPreview(file: FileSysNode) {
+    Card(
+        modifier = Modifier.padding(32.dp).fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        shape = RoundedCornerShape(24.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.MusicNote, null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
+            }
+            
+            Spacer(Modifier.height(24.dp))
+            Text(file.name, style = MaterialTheme.typography.titleLarge, maxLines = 2, textAlign = TextAlign.Center)
+            Text("Unknown Artist", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.outline)
+            
+            Spacer(Modifier.height(16.dp))
+            Slider(value = 0.4f, onValueChange = {})
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = {}) { Icon(Icons.Default.SkipPrevious, null, modifier = Modifier.size(32.dp)) }
+                FilledIconButton(onClick = {}, modifier = Modifier.size(64.dp)) {
+                    Icon(Icons.Default.PlayArrow, null, modifier = Modifier.size(32.dp))
+                }
+                IconButton(onClick = {}) { Icon(Icons.Default.SkipNext, null, modifier = Modifier.size(32.dp)) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun GenericPreview(file: FileSysNode) {
+    Card(
+        modifier = Modifier.padding(32.dp),
+        shape = RoundedCornerShape(24.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.InsertDriveFile,
+                contentDescription = null,
+                modifier = Modifier.size(80.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(file.name, style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
+            Spacer(Modifier.height(8.dp))
+            Text("Preview under development", color = MaterialTheme.colorScheme.outline)
+            Spacer(Modifier.height(32.dp))
+            Button(
+                onClick = { /* Intent implementation */ },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.OpenInNew, null)
+                Spacer(Modifier.width(8.dp))
+                Text("Open in System App")
+            }
+        }
+    }
+}

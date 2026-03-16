@@ -3,6 +3,11 @@
     <string name="details">Détails</string>
     <string name="ellipsis">...</string>
 
+    <!-- Navigation Bar -->
+    <string name="nav_home">Accueil</string>
+    <string name="nav_skills">Compétences</string>
+    <string name="nav_settings">Paramètres</string>
+
     <!-- Home Page -->
     <string name="home_greeting_default">\"Bon retour, Maître ! Quels sont les projets ?\"</string>
     <string name="home_daily_tasks">Tâches quotidiennes</string>
@@ -78,6 +83,53 @@
     <string name="descending">Décroissant</string>
     <string name="folders_first">Dossiers en premier</string>
     <string name="sort_by">Trier par :</string>
+
+    <!-- Simulated File System (simFileSys.kt) -->
+    <string name="file_sys_root_desc">Racine du système de fichiers Android 12</string>
+    <string name="file_sys_storage_desc">Entrée de stockage générale (interne/externe/volumes montés)</string>
+    <string name="file_sys_emulated_desc">Point de montage émulé pour le stockage interne</string>
+    <string name="file_sys_user_home_desc">Répertoire personnel de l\'utilisateur (/sdcard pointe ici)</string>
+    <string name="file_sys_android_data_desc">Répertoire de données d\'application (data, media, obb)</string>
+    <string name="file_sys_app_private_data_desc">Données privées de l\'application (restreintes par le bac à sable et les autorisations)</string>
+    <string name="file_sys_app_media_data_desc">Données multimédias de l\'application (indexées)</string>
+    <string name="file_sys_obb_desc">Packs de ressources volumineux (jeux, etc.)</string>
+    <string name="file_sys_download_desc">Fichiers téléchargés</string>
+    <string name="file_sys_documents_desc">Fichiers de documents</string>
+    <string name="file_sys_dcim_desc">Contenu de la caméra</string>
+    <string name="file_sys_pictures_desc">Images et captures d\'écran</string>
+    <string name="file_sys_screenshots_desc">Captures d\'écran (certains appareils dans Pictures/Screenshots)</string>
+    <string name="file_sys_movies_desc">Fichiers vidéo</string>
+    <string name="file_sys_music_desc">Fichiers musicaux</string>
+    <string name="file_sys_podcasts_desc">Audio de podcast</string>
+    <string name="file_sys_ringtones_desc">Sonneries</string>
+    <string name="file_sys_alarms_desc">Sons d\'alarme</string>
+    <string name="file_sys_notifications_desc">Sons de notification</string>
+    <string name="file_sys_recordings_desc">Enregistrements</string>
+    <string name="file_sys_external_storage_desc">Volumes de stockage externes/amovibles (carte SD/USB, ID de volume)</string>
+    <string name="file_sys_sdcard_link_desc">Lien symbolique vers /storage/emulated/0 (Accueil utilisateur)</string>
+    <string name="file_sys_data_partition_desc">Partition de données d\'application et système</string>
+    <string name="file_sys_installed_apks_desc">APK des applications installées (protégés par autorisation)</string>
+    <string name="file_sys_user_data_root_desc">Racine des données d\'application séparée par l\'utilisateur (par ex. /data/user/0)</string>
+    <string name="file_sys_direct_boot_desc">Domaine Direct Boot (petite quantité de données disponibles avant le déverrouillage de l\'appareil)</string>
+    <string name="file_sys_media_map_desc">Données multimédias (mappées avec le stockage émulé)</string>
+    <string name="file_sys_system_config_desc">Configuration au niveau du système et données d\'état</string>
+    <string name="file_sys_system_partition_desc">Partition système (framework, applications système, bibliothèques, bin)</string>
+    <string name="file_sys_system_ext_desc">Partition d\'extension du système (AOSP + extensions d\'appareil)</string>
+    <string name="file_sys_product_desc">Composants système de la couche produit (spécifiques à l\'appareil/au marché)</string>
+    <string name="file_sys_vendor_desc">Partition du fournisseur (pilotes, HAL, composants du fournisseur)</string>
+    <string name="file_sys_odm_desc">Partition ODM (adaptation matérielle, personnalisation du fournisseur)</string>
+    <string name="file_sys_apex_desc">Point de montage du package APEX (composants système modulaires)</string>
+    <string name="file_sys_linker_config_desc">Configuration de l\'éditeur de liens (chemins de recherche de bibliothèque d\'exécution)</string>
+    <string name="file_sys_etc_desc">Configuration système (SELinux, hôtes, etc.)</string>
+    <string name="file_sys_proc_desc">Informations sur le noyau et les processus (système de fichiers virtuel, généré à la lecture)</string>
+    <string name="file_sys_sys_desc">État de l\'appareil/du pilote (sysfs)</string>
+    <string name="file_sys_dev_desc">Nœuds d\'appareil (interfaces matérielles)</string>
+    <string name="file_sys_mnt_desc">Points de montage (y compris les wrappers de mode d\'exécution)</string>
+    <string name="file_sys_cache_desc">Répertoire de cache système</string>
+    <string name="file_sys_metadata_desc">Partition de métadonnées de l\'appareil (chiffrement/Provisioning, etc.)</string>
+    <string name="file_sys_persist_desc">Données d\'étalonnage persistantes (capteurs/bande de base, selon l\'appareil)</string>
+    <string name="file_sys_oem_desc">Partition OEM (réservée sur certains appareils)</string>
+    <string name="file_sys_config_desc">Configuration système/noyau (spécifique à l\'appareil)</string>
 
     <!-- Settings Pages -->
     <string name="settings_llm_title">Paramètres LLM</string>

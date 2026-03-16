@@ -1,11 +1,11 @@
 package com.example.androidmaiden.screens.pages
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
@@ -23,8 +23,10 @@ import androidx.compose.ui.unit.sp
 import com.example.androidmaiden.model.*
 import com.example.androidmaiden.utils.*
 import com.example.androidmaiden.views.*
+import com.example.androidmaiden.views.fileSys.FilePreviewOverlay
 import com.example.androidmaiden.views.fileSys.ViewMode
 import coil3.compose.AsyncImage
+import com.example.androidmaiden.views.eg.FileListPagePreviewSamples
 import kotlinx.datetime.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.ExperimentalTime
@@ -32,12 +34,10 @@ import kotlin.time.ExperimentalTime
 enum class SortBy { NAME, SIZE, DATE }
 
 /**
- * FilesListPage needs to evolve from a simple list into a multi-functional viewer, the best
- * strategy is to move toward a Type-Aware Adaptive Layout. Instead of a "one-size-fits-all" list,
- * the UI should swap its "content cell" and "arrangement logic" based on the category it is
- * currently displaying.
- * */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
+ * FilesListPage needs to evolve from a simple list into a multi-functional viewer.
+ * The best strategy is to move toward a Type-Aware Adaptive Layout.
+ */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class, ExperimentalFoundationApi::class)
 @Composable
 fun FilesListPage(categoryName: String, files: List<FileSysNode>, onBack: () -> Unit) {
     val categoryType = remember(categoryName) {
@@ -62,6 +62,13 @@ fun FilesListPage(categoryName: String, files: List<FileSysNode>, onBack: () -> 
     var viewMode by remember { mutableStateOf(initialMode) }
     var sortOrder by remember { mutableStateOf(SortBy.DATE) }
     var showSortMenu by remember { mutableStateOf(false) }
+    
+    // Grid density control
+    var gridColumns by remember { mutableIntStateOf(3) }
+    var showGridDensityMenu by remember { mutableStateOf(false) }
+
+    // Preview state
+    var previewFile by remember { mutableStateOf<FileSysNode?>(null) }
 
     val sortedFiles = remember(files, sortOrder) {
         when (sortOrder) {
@@ -105,13 +112,57 @@ fun FilesListPage(categoryName: String, files: List<FileSysNode>, onBack: () -> 
                             )
                         }
                     }
-                    IconButton(onClick = {
-                        viewMode = if (viewMode == ViewMode.LIST) ViewMode.GRID else ViewMode.LIST
-                    }) {
-                        Icon(
-                            imageVector = if (viewMode == ViewMode.LIST) Icons.Default.GridView else Icons.Default.ViewList,
-                            contentDescription = "Switch View"
-                        )
+                    
+                    Box(contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier
+                                .minimumInteractiveComponentSize()
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .combinedClickable(
+                                    onClick = {
+                                        viewMode = if (viewMode == ViewMode.LIST) ViewMode.GRID else ViewMode.LIST
+                                    },
+                                    onLongClick = {
+                                        if (viewMode == ViewMode.GRID) showGridDensityMenu = true
+                                    }
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = if (viewMode == ViewMode.LIST) Icons.Default.GridView else Icons.Default.ViewList,
+                                contentDescription = "Switch View",
+                                tint = if (showGridDensityMenu) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                            )
+                        }
+                        
+                        DropdownMenu(
+                            expanded = showGridDensityMenu,
+                            onDismissRequest = { showGridDensityMenu = false }
+                        ) {
+                            Text(
+                                "Grid Density",
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            listOf(2, 3, 4).forEach { cols ->
+                                DropdownMenuItem(
+                                    text = { Text("$cols Columns") },
+                                    onClick = {
+                                        gridColumns = cols
+                                        showGridDensityMenu = false
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = if (gridColumns == cols) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked,
+                                            contentDescription = null,
+                                            tint = if (gridColumns == cols) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                                        )
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             )
@@ -123,42 +174,81 @@ fun FilesListPage(categoryName: String, files: List<FileSysNode>, onBack: () -> 
             }
         } else {
             Box(modifier = Modifier.padding(padding)) {
-                FileCellFactory(viewMode, categoryType, sortedFiles)
+                FileCellFactory(
+                    viewMode = viewMode,
+                    categoryType = categoryType,
+                    files = sortedFiles,
+                    gridColumns = gridColumns,
+                    onFileClick = { previewFile = it }
+                )
             }
         }
+    }
+
+    // Full screen preview overlay
+    previewFile?.let { file ->
+        FilePreviewOverlay(
+            file = file,
+            onDismiss = { previewFile = null }
+        )
     }
 }
 
 @OptIn(ExperimentalTime::class)
 @Composable
-private fun FileCellFactory(viewMode: ViewMode, categoryType: String, files: List<FileSysNode>) {
+private fun FileCellFactory(
+    viewMode: ViewMode,
+    categoryType: String,
+    files: List<FileSysNode>,
+    gridColumns: Int,
+    onFileClick: (FileSysNode) -> Unit
+) {
     val isMedia = categoryType == "Images" || categoryType == "Videos"
+    val useGrid = viewMode == ViewMode.GRID
 
-    if (viewMode == ViewMode.GRID && isMedia) {
-        val groupedFiles = remember(files) {
-            files.groupBy { file ->
-                file.lastModified?.let { ms ->
-                    val instant = Instant.fromEpochMilliseconds(ms)
-                    val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-                    "${local.month.name} ${local.year}"
-                } ?: "UNKNOWN DATE"
-            }
-        }
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 120.dp),
-            contentPadding = PaddingValues(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            groupedFiles.forEach { (date, items) ->
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    StickyDateHeader(date, count = items.size)
+    if (useGrid) {
+        if (isMedia) {
+            val groupedFiles = remember(files) {
+                files.groupBy { file ->
+                    file.lastModified?.let { ms ->
+                        val instant = Instant.fromEpochMilliseconds(ms)
+                        val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+                        "${local.month.name} ${local.year}"
+                    } ?: "UNKNOWN DATE"
                 }
-                items(items) { file ->
+            }
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(gridColumns),
+                contentPadding = PaddingValues(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                groupedFiles.forEach { (date, items) ->
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        StickyDateHeader(date, count = items.size)
+                    }
+                    items(items) { file ->
+                        val modifier = Modifier.clickable { onFileClick(file) }
+                        when (categoryType) {
+                            "Images" -> ImagesCell(file, ViewMode.GRID, modifier)
+                            "Videos" -> VideosCell(file, ViewMode.GRID, modifier)
+                            else -> GenericItemCell(file, ViewMode.GRID, modifier)
+                        }
+                    }
+                }
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(gridColumns),
+                contentPadding = PaddingValues(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(files) { file ->
+                    val modifier = Modifier.clickable { onFileClick(file) }
                     when (categoryType) {
-                        "Images" -> ImagesCell(file, ViewMode.GRID)
-                        "Videos" -> VideosCell(file, ViewMode.GRID)
-                        else -> GenericItemCell(file, ViewMode.GRID)
+                        "APKs" -> APKCell(file, ViewMode.GRID, modifier)
+                        else -> GenericItemCell(file, ViewMode.GRID, modifier)
                     }
                 }
             }
@@ -166,14 +256,15 @@ private fun FileCellFactory(viewMode: ViewMode, categoryType: String, files: Lis
     } else {
         LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
             items(files) { file ->
+                val modifier = Modifier.clickable { onFileClick(file) }
                 when (categoryType) {
-                    "Images" -> ImagesCell(file, viewMode)
-                    "Videos" -> VideosCell(file, viewMode)
-                    "Audio" -> AudioCell(file, viewMode)
-                    "Documents" -> DocumentsCell(file, viewMode)
-                    "APKs" -> APKCell(file, viewMode)
-                    "Archives" -> ArchiveCell(file, viewMode)
-                    else -> GenericItemCell(file, viewMode)
+                    "Images" -> ImagesCell(file, viewMode, modifier)
+                    "Videos" -> VideosCell(file, viewMode, modifier)
+                    "Audio" -> AudioCell(file, viewMode, modifier)
+                    "Documents" -> DocumentsCell(file, viewMode, modifier)
+                    "APKs" -> APKCell(file, viewMode, modifier)
+                    "Archives" -> ArchiveCell(file, viewMode, modifier)
+                    else -> GenericItemCell(file, viewMode, modifier)
                 }
                 if (viewMode == ViewMode.LIST) HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
             }
@@ -181,36 +272,35 @@ private fun FileCellFactory(viewMode: ViewMode, categoryType: String, files: Lis
     }
 }
 
-/** Standard Detailed Project Presentation */
 @Composable
-private fun GenericItemCell(file: FileSysNode, viewMode: ViewMode) {
+private fun GenericItemCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
     if (viewMode == ViewMode.LIST) {
         ListItem(
             headlineContent = { Text(file.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
             supportingContent = { Text("${formatSize(file.size)} • ${file.path ?: ""}") },
             leadingContent = {
                 Icon(
-                    imageVector = if (file.isFolder) Icons.Default.Folder else Icons.Default.InsertDriveFile,
+                    imageVector = if (file.isFolder) Icons.Default.Folder else Icons.AutoMirrored.Filled.InsertDriveFile,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary
                 )
-            }
+            },
+            modifier = modifier
         )
     } else {
-        Card(modifier = Modifier.fillMaxWidth().padding(4.dp)) {
+        Card(modifier = modifier.fillMaxWidth().padding(4.dp)) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
-                Icon(Icons.Default.InsertDriveFile, null, modifier = Modifier.size(48.dp))
+                Icon(Icons.AutoMirrored.Filled.InsertDriveFile, null, modifier = Modifier.size(48.dp))
                 Text(file.name, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }
 }
 
-/** Provides file display and layout for image types */
 @Composable
-private fun ImagesCell(file: FileSysNode, viewMode: ViewMode) {
+private fun ImagesCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
     if (viewMode == ViewMode.GRID) {
-        Card(shape = RoundedCornerShape(8.dp)) {
+        Card(shape = RoundedCornerShape(8.dp), modifier = modifier) {
             Box {
                 AsyncImage(
                     model = file.path,
@@ -244,15 +334,16 @@ private fun ImagesCell(file: FileSysNode, viewMode: ViewMode) {
                     modifier = Modifier.size(40.dp).clip(RoundedCornerShape(4.dp)),
                     contentScale = ContentScale.Crop
                 )
-            }
+            },
+            modifier = modifier
         )
     }
 }
 
 @Composable
-private fun VideosCell(file: FileSysNode, viewMode: ViewMode) {
+private fun VideosCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
     if (viewMode == ViewMode.GRID) {
-        Card(modifier = Modifier.fillMaxWidth()) {
+        Card(modifier = modifier.fillMaxWidth()) {
             Box {
                 AsyncImage(
                     model = file.path,
@@ -266,9 +357,10 @@ private fun VideosCell(file: FileSysNode, viewMode: ViewMode) {
                     tint = Color.White.copy(alpha = 0.8f)
                 )
                 Text(
-                    "HD • 00:42", // Mock metadata
+                    "HD • 00:42",
                     color = Color.White,
-                    modifier = Modifier.align(Alignment.BottomEnd).padding(4.dp).background(Color.Black.copy(0.6f), RoundedCornerShape(2.dp)).padding(horizontal = 4.dp),
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(4.dp)
+                        .background(Color.Black.copy(0.6f), RoundedCornerShape(2.dp)).padding(horizontal = 4.dp),
                     style = MaterialTheme.typography.labelSmall
                 )
             }
@@ -292,23 +384,56 @@ private fun VideosCell(file: FileSysNode, viewMode: ViewMode) {
                         tint = Color.White
                     )
                 }
-            }
+            },
+            modifier = modifier
         )
     }
 }
 
 @Composable
-private fun AudioCell(file: FileSysNode, viewMode: ViewMode) {
+private fun AudioCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
+    val path = file.path ?: ""
+    val isRecording = remember(path) {
+        val keywords = listOf("record", "voice")
+        keywords.any { path.contains(it, ignoreCase = true) }
+    }
+
     ListItem(
-        headlineContent = { Text(file.name) },
-        supportingContent = { Text("Artist • Album • 320kbps • ${formatSize(file.size)}") },
-        leadingContent = { Icon(Icons.Default.MusicNote, null, tint = Color(0xFFE91E63)) },
-        trailingContent = { Text("03:45", style = MaterialTheme.typography.labelSmall) }
+        headlineContent = { Text(file.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        supportingContent = {
+            val author = "Unknown Artist"
+            val album = "Unknown Album"
+            val bitrate = "Not available"
+            Text("$author • $album • $bitrate • ${formatSize(file.size)}")
+        },
+        leadingContent = {
+            Box(contentAlignment = Alignment.Center) {
+                AsyncImage(
+                    model = file.path,
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp).clip(RoundedCornerShape(4.dp)),
+                    contentScale = ContentScale.Crop,
+                    error = null
+                )
+
+                Icon(
+                    imageVector = when {
+                        isRecording -> Icons.Default.Mic
+                        else -> Icons.Default.Audiotrack
+                    },
+                    contentDescription = null,
+                    tint = if (isRecording) MaterialTheme.colorScheme.secondary else Color(0xFFE91E63),
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        },
+        trailingContent = { Text("00:00", style = MaterialTheme.typography.labelSmall) },
+        modifier = modifier
     )
 }
 
 @Composable
-private fun DocumentsCell(file: FileSysNode, viewMode: ViewMode) {
+private fun DocumentsCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
     val ext = file.name.substringAfterLast(".").uppercase()
     ListItem(
         headlineContent = { Text(file.name) },
@@ -326,14 +451,15 @@ private fun DocumentsCell(file: FileSysNode, viewMode: ViewMode) {
             ) {
                 Text(ext, color = Color.White, modifier = Modifier.padding(4.dp), fontWeight = FontWeight.Bold, fontSize = 10.sp)
             }
-        }
+        },
+        modifier = modifier
     )
 }
 
 @Composable
-private fun APKCell(file: FileSysNode, viewMode: ViewMode) {
+private fun APKCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
     if (viewMode == ViewMode.GRID) {
-        Card(modifier = Modifier.fillMaxWidth().padding(4.dp)) {
+        Card(modifier = modifier.fillMaxWidth().padding(4.dp)) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
                 Icon(Icons.Default.Android, null, modifier = Modifier.size(48.dp), tint = Color(0xFF3DDC84))
                 Text(file.name, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -344,17 +470,19 @@ private fun APKCell(file: FileSysNode, viewMode: ViewMode) {
         ListItem(
             headlineContent = { Text(file.name) },
             supportingContent = { Text("com.example.app • ${formatSize(file.size)}") },
-            leadingContent = { Icon(Icons.Default.Android, null, tint = Color(0xFF3DDC84)) }
+            leadingContent = { Icon(Icons.Default.Android, null, tint = Color(0xFF3DDC84)) },
+            modifier = modifier
         )
     }
 }
 
 @Composable
-private fun ArchiveCell(file: FileSysNode, viewMode: ViewMode) {
+private fun ArchiveCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
     ListItem(
         headlineContent = { Text(file.name) },
         supportingContent = { Text("${formatSize(file.size)} • ${formatDateTime(file.lastModified)}") },
-        leadingContent = { Icon(Icons.Default.Archive, null, tint = Color(0xFFFF9800)) }
+        leadingContent = { Icon(Icons.Default.Archive, null, tint = Color(0xFFFF9800)) },
+        modifier = modifier
     )
 }
 
@@ -363,82 +491,49 @@ private fun formatSize(size: Long?): String {
     return if (size > 1024 * 1024) "${size / (1024 * 1024)} MB" else "${size / 1024} KB"
 }
 
-// --- Preview Sample Data ---
-private object PreviewSamples {
-    val now = 1715856000000L
-    val lastMonth = now - 30L * 24 * 60 * 60 * 1000
-    val twoMonthsAgo = now - 60L * 24 * 60 * 60 * 1000
+/*
+ * --- Preview ---
+*/
 
-    val images = listOf(
-        FileSysNode("Beach_Sunset.jpg", 3500000, now, NodeType.FILE, path = "mock/beach.jpg"),
-        FileSysNode("Mountain_View.png", 5200000, now - 100000, NodeType.FILE, path = "mock/mountain.png"),
-        FileSysNode("Family_Dinner.webp", 1200000, lastMonth, NodeType.FILE, path = "mock/family.webp"),
-        FileSysNode("Old_Memory.jpg", 800000, twoMonthsAgo, NodeType.FILE, path = "mock/old.jpg")
-    )
-
-    val videos = listOf(
-        FileSysNode("Summer_Vacation.mp4", 150000000, now, NodeType.FILE, path = "mock/summer.mp4"),
-        FileSysNode("Birthday_Party.mkv", 300000000, lastMonth, NodeType.FILE, path = "mock/birthday.mkv"),
-        FileSysNode("Tutorial.mov", 50000000, lastMonth - 500000, NodeType.FILE, path = "mock/tutorial.mov")
-    )
-
-    val audio = listOf(
-        FileSysNode("Song_One.mp3", 5000000, now, NodeType.FILE),
-        FileSysNode("Podcast_Ep1.wav", 45000000, lastMonth, NodeType.FILE),
-        FileSysNode("Voice_Note.m4a", 1000000, twoMonthsAgo, NodeType.FILE)
-    )
-
-    val documents = listOf(
-        FileSysNode("Project_Report.pdf", 2500000, now, NodeType.FILE),
-        FileSysNode("Budget_Plan.xlsx", 1200000, lastMonth, NodeType.FILE),
-        FileSysNode("Notes.txt", 50000, twoMonthsAgo, NodeType.FILE),
-        FileSysNode("Resume.docx", 800000, now - 3600000, NodeType.FILE)
-    )
-
-    val apks = listOf(
-        FileSysNode("Game_Launcher.apk", 60000000, now, NodeType.FILE),
-        FileSysNode("Messenger_Lite.apk", 15000000, lastMonth, NodeType.FILE)
-    )
-
-    val archives = listOf(
-        FileSysNode("Photos_2023.zip", 500000000, twoMonthsAgo, NodeType.FILE),
-        FileSysNode("Old_Projects.rar", 1200000000, lastMonth, NodeType.FILE),
-        FileSysNode("Backup.7z", 250000000, now, NodeType.FILE)
-    )
+@Preview
+@Composable
+fun FilesListPageGeneralPreview() {
+    FilesListPage("General", FileListPagePreviewSamples.images) {}
 }
+
 
 @Preview
 @Composable
 fun FileListPageImagesPreview() {
-    FilesListPage("Images", PreviewSamples.images, {})
+    FilesListPage("Images", FileListPagePreviewSamples.images) {}
 }
 
 @Preview
 @Composable
 fun FileListPageVideosPreview() {
-    FilesListPage("Videos", PreviewSamples.videos, {})
+    FilesListPage("Videos", FileListPagePreviewSamples.videos) {}
 }
 
 @Preview
 @Composable
 fun FileListPageAudioPreview() {
-    FilesListPage("Audio", PreviewSamples.audio, {})
+    FilesListPage("Audio", FileListPagePreviewSamples.audio) {}
 }
 
 @Preview
 @Composable
 fun FileListPageDocumentsPreview() {
-    FilesListPage("Documents", PreviewSamples.documents, {})
+    FilesListPage("Documents", FileListPagePreviewSamples.documents) {}
 }
 
 @Preview
 @Composable
 fun FileListPageAPKsPreview() {
-    FilesListPage("APKs", PreviewSamples.apks, {})
+    FilesListPage("APKs", FileListPagePreviewSamples.apks) {}
 }
 
 @Preview
 @Composable
 fun FileListPageArchivesPreview() {
-    FilesListPage("Archives", PreviewSamples.archives, {})
+    FilesListPage("Archives", FileListPagePreviewSamples.archives) {}
 }

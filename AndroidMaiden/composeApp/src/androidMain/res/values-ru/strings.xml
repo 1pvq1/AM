@@ -3,6 +3,11 @@
     <string name="details">Подробности</string>
     <string name="ellipsis">...</string>
 
+    <!-- Navigation Bar -->
+    <string name="nav_home">Главная</string>
+    <string name="nav_skills">Навыки</string>
+    <string name="nav_settings">Настройки</string>
+
     <!-- Home Page -->
     <string name="home_greeting_default">\"С возвращением, Хозяин! Какие будут распоряжения?\"</string>
     <string name="home_daily_tasks">Ежедневные задачи</string>
@@ -78,6 +83,53 @@
     <string name="descending">По убыванию</string>
     <string name="folders_first">Сначала папки</string>
     <string name="sort_by">Сортировать по:</string>
+
+    <!-- Simulated File System (simFileSys.kt) -->
+    <string name="file_sys_root_desc">Корень файловой системы Android 12</string>
+    <string name="file_sys_storage_desc">Общий вход в хранилище (внутренние/внешние/подключенные тома)</string>
+    <string name="file_sys_emulated_desc">Эмулируемая точка монтирования для внутреннего хранилища</string>
+    <string name="file_sys_user_home_desc">Домашний каталог пользователя (/sdcard указывает сюда)</string>
+    <string name="file_sys_android_data_desc">Каталог данных приложений (data, media, obb)</string>
+    <string name="file_sys_app_private_data_desc">Личные данные приложения (ограничены песочницей и разрешениями)</string>
+    <string name="file_sys_app_media_data_desc">Медиаданные приложения (индексированные)</string>
+    <string name="file_sys_obb_desc">Большие пакеты ресурсов (игры и т. д.)</string>
+    <string name="file_sys_download_desc">Загруженные файлы</string>
+    <string name="file_sys_documents_desc">Документы</string>
+    <string name="file_sys_dcim_desc">Содержимое камеры</string>
+    <string name="file_sys_pictures_desc">Изображения и скриншоты</string>
+    <string name="file_sys_screenshots_desc">Скриншоты (на некоторых устройствах в Pictures/Screenshots)</string>
+    <string name="file_sys_movies_desc">Видеофайлы</string>
+    <string name="file_sys_music_desc">Музыкальные файлы</string>
+    <string name="file_sys_podcasts_desc">Аудиоподкасты</string>
+    <string name="file_sys_ringtones_desc">Рингтоны</string>
+    <string name="file_sys_alarms_desc">Звуки будильника</string>
+    <string name="file_sys_notifications_desc">Звуки уведомлений</string>
+    <string name="file_sys_recordings_desc">Записи</string>
+    <string name="file_sys_external_storage_desc">Внешние/съемные тома хранения (SD-карта/USB, ID тома)</string>
+    <string name="file_sys_sdcard_link_desc">Символическая ссылка на /storage/emulated/0 (Домашняя страница)</string>
+    <string name="file_sys_data_partition_desc">Раздел данных приложений и системы</string>
+    <string name="file_sys_installed_apks_desc">APK установленных приложений (защищены разрешениями)</string>
+    <string name="file_sys_user_data_root_desc">Корень данных приложения, разделенный пользователем (например, /data/user/0)</string>
+    <string name="file_sys_direct_boot_desc">Домен Direct Boot (небольшой объем данных, доступный до разблокировки устройства)</string>
+    <string name="file_sys_media_map_desc">Медиаданные (сопоставленные с эмулируемым хранилищем)</string>
+    <string name="file_sys_system_config_desc">Конфигурация уровня системы и данные о состоянии</string>
+    <string name="file_sys_system_partition_desc">Системный раздел (framework, системные приложения, библиотеки, bin)</string>
+    <string name="file_sys_system_ext_desc">Раздел расширения системы (AOSP + расширения устройства)</string>
+    <string name="file_sys_product_desc">Системные компоненты уровня продукта (зависят от устройства/рынка)</string>
+    <string name="file_sys_vendor_desc">Раздел поставщика (драйверы, HAL, компоненты поставщика)</string>
+    <string name="file_sys_odm_desc">Раздел ODM (адаптация оборудования, настройка поставщика)</string>
+    <string name="file_sys_apex_desc">Точка монтирования пакета APEX (модульные компоненты системы)</string>
+    <string name="file_sys_linker_config_desc">Конфигурация компоновщика (пути поиска библиотек времени выполнения)</string>
+    <string name="file_sys_etc_desc">Системная конфигурация (SELinux, hosts и т. д.)</string>
+    <string name="file_sys_proc_desc">Информация о ядре и процессах (виртуальная файловая система, создается при чтении)</string>
+    <string name="file_sys_sys_desc">Статус устройства/драйвера (sysfs)</string>
+    <string name="file_sys_dev_desc">Узлы устройств (аппаратные интерфейсы)</string>
+    <string name="file_sys_mnt_desc">Точки монтирования (включая оболочки режима выполнения)</string>
+    <string name="file_sys_cache_desc">Каталог системного кэша</string>
+    <string name="file_sys_metadata_desc">Раздел метаданных устройства (шифрование/Provisioning и т. д.)</string>
+    <string name="file_sys_persist_desc">Постоянные данные калибровки (датчики/Baseband, зависит от устройства)</string>
+    <string name="file_sys_oem_desc">Раздел OEM (зарезервирован на некоторых устройствах)</string>
+    <string name="file_sys_config_desc">Конфигурация системы/ядра (зависит от устройства)</string>
 
     <!-- Settings Pages -->
     <string name="settings_llm_title">Настройки LLM</string>

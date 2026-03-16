@@ -65,7 +65,6 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
 
     // 2. Trigger incremental sync once on startup
     LaunchedEffect(Unit) { // Load real data
-//        vm.loadRoot(useMock = false)
         vm.startSync()
     }
 
@@ -265,13 +264,6 @@ private fun FileCategoryCard(category: FileCategory, onClick: () -> Unit) {
     }
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun FileClassifyPagePreview() {
-    FileClassifyPage()
-}
-
 @Preview
 @Composable
 fun CategoryListViewPreview() {
@@ -283,4 +275,3 @@ fun CategoryListViewPreview() {
 fun CategoryGridViewPreview() {
     CategoryGridView(initialCategories) {}
 }
-

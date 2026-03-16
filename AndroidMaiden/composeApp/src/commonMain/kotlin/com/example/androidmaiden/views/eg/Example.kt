@@ -40,25 +40,25 @@ fun CommonUIBarCharacterSection(
     layout: CharacterLayout
 ) {
     Column {
-        // 显示切换按钮
+        // Show toggle button
         Button(onClick = { onShowDialogChange(!showDialog) }) {
-            Text(if (showDialog) "\uD83D\uDCAC只显示人物" else "\uD83D\uDC64显示人物+对话")
+            Text(if (showDialog) "\uD83D\uDCACShow only characters" else "\uD83D\uDC64Show characters + dialogue")
         }
 
         if (showDialog) {
-            // 布局切换按钮
+            // Layout toggle button
             Button(onClick = {
                 onLayoutChange(
                     if (layout == CharacterLayout.Horizontal) CharacterLayout.Vertical
                     else CharacterLayout.Horizontal
                 )
             }) {
-                Text("\uD83D\uDD04切换布局")
+                Text("\uD83D\uDD04Switch layout")
             }
         }
-        // 预留开发中按钮
-        OutlinedButton(onClick = { /* TODO: 开发中功能 */ }) {
-            Text("\uD83D\uDEE0开发中…")
+        // Reserved 'In Development' Button
+        OutlinedButton(onClick = { /* TODO: Feature under development */ }) {
+            Text("\uD83D\uDEE0In development…")
         }
     }
 
@@ -73,15 +73,15 @@ fun CommonUITaskPanel() {
             .padding(16.dp)
     ) {
         Text(
-            text = "今日任务",
+            text = "Today's task",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSecondaryContainer
         )
         Spacer(Modifier.height(8.dp))
 
-        // 示例任务列表
+        // Example Task List
         repeat(5) { index ->
-            Text("任务 ${index + 1}", style = MaterialTheme.typography.bodyLarge)
+            Text("Task ${index + 1}", style = MaterialTheme.typography.bodyLarge)
             Spacer(Modifier.height(4.dp))
         }
     }

@@ -84,6 +84,53 @@
     <string name="folders_first">文件夹优先</string>
     <string name="sort_by">排序方式：</string>
 
+    <!-- 模拟文件系统 (simFileSys.kt) -->
+    <string name="file_sys_root_desc">Android 12 文件系统根目录</string>
+    <string name="file_sys_storage_desc">通用存储入口（内部/外部/挂载卷）</string>
+    <string name="file_sys_emulated_desc">内部存储的模拟挂载点</string>
+    <string name="file_sys_user_home_desc">用户主目录（/sdcard 指向此处）</string>
+    <string name="file_sys_android_data_desc">应用数据目录（data、media、obb）</string>
+    <string name="file_sys_app_private_data_desc">应用私有数据（受沙盒与权限限制）</string>
+    <string name="file_sys_app_media_data_desc">应用媒体数据（面向索引）</string>
+    <string name="file_sys_obb_desc">大型资源包（游戏等）</string>
+    <string name="file_sys_download_desc">下载文件</string>
+    <string name="file_sys_documents_desc">文档文件</string>
+    <string name="file_sys_dcim_desc">相机拍摄内容</string>
+    <string name="file_sys_pictures_desc">图片与截图</string>
+    <string name="file_sys_screenshots_desc">截图（部分设备在 Pictures/Screenshots）</string>
+    <string name="file_sys_movies_desc">视频文件</string>
+    <string name="file_sys_music_desc">音乐文件</string>
+    <string name="file_sys_podcasts_desc">播客音频</string>
+    <string name="file_sys_ringtones_desc">铃声</string>
+    <string name="file_sys_alarms_desc">闹钟音</string>
+    <string name="file_sys_notifications_desc">通知音</string>
+    <string name="file_sys_recordings_desc">录音</string>
+    <string name="file_sys_external_storage_desc">外接/可移除存储卷（SD 卡/U 盘，卷 ID）</string>
+    <string name="file_sys_sdcard_link_desc">符号链接到 /storage/emulated/0（用户主目录）</string>
+    <string name="file_sys_data_partition_desc">应用与系统数据分区</string>
+    <string name="file_sys_installed_apks_desc">已安装应用的 APK（受权限保护）</string>
+    <string name="file_sys_user_data_root_desc">按用户分隔的应用数据根（如 /data/user/0）</string>
+    <string name="file_sys_direct_boot_desc">Direct Boot 域（设备未解锁也可用的少量数据）</string>
+    <string name="file_sys_media_map_desc">媒体数据（与 emulated 存储映射相关）</string>
+    <string name="file_sys_system_config_desc">系统级配置与状态数据</string>
+    <string name="file_sys_system_partition_desc">系统分区（framework、system apps、libs、bin）</string>
+    <string name="file_sys_system_ext_desc">系统扩展分区（AOSP+设备扩展）</string>
+    <string name="file_sys_product_desc">产品层系统组件（设备/市场差异）</string>
+    <string name="file_sys_vendor_desc">厂商分区（驱动、HAL、厂商组件）</string>
+    <string name="file_sys_odm_desc">ODM 分区（硬件适配，厂商定制）</string>
+    <string name="file_sys_apex_desc">APEX 包挂载点（模块化系统组件）</string>
+    <string name="file_sys_linker_config_desc">链接器配置（运行时库搜索路径）</string>
+    <string name="file_sys_etc_desc">系统配置（SELinux、hosts 等）</string>
+    <string name="file_sys_proc_desc">内核与进程信息（虚拟文件系统，读时生成）</string>
+    <string name="file_sys_sys_desc">设备/驱动状态（sysfs）</string>
+    <string name="file_sys_dev_desc">设备节点（硬件接口）</string>
+    <string name="file_sys_mnt_desc">挂载点（包含 runtime 模式封装）</string>
+    <string name="file_sys_cache_desc">系统缓存目录</string>
+    <string name="file_sys_metadata_desc">设备元数据分区（加密/Provisioning 等）</string>
+    <string name="file_sys_persist_desc">持久化校准数据（传感器/基带，设备依赖）</string>
+    <string name="file_sys_oem_desc">OEM 分区（部分设备保留）</string>
+    <string name="file_sys_config_desc">系统/内核配置（设备差异）</string>
+
     <!-- 设置页面 -->
     <string name="settings_llm_title">LLM设置</string>
     <string name="settings_advanced_title">高级设置</string>

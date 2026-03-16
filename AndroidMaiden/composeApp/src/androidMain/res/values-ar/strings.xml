@@ -3,6 +3,11 @@
     <string name="details">التفاصيل</string>
     <string name="ellipsis">...</string>
 
+    <!-- Navigation Bar -->
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_skills">المهارات</string>
+    <string name="nav_settings">الإعدادات</string>
+
     <!-- Home Page -->
     <string name="home_greeting_default">\"أهلاً بك من جديد يا سيدي! ما هي المخططات؟\"</string>
     <string name="home_daily_tasks">المهام اليومية</string>
@@ -78,6 +83,53 @@
     <string name="descending">تنازلي</string>
     <string name="folders_first">المجلدات أولاً</string>
     <string name="sort_by">الفرز حسب:</string>
+
+    <!-- Simulated File System (simFileSys.kt) -->
+    <string name="file_sys_root_desc">جذر نظام ملفات أندرويد 12</string>
+    <string name="file_sys_storage_desc">مدخل تخزين عام (داخلي/خارجي/مجلدات مثبتة)</string>
+    <string name="file_sys_emulated_desc">نقطة تثبيت محاكاة للتخزين الداخلي</string>
+    <string name="file_sys_user_home_desc">دليل المستخدم الرئيسي (/sdcard يشير إلى هنا)</string>
+    <string name="file_sys_android_data_desc">دليل بيانات التطبيق (data، media، obb)</string>
+    <string name="file_sys_app_private_data_desc">بيانات التطبيق الخاصة (مقيدة بالوضع المعزول والأذونات)</string>
+    <string name="file_sys_app_media_data_desc">بيانات وسائط التطبيق (مفهرسة)</string>
+    <string name="file_sys_obb_desc">حزم موارد كبيرة (ألعاب، إلخ.)</string>
+    <string name="file_sys_download_desc">الملفات المحملة</string>
+    <string name="file_sys_documents_desc">ملفات المستندات</string>
+    <string name="file_sys_dcim_desc">محتوى الكاميرا</string>
+    <string name="file_sys_pictures_desc">الصور ولقطات الشاشة</string>
+    <string name="file_sys_screenshots_desc">لقطات الشاشة (بعض الأجهزة في Pictures/Screenshots)</string>
+    <string name="file_sys_movies_desc">ملفات الفيديو</string>
+    <string name="file_sys_music_desc">ملفات الموسيقى</string>
+    <string name="file_sys_podcasts_desc">صوتيات البودكاست</string>
+    <string name="file_sys_ringtones_desc">نغمات الرنين</string>
+    <string name="file_sys_alarms_desc">أصوات المنبه</string>
+    <string name="file_sys_notifications_desc">أصوات التنبيهات</string>
+    <string name="file_sys_recordings_desc">التسجيلات</string>
+    <string name="file_sys_external_storage_desc">مجلدات تخزين خارجية/قابلة للإزالة (بطاقة SD/USB، معرف المجلد)</string>
+    <string name="file_sys_sdcard_link_desc">رابط رمزي لـ /storage/emulated/0 (المنزل)</string>
+    <string name="file_sys_data_partition_desc">قسم بيانات التطبيقات والنظام</string>
+    <string name="file_sys_installed_apks_desc">ملفات APK للتطبيقات المثبتة (محمية بالأذونات)</string>
+    <string name="file_sys_user_data_root_desc">جذر بيانات التطبيقات المفصولة حسب المستخدم (مثل /data/user/0)</string>
+    <string name="file_sys_direct_boot_desc">مجال Direct Boot (كمية صغيرة من البيانات متاحة قبل فتح قفل الجهاز)</string>
+    <string name="file_sys_media_map_desc">بيانات الوسائط (مرتبطة بالتخزين المحاكى)</string>
+    <string name="file_sys_system_config_desc">تكوين مستوى النظام وبيانات الحالة</string>
+    <string name="file_sys_system_partition_desc">قسم النظام (framework، تطبيقات النظام، المكتبات، bin)</string>
+    <string name="file_sys_system_ext_desc">قسم امتداد النظام (AOSP + امتدادات الجهاز)</string>
+    <string name="file_sys_product_desc">مكونات نظام طبقة المنتج (خاصة بالجهاز/السوق)</string>
+    <string name="file_sys_vendor_desc">قسم البائع (برامج التشغيل، HAL، مكونات البائع)</string>
+    <string name="file_sys_odm_desc">قسم ODM (تكييف الأجهزة، تخصيص البائع)</string>
+    <string name="file_sys_apex_desc">نقطة تثبيت حزمة APEX (مكونات النظام النمطية)</string>
+    <string name="file_sys_linker_config_desc">تكوين الرابط (مسارات البحث عن المكتبة في وقت التشغيل)</string>
+    <string name="file_sys_etc_desc">تكوين النظام (SELinux، hosts، إلخ.)</string>
+    <string name="file_sys_proc_desc">معلومات النواة والعمليات (نظام ملفات افتراضي، يتم إنشاؤه عند القراءة)</string>
+    <string name="file_sys_sys_desc">حالة الجهاز/برنامج التشغيل (sysfs)</string>
+    <string name="file_sys_dev_desc">عقد الجهاز (واجهات الأجهزة)</string>
+    <string name="file_sys_mnt_desc">نقاط التثبيت (بما في ذلك أغلفة وضع التشغيل)</string>
+    <string name="file_sys_cache_desc">دليل تخزين النظام المؤقت</string>
+    <string name="file_sys_metadata_desc">قسم بيانات تعريف الجهاز (التشفير/الإمداد، إلخ.)</string>
+    <string name="file_sys_persist_desc">بيانات المعايرة المستمرة (المستشعرات/Baseband، تعتمد على الجهاز)</string>
+    <string name="file_sys_oem_desc">قسم OEM (محجوز في بعض الأجهزة)</string>
+    <string name="file_sys_config_desc">تكوين النظام/النواة (خاص بالجهاز)</string>
 
     <!-- Settings Pages -->
     <string name="settings_llm_title">إعدادات LLM</string>
