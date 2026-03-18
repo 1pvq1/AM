@@ -45,7 +45,6 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
-
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
@@ -53,6 +52,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.generativeai)
             implementation(libs.koin.android)
+            implementation(libs.androidx.media3.exoplayer)
+            implementation(libs.androidx.media3.ui)
+            implementation(libs.coil.video)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -147,7 +149,7 @@ compose.desktop {
 
             // Global icon setting
 //            iconFile.set(project.file("src/desktopMain/resources/icon.ico"))
-            
+
             // Platform-specific overrides
 //            windows {
 //                iconFile.set(project.file("icons/windows.ico"))
