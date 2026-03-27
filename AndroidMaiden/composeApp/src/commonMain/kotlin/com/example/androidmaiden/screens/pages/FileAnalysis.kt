@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Res.stringResource
-import com.example.androidmaiden.mods.RequestStoragePermission
 import com.example.androidmaiden.model.*
 import com.example.androidmaiden.ui.icons.fileIcon
 import com.example.androidmaiden.ui.icons.folderIcon

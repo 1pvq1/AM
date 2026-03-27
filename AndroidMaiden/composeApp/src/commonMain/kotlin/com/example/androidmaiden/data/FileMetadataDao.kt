@@ -31,6 +31,10 @@ interface FileMetadataDao {
     @Query("SELECT lastModified FROM file_metadata WHERE path = :path LIMIT 1")
     suspend fun getStoredTimestamp(path: String): Long?
 
+    // Checks if any files in a directory are missing metadata extraction
+    @Query("SELECT EXISTS(SELECT 1 FROM file_metadata WHERE parentPath = :path AND metadataStatus = 0 AND isDirectory = 0)")
+    suspend fun hasPendingMetadata(path: String): Boolean
+
     // For Category counts (used in your Strip Blocks)
     @Query("SELECT COUNT(*) FROM file_metadata WHERE isDirectory = 0")
     fun getTotalFileCount(): Flow<Int>

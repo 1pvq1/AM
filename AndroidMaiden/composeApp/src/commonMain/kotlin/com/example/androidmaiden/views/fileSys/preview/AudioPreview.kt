@@ -38,11 +38,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.data.FileMetadata
 import com.example.androidmaiden.model.FileSysNode
 
 
 @Composable
-fun AudioPreview(file: FileSysNode) {
+fun AudioPreview(file: FileMetadata) {
     var isPlaying by remember { mutableStateOf(false) }
     var progress by remember { mutableFloatStateOf(0f) }
 

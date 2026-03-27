@@ -7,7 +7,6 @@ import com.example.androidmaiden.data.FileRepository
 import com.example.androidmaiden.model.FileCategory
 import com.example.androidmaiden.utils.FileTypeUtils
 import com.example.androidmaiden.utils.FileTypeUtils.getExtensionType
-import com.example.androidmaiden.utils.toFileNode
 import kotlinx.coroutines.flow.*
 
 
@@ -56,7 +55,7 @@ class PersistentFileViewModel(private val repository: FileRepository) : ViewMode
     }
 
     private fun processMetadata(list: List<FileMetadata>): List<FileCategory> {
-        val groups = list.filter { !it.isDirectory }.groupBy { getExtensionType(it.fileName) }
+        val groups = list.filter { !it.isDirectory }.groupBy { getExtensionType(it.name) }
 
         val classificationCategories = FileTypeUtils.categoryDefinitions.map { def ->
             val items = groups[def.type] ?: emptyList()
@@ -66,8 +65,10 @@ class PersistentFileViewModel(private val repository: FileRepository) : ViewMode
                 type = def.type,
                 count = items.size,
                 totalSizeMb = items.sumOf { it.size } / (1024 * 1024),
+                files = items
                 // CRITICAL: Ensure this mapping is happening! Otherwise, it will cause the detailed page to be blank.
-                files = items.map { it.toFileNode() }
+                // Data model : FileSysNode (old) -> FileMetadata (now)
+                // files = items.map { it.toFileNode() } // No mapping is required when the data model is FileMetadata.
             )
         }
 
@@ -83,33 +84,6 @@ class PersistentFileViewModel(private val repository: FileRepository) : ViewMode
         return classificationCategories + analysisCategories
     }
 
-    /**
-     * Logic to group raw Database Metadata into UI-friendly Categories.
-     */
-    private fun classifyMetadata(list: List<FileMetadata>): List<FileCategory> {
-        val groups = list.filter { !it.isDirectory }.groupBy { getExtensionType(it.fileName) }
 
-/*        return listOf(
-            mapToCategory("Images", Icons.Default.Image, "Images", groups["Images"]),
-            mapToCategory("Videos", Icons.Default.Videocam, "Videos", groups["Videos"]),
-            mapToCategory("Audio", Icons.Default.MusicNote, "Audio", groups["Audio"]),
-            mapToCategory("Documents", Icons.Default.Description, "Documents", groups["Documents"]),
-            mapToCategory("APKs", Icons.Default.Android, "APKs", groups["APKs"]),
-            mapToCategory("Archives", Icons.Default.Archive, "Archives", groups["Archives"]),
-            mapToCategory("Other", Icons.AutoMirrored.Filled.InsertDriveFile, "Other", groups["Other"])
-        )*/
-
-        // Map through the definitions to build the categories
-        return FileTypeUtils.categoryDefinitions.map { def ->
-            val items = groups[def.type] ?: emptyList()
-            FileCategory(
-                name = def.name,
-                icon = def.icon,
-                type = def.type,
-                count = items.size,
-                totalSizeMb = items.sumOf { it.size } / (1024 * 1024)
-            )
-        }
-    }
 
 }

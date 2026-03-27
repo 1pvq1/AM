@@ -7,10 +7,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.example.androidmaiden.data.FileMetadata
 import com.example.androidmaiden.model.FileSysNode
 
 @Composable
-fun VideoPreview(file: FileSysNode) {
+fun VideoPreview(file: FileMetadata) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center

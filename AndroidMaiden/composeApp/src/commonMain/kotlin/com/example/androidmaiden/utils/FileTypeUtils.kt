@@ -56,16 +56,25 @@ object FileTypeUtils {
 
 }
 
+// Extension functions for FileSysNode
+private data class FileCategoryOfFileSysNode(
+    val name: String,
+    val icon: ImageVector,
+    val type: String,
+    val count: Int? = null,
+    val totalSizeMb: Long? = null,
+    val files: List<FileSysNode> = emptyList() // Changed to use formal model
+)
 /**
 which performs a "flatten" operation on the tree. In a mature file manager, this is replaced by
 SQL queries or List filtering on the database records, which is significantly faster and survives
 app restarts.
 Thread Safety
  */
-suspend fun calculateCategoryDetails(
+private suspend fun calculateCategoryDetails(
     root: FileSysNode,
-    baseCategories: List<FileCategory>
-): List<FileCategory> = withContext(Dispatchers.Default) {
+    baseCategories: List<FileCategoryOfFileSysNode>
+): List<FileCategoryOfFileSysNode> = withContext(Dispatchers.Default) {
     val files = root.flatten().filter { !it.isFolder }
     val counts = root.countByType()
     val sizes = root.totalSizeByType()
@@ -79,7 +88,7 @@ suspend fun calculateCategoryDetails(
             }
 
             "RecentFiles" -> {
-                val recentFiles = root.getRecentFiles(withinMillis = 7 * 24 * 60 * 60 * 1000)
+                val recentFiles: List<FileSysNode> = root.getRecentFiles(withinMillis = 7 * 24 * 60 * 60 * 1000)
                 val sizeMb = recentFiles.sumOf { it.size ?: 0L } / (1024 * 1024)
                 category.copy(
                     count = recentFiles.size,
@@ -102,7 +111,7 @@ suspend fun calculateCategoryDetails(
 
 fun FileMetadata.toFileNode(): FileSysNode {
     return FileSysNode(
-        name = this.fileName,
+        name = this.name,
         path = this.path,
         nodeType = if (this.isDirectory) NodeType.FOLDER else NodeType.FILE,
         size = this.size,
@@ -114,9 +123,9 @@ fun FileMetadata.toFileNode(): FileSysNode {
 private fun mapToCategory(
     def: CategoryDef,
     files: List<FileMetadata>?
-): FileCategory {
+): FileCategoryOfFileSysNode {
     val items = files ?: emptyList()
-    return FileCategory(
+    return FileCategoryOfFileSysNode(
         name = def.name,
         icon = def.icon,
         type = def.type,

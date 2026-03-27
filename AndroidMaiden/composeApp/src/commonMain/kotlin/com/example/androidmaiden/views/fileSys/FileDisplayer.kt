@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil3.compose.AsyncImage
+import com.example.androidmaiden.data.FileMetadata
 import com.example.androidmaiden.model.FileSysNode
 import com.example.androidmaiden.utils.FileTypeUtils
 import com.example.androidmaiden.views.fileSys.preview.*
@@ -41,7 +42,7 @@ import com.example.androidmaiden.views.fileSys.preview.*
  */
 @Composable
 fun FilePreviewOverlay(
-    file: FileSysNode,
+    file: FileMetadata,
     onDismiss: () -> Unit
 ) {
     val category = remember(file.name) { FileTypeUtils.getExtensionType(file.name) }
@@ -164,7 +165,7 @@ fun FilePreviewOverlay(
 }
 
 @Composable
-private fun GenericPreview(file: FileSysNode) {
+private fun GenericPreview(file: FileMetadata) {
     Card(
         modifier = Modifier.padding(32.dp),
         shape = RoundedCornerShape(24.dp)

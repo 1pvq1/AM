@@ -25,7 +25,7 @@ class FileSyncManager(private val dao: FileMetadataDao) {
         val metadataList = children.map { file ->
             FileMetadata(
                 path = file.absolutePath,
-                fileName = file.name,
+                name = file.name,
                 isDirectory = file.isDirectory,
                 lastModified = file.lastModified(),
                 size = if (file.isDirectory) 0L else file.length(),

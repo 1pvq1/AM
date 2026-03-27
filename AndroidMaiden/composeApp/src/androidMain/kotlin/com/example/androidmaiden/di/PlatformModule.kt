@@ -14,7 +14,11 @@ val platformModule = module {
         Room.databaseBuilder<AppDatabase>(
             context = androidContext(),
             name = dbFile.absolutePath
-        ).build()
+        )
+        // This tells Room to clear the database if the schema version changes.
+        // Useful for development to avoid manual migrations.
+        .fallbackToDestructiveMigration(dropAllTables = true)
+        .build()
     }
 
     // 2. Provide the DAO from the Database

@@ -2,34 +2,33 @@ package com.example.androidmaiden.screens.pages
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.*
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.*
 import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.*
+import androidx.compose.ui.draw.*
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.layout.*
+import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.style.*
+import androidx.compose.ui.unit.*
 import com.example.androidmaiden.model.*
 import com.example.androidmaiden.utils.*
 import com.example.androidmaiden.views.*
-import com.example.androidmaiden.views.fileSys.FilePreviewOverlay
-import com.example.androidmaiden.views.fileSys.ViewMode
-import coil3.compose.AsyncImage
-import com.example.androidmaiden.views.eg.FileListPagePreviewSamples
-import kotlinx.datetime.*
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlin.time.ExperimentalTime
+import com.example.androidmaiden.views.fileSys.*
+import coil3.compose.*
+import com.example.androidmaiden.data.*
+import com.example.androidmaiden.views.eg.*
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.ui.tooling.preview.*
+import kotlin.time.*
 
 enum class SortBy { NAME, SIZE, DATE }
 
@@ -39,7 +38,7 @@ enum class SortBy { NAME, SIZE, DATE }
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class, ExperimentalFoundationApi::class)
 @Composable
-fun FilesListPage(categoryName: String, files: List<FileSysNode>, onBack: () -> Unit) {
+fun FilesListPage(categoryName: String, files: List<FileMetadata>, onBack: () -> Unit) {
     val categoryType = remember(categoryName) {
         when {
             categoryName.contains("Images", ignoreCase = true) -> "Images"
@@ -68,7 +67,7 @@ fun FilesListPage(categoryName: String, files: List<FileSysNode>, onBack: () -> 
     var showGridDensityMenu by remember { mutableStateOf(false) }
 
     // Preview state
-    var previewFile by remember { mutableStateOf<FileSysNode?>(null) }
+    var previewFile by remember { mutableStateOf<FileMetadata?>(null) }
 
     val sortedFiles = remember(files, sortOrder) {
         when (sortOrder) {
@@ -199,9 +198,9 @@ fun FilesListPage(categoryName: String, files: List<FileSysNode>, onBack: () -> 
 private fun FileCellFactory(
     viewMode: ViewMode,
     categoryType: String,
-    files: List<FileSysNode>,
+    files: List<FileMetadata>,
     gridColumns: Int,
-    onFileClick: (FileSysNode) -> Unit
+    onFileClick: (FileMetadata) -> Unit
 ) {
     val isMedia = categoryType == "Images" || categoryType == "Videos"
     val useGrid = viewMode == ViewMode.GRID
@@ -224,7 +223,7 @@ private fun FileCellFactory(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 groupedFiles.forEach { (date, items) ->
-                    item(span = { GridItemSpan(maxLineSpan) }) {
+                    item(span = { GridItemSpan(this.maxLineSpan) }) {
                         StickyDateHeader(date, count = items.size)
                     }
                     items(items) { file ->
@@ -273,14 +272,14 @@ private fun FileCellFactory(
 }
 
 @Composable
-private fun GenericItemCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
+private fun GenericItemCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier = Modifier) {
     if (viewMode == ViewMode.LIST) {
         ListItem(
             headlineContent = { Text(file.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
             supportingContent = { Text("${formatSize(file.size)} • ${file.path ?: ""}") },
             leadingContent = {
                 Icon(
-                    imageVector = if (file.isFolder) Icons.Default.Folder else Icons.AutoMirrored.Filled.InsertDriveFile,
+                    imageVector = if (file.isDirectory) Icons.Default.Folder else Icons.AutoMirrored.Filled.InsertDriveFile,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -298,7 +297,7 @@ private fun GenericItemCell(file: FileSysNode, viewMode: ViewMode, modifier: Mod
 }
 
 @Composable
-private fun ImagesCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
+private fun ImagesCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier = Modifier) {
     if (viewMode == ViewMode.GRID) {
         Card(shape = RoundedCornerShape(8.dp), modifier = modifier) {
             Box {
@@ -326,7 +325,10 @@ private fun ImagesCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier
     } else {
         ListItem(
             headlineContent = { Text(file.name) },
-            supportingContent = { Text("${formatSize(file.size)} • ${formatDateTime(file.lastModified)}") },
+            supportingContent = { 
+                val resolution = if (file.width != null && file.height != null) " • ${file.width}x${file.height}" else ""
+                Text("${formatSize(file.size)} • ${formatDateTime(file.lastModified)}$resolution") 
+            },
             leadingContent = {
                 AsyncImage(
                     model = file.path,
@@ -341,7 +343,7 @@ private fun ImagesCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier
 }
 
 @Composable
-private fun VideosCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
+private fun VideosCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier = Modifier) {
     if (viewMode == ViewMode.GRID) {
         Card(modifier = modifier.fillMaxWidth()) {
             Box {
@@ -356,8 +358,24 @@ private fun VideosCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier
                     modifier = Modifier.align(Alignment.Center).size(32.dp),
                     tint = Color.White.copy(alpha = 0.8f)
                 )
+                
+                val durationText = remember(file.duration) {
+                    file.duration?.let { formatDuration(it) } ?: "00:00"
+                }
+                
+                val resolutionText = remember(file.width, file.height) {
+                    if (file.width != null && file.height != null) {
+                        when {
+                            file.height >= 2160 -> "4K"
+                            file.height >= 1080 -> "FHD"
+                            file.height >= 720 -> "HD"
+                            else -> "${file.width}x${file.height}"
+                        }
+                    } else "Video"
+                }
+
                 Text(
-                    "HD • 00:42",
+                    "$resolutionText • $durationText",
                     color = Color.White,
                     modifier = Modifier.align(Alignment.BottomEnd).padding(4.dp)
                         .background(Color.Black.copy(0.6f), RoundedCornerShape(2.dp)).padding(horizontal = 4.dp),
@@ -369,7 +387,11 @@ private fun VideosCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier
     } else {
         ListItem(
             headlineContent = { Text(file.name) },
-            supportingContent = { Text("${formatSize(file.size)} • ${formatDateTime(file.lastModified)}") },
+            supportingContent = { 
+                val durationText = file.duration?.let { " • ${formatDuration(it)}" } ?: ""
+                val resolution = if (file.width != null && file.height != null) " • ${file.width}x${file.height}" else ""
+                Text("${formatSize(file.size)} • ${formatDateTime(file.lastModified)}$durationText$resolution") 
+            },
             leadingContent = {
                 Box {
                     AsyncImage(
@@ -391,7 +413,7 @@ private fun VideosCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier
 }
 
 @Composable
-private fun AudioCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
+private fun AudioCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier = Modifier) {
     val path = file.path ?: ""
     val isRecording = remember(path) {
         val keywords = listOf("record", "voice")
@@ -401,10 +423,11 @@ private fun AudioCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier 
     ListItem(
         headlineContent = { Text(file.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         supportingContent = {
-            val author = "Unknown Artist"
-            val album = "Unknown Album"
-            val bitrate = "Not available"
-            Text("$author • $album • $bitrate • ${formatSize(file.size)}")
+            val author = file.artist ?: "Unknown Artist"
+            val album = file.album ?: "Unknown Album"
+            val bitrateText = file.bitrate?.let { " • ${it / 1000}kbps" } ?: ""
+            val durationText = file.duration?.let { " • ${formatDuration(it)}" } ?: ""
+            Text("$author • $album$bitrateText$durationText • ${formatSize(file.size)}")
         },
         leadingContent = {
             Box(contentAlignment = Alignment.Center) {
@@ -427,13 +450,16 @@ private fun AudioCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier 
                 )
             }
         },
-        trailingContent = { Text("00:00", style = MaterialTheme.typography.labelSmall) },
+        trailingContent = { 
+            val durationText = file.duration?.let { formatDuration(it) } ?: "00:00"
+            Text(durationText, style = MaterialTheme.typography.labelSmall) 
+        },
         modifier = modifier
     )
 }
 
 @Composable
-private fun DocumentsCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
+private fun DocumentsCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier = Modifier) {
     val ext = file.name.substringAfterLast(".").uppercase()
     ListItem(
         headlineContent = { Text(file.name) },
@@ -457,7 +483,7 @@ private fun DocumentsCell(file: FileSysNode, viewMode: ViewMode, modifier: Modif
 }
 
 @Composable
-private fun APKCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
+private fun APKCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier = Modifier) {
     if (viewMode == ViewMode.GRID) {
         Card(modifier = modifier.fillMaxWidth().padding(4.dp)) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
@@ -477,18 +503,13 @@ private fun APKCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = 
 }
 
 @Composable
-private fun ArchiveCell(file: FileSysNode, viewMode: ViewMode, modifier: Modifier = Modifier) {
+private fun ArchiveCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier = Modifier) {
     ListItem(
         headlineContent = { Text(file.name) },
         supportingContent = { Text("${formatSize(file.size)} • ${formatDateTime(file.lastModified)}") },
         leadingContent = { Icon(Icons.Default.Archive, null, tint = Color(0xFFFF9800)) },
         modifier = modifier
     )
-}
-
-private fun formatSize(size: Long?): String {
-    if (size == null) return "Unknown"
-    return if (size > 1024 * 1024) "${size / (1024 * 1024)} MB" else "${size / 1024} KB"
 }
 
 /*

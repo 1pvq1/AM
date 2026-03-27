@@ -1,6 +1,7 @@
 package com.example.androidmaiden.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.androidmaiden.data.FileMetadata
 
 // Folder categories that display specific folder icons to distinguish them from the default folder icons
 enum class FolderType {
@@ -15,15 +16,12 @@ enum class NodeType { FILE, FOLDER }
  * */
 enum class DataSource { MOCK, REAL }
 
-
-// Define a stable structure for Category definitions
-data class CategoryDef(
-    val name: String, val icon: ImageVector, val type: String
-)
-
 /**
  * Core data structure for representing a file or folder.
- */
+ *
+ * Experimental feature intended only for specific pages (analysis page),
+ * and should not currently be used elsewhere.
+ * */
 data class FileSysNode(
     val name: String,
     val size: Long? = null,            // file size; folders can be null
@@ -40,11 +38,17 @@ data class FileSysNode(
     val childCount: Int get() = children.size
 }
 
+
+// Define a stable structure for Category definitions
+data class CategoryDef(
+    val name: String, val icon: ImageVector, val type: String
+)
+
 data class FileCategory(
     val name: String,
     val icon: ImageVector,
     val type: String,
     val count: Int? = null,
     val totalSizeMb: Long? = null,
-    val files: List<FileSysNode> = emptyList()
+    val files: List<FileMetadata> = emptyList() // Changed to use formal model
 )
