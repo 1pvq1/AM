@@ -16,26 +16,28 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.androidmaiden.model.*
-import com.example.androidmaiden.viewmodel.*
+import com.example.androidmaiden.utils.FileTypeUtils
+import com.example.androidmaiden.viewModels.*
 import com.example.androidmaiden.views.SectionHeader
 import com.example.androidmaiden.views.fileSys.ViewMode
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FileClassifyPage(onBack: () -> Unit = {}) {
     val vm: PersistentFileViewModel = koinViewModel()
 
-    // 1. Observe pre-calculated categories from the VM
+    // 1. Observe state from the ViewModel (Survives rotation)
     val categories by vm.categories.collectAsState()
     val isSyncing by vm.isSyncing.collectAsState()
-
-    var viewMode by remember { mutableStateOf(ViewMode.LIST) }
-    var selectedCategory by remember { mutableStateOf<FileCategory?>(null) }
+    val viewMode by vm.viewMode.collectAsState()
+    val selectedCategory by vm.selectedCategory.collectAsState()
 
     // 2. Trigger incremental sync once on startup
-    LaunchedEffect(Unit) { // Load real data
+    LaunchedEffect(Unit) {
         vm.startSync()
     }
 
@@ -43,7 +45,7 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
         FilesListPage(
             categoryName = selectedCategory!!.name,
             files = selectedCategory!!.files,
-            onBack = { selectedCategory = null }
+            onBack = { vm.selectCategory(null) }
         )
     } else {
         Scaffold(
@@ -85,7 +87,8 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
 
                         // --- View Switcher Button ---
                         IconButton(onClick = {
-                            viewMode = if (viewMode == ViewMode.LIST) ViewMode.GRID else ViewMode.LIST
+                            val nextMode = if (viewMode == ViewMode.LIST) ViewMode.GRID else ViewMode.LIST
+                            vm.setViewMode(nextMode)
                         }) {
                             Icon(
                                 imageVector = if (viewMode == ViewMode.LIST) Icons.Default.GridView else Icons.Default.List,
@@ -98,46 +101,60 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
         ) { padding ->
             Box(modifier = Modifier.padding(padding).fillMaxSize()) {
                 if (viewMode == ViewMode.LIST) {
-                    CategoryListView(categories) { selectedCategory = it }
+                    CategoryListView(categories) { vm.selectCategory(it) }
                 } else {
-                    CategoryGridView(categories) { selectedCategory = it }
+                    CategoryGridView(categories) { vm.selectCategory(it) }
                 }
 
-                    // 4. Show loading indicator only during the initial scan or background sync
-                    if (isSyncing && categories.isEmpty()) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center),
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
+                if (isSyncing && categories.isEmpty()) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         }
     }
+}
 
 
 // --- List Layout ---
 @Composable
 private fun CategoryListView(categories: List<FileCategory>, onSelect: (FileCategory) -> Unit) {
-    val commonType = if (categories.size >= 6) categories.subList(0, 6) else categories
-    val sizeAndDateType = if (categories.size >= 8) categories.subList(6, 8) else emptyList()
-    val otherType = if (categories.size > 8) categories.subList(8, categories.size) else emptyList()
+    val commonTypes = remember(categories) {
+        val commonNames = FileTypeUtils.categoryDefinitions.map { it.name }
+        categories.filter { it.name in commonNames }
+    }
+    val analysisTypes = remember(categories) {
+        val analysisNames = FileTypeUtils.analysisDefinitions.filter { it.type != "Other" }.map { it.name }
+        categories.filter { it.name in analysisNames }
+    }
+    val otherTypes = remember(categories) {
+        val knownNames = (FileTypeUtils.categoryDefinitions + FileTypeUtils.analysisDefinitions.filter { it.type != "Other" }).map { it.name }
+        categories.filter { it.name !in knownNames }
+    }
     
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item { SectionHeader("Common Types") }
-        items(commonType) { FileCategoryCard(it, onClick = { onSelect(it) }) }
+        if (commonTypes.isNotEmpty()) {
+            item { SectionHeader("Common Types") }
+            items(commonTypes) { FileCategoryCard(it, onClick = { onSelect(it) }) }
+        }
 
-        item { SectionHeader("Size and Date") }
-        items(sizeAndDateType) { FileCategoryCard(it, onClick = { onSelect(it) }) }
+        if (analysisTypes.isNotEmpty()) {
+            item { SectionHeader("Size and Date") }
+            items(analysisTypes) { FileCategoryCard(it, onClick = { onSelect(it) }) }
+        }
 
-        item { SectionHeader("Other") }
-        items(otherType) {
-            FileCategoryCard(
-                it,
-                onClick = { onSelect(it) })
+        if (otherTypes.isNotEmpty()) {
+            item { SectionHeader("Other") }
+            items(otherTypes) {
+                FileCategoryCard(
+                    it,
+                    onClick = { onSelect(it) })
+            }
         }
     }
 }
@@ -145,9 +162,18 @@ private fun CategoryListView(categories: List<FileCategory>, onSelect: (FileCate
 // --- Compact Grid Layout ---
 @Composable
 private fun CategoryGridView(categories: List<FileCategory>, onSelect: (FileCategory) -> Unit) {
-    val commonType = categories.subList(0, 6)
-    val sizeAndDateType = categories.subList(6, 8)
-    val otherType = categories.subList(8, categories.size)
+    val commonTypes = remember(categories) {
+        val commonNames = FileTypeUtils.categoryDefinitions.map { it.name }
+        categories.filter { it.name in commonNames }
+    }
+    val analysisTypes = remember(categories) {
+        val analysisNames = FileTypeUtils.analysisDefinitions.filter { it.type != "Other" }.map { it.name }
+        categories.filter { it.name in analysisNames }
+    }
+    val otherTypes = remember(categories) {
+        val knownNames = (FileTypeUtils.categoryDefinitions + FileTypeUtils.analysisDefinitions.filter { it.type != "Other" }).map { it.name }
+        categories.filter { it.name !in knownNames }
+    }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -155,17 +181,23 @@ private fun CategoryGridView(categories: List<FileCategory>, onSelect: (FileCate
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        item(span = { GridItemSpan(2) }) { SectionHeader("Common Types") }
-        items(commonType) { FileCategoryStrip(it, onClick = { onSelect(it) }) }
+        if (commonTypes.isNotEmpty()) {
+            item(span = { GridItemSpan(2) }) { SectionHeader("Common Types") }
+            items(commonTypes) { FileCategoryStrip(it, onClick = { onSelect(it) }) }
+        }
 
-        item(span = { GridItemSpan(2) }) { SectionHeader("Size and Date") }
-        items(sizeAndDateType) { FileCategoryStrip(it, onClick = { onSelect(it) }) }
+        if (analysisTypes.isNotEmpty()) {
+            item(span = { GridItemSpan(2) }) { SectionHeader("Size and Date") }
+            items(analysisTypes) { FileCategoryStrip(it, onClick = { onSelect(it) }) }
+        }
 
-        item(span = { GridItemSpan(2) }) { SectionHeader("Other") }
-        items(otherType) {
-            FileCategoryStrip(
-                it,
-                onClick = { onSelect(it) })
+        if (otherTypes.isNotEmpty()) {
+            item(span = { GridItemSpan(2) }) { SectionHeader("Other") }
+            items(otherTypes) {
+                FileCategoryStrip(
+                    it,
+                    onClick = { onSelect(it) })
+            }
         }
     }
 }

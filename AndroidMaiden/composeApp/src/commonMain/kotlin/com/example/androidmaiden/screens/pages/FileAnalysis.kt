@@ -38,8 +38,9 @@ fun FileAnalysisScreen(onNavigateUp: () -> Unit = {}) {
     val useMock = vm.useMock
     LaunchedEffect(Unit) { vm.loadRoot(useMock) }
     val root = vm.fileTree
-    val isLoading = vm.isLoading
-    val loadError = vm.loadError
+    // Use collectAsState for StateFlow from BaseViewModel
+    val isLoading by vm.isLoading.collectAsState()
+    val loadError by vm.error.collectAsState()
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -95,7 +96,7 @@ fun FileAnalysisScreen(onNavigateUp: () -> Unit = {}) {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = loadError,
+                            text = loadError!!,
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyLarge
                         )

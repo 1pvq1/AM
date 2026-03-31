@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Res.stringResource
-import com.example.androidmaiden.Screen
+import com.example.androidmaiden.model.Screen
 import com.example.androidmaiden.mods.RequestStoragePermission
 import com.example.androidmaiden.ui.BaseCard
 import org.jetbrains.compose.ui.tooling.preview.Preview

@@ -4,12 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import com.example.androidmaiden.screens.pages.ChatMessage
 import com.example.androidmaiden.screens.pages.ChatViewMode
 import com.example.androidmaiden.screens.pages.Sender
 
-class CharacterInteractionViewModel : ViewModel() {
+class CharacterInteractionViewModel : BaseViewModel() {
     var viewMode by mutableStateOf(ChatViewMode.REGULAR)
         private set
 

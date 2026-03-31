@@ -152,7 +152,7 @@ private fun BarCharacterSection(
 
 @Composable
 fun CharacterPreview() {
-    CharacterWithDialog("[横向布局]\n\"欢迎回来，主人\"", layout = CharacterLayout.Horizontal)
-    CharacterWithDialog("纵向布局", layout = CharacterLayout.Vertical)
-    CharacterWithDialog("浮动布局", layout = CharacterLayout.Floating) // bugs
+    CharacterWithDialog("horizontical", layout = CharacterLayout.Horizontal)
+    CharacterWithDialog("vertical", layout = CharacterLayout.Vertical)
+    CharacterWithDialog("Floating", layout = CharacterLayout.Floating) // bugs
 }

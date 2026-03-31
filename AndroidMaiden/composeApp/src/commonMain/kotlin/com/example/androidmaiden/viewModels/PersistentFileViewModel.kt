@@ -1,13 +1,15 @@
-package com.example.androidmaiden.viewmodel
+package com.example.androidmaiden.viewModels
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidmaiden.data.FileMetadata
 import com.example.androidmaiden.data.FileRepository
 import com.example.androidmaiden.model.FileCategory
 import com.example.androidmaiden.utils.FileTypeUtils
 import com.example.androidmaiden.utils.FileTypeUtils.getExtensionType
+import com.example.androidmaiden.views.fileSys.ViewMode
 import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.days
+import kotlin.time.ExperimentalTime
 
 
 val initialCategories =
@@ -16,7 +18,8 @@ val initialCategories =
             FileCategory(name = def.name, icon = def.icon, type = def.type)
         }
 
-class PersistentFileViewModel(private val repository: FileRepository) : ViewModel() {
+@ExperimentalTime
+class PersistentFileViewModel(private val repository: FileRepository) : BaseViewModel() {
 
 
     // 1. Observe the Repository's sync status for UI progress indicators
@@ -26,9 +29,6 @@ class PersistentFileViewModel(private val repository: FileRepository) : ViewMode
     // This Flow provides the data for your "Strip Blocks" and "Classify" cards
     val categories: StateFlow<List<FileCategory>> = repository.allFiles
         .map { metadataList ->
-//            if (metadataList.isEmpty()) emptyList()
-//            else classifyMetadata(metadataList)
-
             if (metadataList.isEmpty()) {
                 initialCategories // Show the framework even if DB is empty
             } else {
@@ -38,13 +38,27 @@ class PersistentFileViewModel(private val repository: FileRepository) : ViewMode
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-//            initialValue = emptyList()
             initialValue = initialCategories // CRITICAL: Start with the framework
         )
 
     val currentScannedPath: StateFlow<String?> = flow {
         emit(repository.getScannedPath())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    // UI State that survives configuration changes (rotation, split-screen)
+    private val _selectedCategory = MutableStateFlow<FileCategory?>(null)
+    val selectedCategory: StateFlow<FileCategory?> = _selectedCategory.asStateFlow()
+
+    private val _viewMode = MutableStateFlow(ViewMode.LIST)
+    val viewMode: StateFlow<ViewMode> = _viewMode.asStateFlow()
+
+    fun selectCategory(category: FileCategory?) {
+        _selectedCategory.value = category
+    }
+
+    fun setViewMode(mode: ViewMode) {
+        _viewMode.value = mode
+    }
 
     /**
      * Triggers the incremental sync via the repository.
@@ -55,7 +69,8 @@ class PersistentFileViewModel(private val repository: FileRepository) : ViewMode
     }
 
     private fun processMetadata(list: List<FileMetadata>): List<FileCategory> {
-        val groups = list.filter { !it.isDirectory }.groupBy { getExtensionType(it.name) }
+        val allFilesOnly = list.filter { !it.isDirectory }
+        val groups = allFilesOnly.groupBy { getExtensionType(it.name) }
 
         val classificationCategories = FileTypeUtils.categoryDefinitions.map { def ->
             val items = groups[def.type] ?: emptyList()
@@ -66,24 +81,31 @@ class PersistentFileViewModel(private val repository: FileRepository) : ViewMode
                 count = items.size,
                 totalSizeMb = items.sumOf { it.size } / (1024 * 1024),
                 files = items
-                // CRITICAL: Ensure this mapping is happening! Otherwise, it will cause the detailed page to be blank.
-                // Data model : FileSysNode (old) -> FileMetadata (now)
-                // files = items.map { it.toFileNode() } // No mapping is required when the data model is FileMetadata.
             )
         }
 
+        val nowMillis = kotlin.time.Clock.System.now().toEpochMilliseconds()
+        val sevenDaysAgo = nowMillis - 7.days.inWholeMilliseconds
+        val largeFileThreshold = 50 * 1024 * 1024L
+
         val analysisCategories = FileTypeUtils.analysisDefinitions.map { def ->
+            val filteredFiles = when (def.type) {
+                "LargeFiles" -> allFilesOnly.filter { it.size > largeFileThreshold }
+                "RecentFiles" -> allFilesOnly.filter { it.lastModified > sevenDaysAgo }
+                "Other" -> groups["Other"] ?: emptyList()
+                else -> emptyList()
+            }
+
             FileCategory(
                 name = def.name,
                 icon = def.icon,
-                type = def.type
-                // Count and size can be calculated here if needed for analysis categories
+                type = def.type,
+                count = filteredFiles.size,
+                totalSizeMb = filteredFiles.sumOf { it.size } / (1024 * 1024),
+                files = filteredFiles
             )
         }
 
         return classificationCategories + analysisCategories
     }
-
-
-
 }

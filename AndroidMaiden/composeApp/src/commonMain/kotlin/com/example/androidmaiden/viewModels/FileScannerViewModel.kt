@@ -1,10 +1,11 @@
 package com.example.androidmaiden.viewmodel
 
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewModelScope
 import com.example.androidmaiden.model.*
 import com.example.androidmaiden.mods.listFiles
+import com.example.androidmaiden.viewModels.BaseViewModel
 import com.example.androidmaiden.views.eg.simFileNode
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.io.*
@@ -13,17 +14,11 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 
-class FileScannerViewModel() {
+class FileScannerViewModel() : BaseViewModel() {
 
     val rootPath = "/storage/emulated/0" // Public storage root
 
     var fileTree by mutableStateOf<FileSysNode?>(null)
-        private set
-
-    var isLoading by mutableStateOf(false)
-        private set
-
-    var loadError by mutableStateOf<String?>(null)
         private set
 
     var useMock by mutableStateOf(true)
@@ -43,10 +38,10 @@ class FileScannerViewModel() {
      */
     @OptIn(ExperimentalTime::class)
     fun loadRoot(useMock: Boolean = this.useMock) {
-        isLoading = true
-        loadError = null
+        _isLoading.value = true
+        _error.value = null
 
-        CoroutineScope(Dispatchers.Default).launch {
+        viewModelScope.launch(Dispatchers.Default) {
             try {
                 val result = if (useMock) simFileNode()
                 else {
@@ -64,15 +59,15 @@ class FileScannerViewModel() {
                 }
                 fileTree = result
 //            } catch (e: SecurityException) {
-//                loadError = "Permission denied. Cannot access storage."
+//                _error.value = "Permission denied. Cannot access storage."
             } catch (e: FileNotFoundException) {
-                loadError = "Root directory not found."
+                _error.value = "Root directory not found."
             } catch (e: IOException) {
-                loadError = "Error accessing file system: ${'$'}{e.message}"
+                _error.value = "Error accessing file system: ${e.message}"
             } catch (e: Exception) {
-                loadError = "Unexpected error: ${'$'}{e.message}"
+                _error.value = "Unexpected error: ${e.message}"
             } finally {
-                isLoading = false
+                _isLoading.value = false
             }
         }
     }
