@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.Dispatchers
 import org.koin.dsl.module
-import org.koin.core.module.dsl.factoryOf
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -20,4 +19,5 @@ val commonModule = module {
     // 3. Provide the ViewModels
     factory { PersistentFileViewModel(get()) }
     factory { NavigationViewModel() }
+    factory { FileScannerViewModel(get()) }
 }

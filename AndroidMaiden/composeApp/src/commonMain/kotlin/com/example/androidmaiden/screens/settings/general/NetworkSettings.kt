@@ -1,4 +1,4 @@
-package com.example.androidmaiden.screens.settings
+package com.example.androidmaiden.screens.settings.general
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,7 +19,9 @@ import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.screens.SettingsGroup
 import com.example.androidmaiden.viewModels.rememberAdvancedLlmSettingsViewModel
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
+@Preview
 @Composable
 fun NetworkSettingsGroup() {
     val viewModel = rememberAdvancedLlmSettingsViewModel()

@@ -1,4 +1,4 @@
-package com.example.androidmaiden.screens.pages
+package com.example.androidmaiden.screens.fileSystem.classify
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -17,13 +17,12 @@ import androidx.compose.ui.layout.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
-import com.example.androidmaiden.model.*
 import com.example.androidmaiden.utils.*
 import com.example.androidmaiden.views.*
-import com.example.androidmaiden.views.fileSys.*
 import coil3.compose.*
 import com.example.androidmaiden.data.*
 import com.example.androidmaiden.views.eg.*
+import com.example.androidmaiden.views.fileSys.ViewMode
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -32,13 +31,36 @@ import kotlin.time.*
 
 enum class SortBy { NAME, SIZE, DATE }
 
+// Internal state management for actions in FilesListPage
+private class FileActionState(
+    initialFile: FileMetadata? = null,
+    initialShowDelete: Boolean = false,
+    initialShowRename: Boolean = false
+) {
+    var file by mutableStateOf(initialFile)
+    var showDelete by mutableStateOf(initialShowDelete)
+    var showRename by mutableStateOf(initialShowRename)
+    
+    fun clear() {
+        file = null
+        showDelete = false
+        showRename = false
+    }
+}
+
 /**
- * FilesListPage needs to evolve from a simple list into a multi-functional viewer.
- * The best strategy is to move toward a Type-Aware Adaptive Layout.
+ * FilesListPage provides a detailed view of files in a specific category.
+ * Supports switching between List and Grid modes, sorting, searching, and basic file operations.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class, ExperimentalFoundationApi::class)
 @Composable
-fun FilesListPage(categoryName: String, files: List<FileMetadata>, onBack: () -> Unit) {
+fun FilesListPage(
+    categoryName: String, 
+    files: List<FileMetadata>, 
+    onBack: () -> Unit,
+    onDelete: (FileMetadata) -> Unit = {},
+    onRename: (FileMetadata, String) -> Unit = { _, _ -> }
+) {
     val categoryType = remember(categoryName) {
         when {
             categoryName.contains("Images", ignoreCase = true) -> "Images"
@@ -62,17 +84,18 @@ fun FilesListPage(categoryName: String, files: List<FileMetadata>, onBack: () ->
     var sortOrder by remember { mutableStateOf(SortBy.DATE) }
     var showSortMenu by remember { mutableStateOf(false) }
     
-    // Grid density control
     var gridColumns by remember { mutableIntStateOf(3) }
     var showGridDensityMenu by remember { mutableStateOf(false) }
 
-    // Preview state
     var previewFile by remember { mutableStateOf<FileMetadata?>(null) }
+    
+    // Action State Object
+    val actionState = remember { FileActionState() }
 
     val sortedFiles = remember(files, sortOrder) {
         when (sortOrder) {
             SortBy.NAME -> files.sortedBy { it.name }
-            SortBy.SIZE -> files.sortedByDescending { it.size ?: 0L }
+            SortBy.SIZE -> files.sortedByDescending { it.size }
             SortBy.DATE -> files.sortedByDescending { it.lastModified }
         }
     }
@@ -178,29 +201,127 @@ fun FilesListPage(categoryName: String, files: List<FileMetadata>, onBack: () ->
                     categoryType = categoryType,
                     files = sortedFiles,
                     gridColumns = gridColumns,
-                    onFileClick = { previewFile = it }
+                    onFileClick = { previewFile = it },
+                    onFileLongClick = { actionState.file = it }
                 )
             }
         }
     }
 
-    // Full screen preview overlay
+    // --- Overlays ---
+
+    // 1. Preview
     previewFile?.let { file ->
         FilePreviewOverlay(
             file = file,
             onDismiss = { previewFile = null }
         )
     }
+    
+    // 2. Actions Bottom Sheet
+    actionState.file?.let { file ->
+        if (!actionState.showDelete && !actionState.showRename) {
+            ModalBottomSheet(
+                onDismissRequest = { actionState.file = null }
+            ) {
+                Column(modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp)) {
+                    ListItem(
+                        headlineContent = { Text(file.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                        supportingContent = { Text(formatSize(file.size)) },
+                        leadingContent = { 
+                            Icon(
+                                imageVector = if (file.isDirectory) Icons.Default.Folder else Icons.AutoMirrored.Filled.InsertDriveFile,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            ) 
+                        }
+                    )
+                    HorizontalDivider()
+                    ListItem(
+                        headlineContent = { Text("Rename") },
+                        leadingContent = { Icon(Icons.Default.Edit, null) },
+                        modifier = Modifier.clickable { actionState.showRename = true }
+                    )
+                    ListItem(
+                        headlineContent = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                        leadingContent = { Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error) },
+                        modifier = Modifier.clickable { actionState.showDelete = true }
+                    )
+                }
+            }
+        }
+    }
+    
+    // 3. Delete Dialog
+    if (actionState.showDelete) {
+        AlertDialog(
+            onDismissRequest = { actionState.showDelete = false },
+            title = { Text("Delete File?") },
+            text = { Text("Are you sure you want to delete '${actionState.file?.name}'? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        actionState.file?.let { onDelete(it) }
+                        actionState.clear()
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { actionState.showDelete = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+    
+    // 4. Rename Dialog
+    if (actionState.showRename) {
+        var newName by remember { mutableStateOf(actionState.file?.name ?: "") }
+        AlertDialog(
+            onDismissRequest = { actionState.showRename = false },
+            title = { Text("Rename File") },
+            text = {
+                OutlinedTextField(
+                    value = newName,
+                    onValueChange = { newName = it },
+                    label = { Text("New Name") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (newName.isNotBlank() && newName != actionState.file?.name) {
+                            actionState.file?.let { onRename(it, newName) }
+                        }
+                        actionState.clear()
+                    }
+                ) {
+                    Text("Rename")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { actionState.showRename = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 
-@OptIn(ExperimentalTime::class)
+@OptIn(ExperimentalTime::class, ExperimentalFoundationApi::class)
 @Composable
 private fun FileCellFactory(
     viewMode: ViewMode,
     categoryType: String,
     files: List<FileMetadata>,
     gridColumns: Int,
-    onFileClick: (FileMetadata) -> Unit
+    onFileClick: (FileMetadata) -> Unit,
+    onFileLongClick: (FileMetadata) -> Unit = {}
 ) {
     val isMedia = categoryType == "Images" || categoryType == "Videos"
     val useGrid = viewMode == ViewMode.GRID
@@ -209,11 +330,9 @@ private fun FileCellFactory(
         if (isMedia) {
             val groupedFiles = remember(files) {
                 files.groupBy { file ->
-                    file.lastModified?.let { ms ->
-                        val instant = Instant.fromEpochMilliseconds(ms)
-                        val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-                        "${local.month.name} ${local.year}"
-                    } ?: "UNKNOWN DATE"
+                    val instant = Instant.fromEpochMilliseconds(file.lastModified)
+                    val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+                    "${local.month.name} ${local.year}"
                 }
             }
             LazyVerticalGrid(
@@ -227,7 +346,10 @@ private fun FileCellFactory(
                         StickyDateHeader(date, count = items.size)
                     }
                     items(items) { file ->
-                        val modifier = Modifier.clickable { onFileClick(file) }
+                        val modifier = Modifier.combinedClickable(
+                            onClick = { onFileClick(file) },
+                            onLongClick = { onFileLongClick(file) }
+                        )
                         when (categoryType) {
                             "Images" -> ImagesCell(file, ViewMode.GRID, modifier)
                             "Videos" -> VideosCell(file, ViewMode.GRID, modifier)
@@ -244,7 +366,10 @@ private fun FileCellFactory(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(files) { file ->
-                    val modifier = Modifier.clickable { onFileClick(file) }
+                    val modifier = Modifier.combinedClickable(
+                        onClick = { onFileClick(file) },
+                        onLongClick = { onFileLongClick(file) }
+                    )
                     when (categoryType) {
                         "APKs" -> APKCell(file, ViewMode.GRID, modifier)
                         else -> GenericItemCell(file, ViewMode.GRID, modifier)
@@ -255,7 +380,10 @@ private fun FileCellFactory(
     } else {
         LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
             items(files) { file ->
-                val modifier = Modifier.clickable { onFileClick(file) }
+                val modifier = Modifier.combinedClickable(
+                    onClick = { onFileClick(file) },
+                    onLongClick = { onFileLongClick(file) }
+                )
                 when (categoryType) {
                     "Images" -> ImagesCell(file, viewMode, modifier)
                     "Videos" -> VideosCell(file, viewMode, modifier)
@@ -276,7 +404,7 @@ private fun GenericItemCell(file: FileMetadata, viewMode: ViewMode, modifier: Mo
     if (viewMode == ViewMode.LIST) {
         ListItem(
             headlineContent = { Text(file.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-            supportingContent = { Text("${formatSize(file.size)} • ${file.path ?: ""}") },
+            supportingContent = { Text("${formatSize(file.size)} • ${file.path}") },
             leadingContent = {
                 Icon(
                     imageVector = if (file.isDirectory) Icons.Default.Folder else Icons.AutoMirrored.Filled.InsertDriveFile,
@@ -414,7 +542,7 @@ private fun VideosCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifie
 
 @Composable
 private fun AudioCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier = Modifier) {
-    val path = file.path ?: ""
+    val path = file.path
     val isRecording = remember(path) {
         val keywords = listOf("record", "voice")
         keywords.any { path.contains(it, ignoreCase = true) }
@@ -519,42 +647,42 @@ private fun ArchiveCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifi
 @Preview
 @Composable
 fun FilesListPageGeneralPreview() {
-    FilesListPage("General", FileListPagePreviewSamples.images) {}
+    FilesListPage("General", FileListPagePreviewSamples.images, {})
 }
 
 
 @Preview
 @Composable
 fun FileListPageImagesPreview() {
-    FilesListPage("Images", FileListPagePreviewSamples.images) {}
+    FilesListPage("Images", FileListPagePreviewSamples.images, {})
 }
 
 @Preview
 @Composable
 fun FileListPageVideosPreview() {
-    FilesListPage("Videos", FileListPagePreviewSamples.videos) {}
+    FilesListPage("Videos", FileListPagePreviewSamples.videos, {})
 }
 
 @Preview
 @Composable
 fun FileListPageAudioPreview() {
-    FilesListPage("Audio", FileListPagePreviewSamples.audio) {}
+    FilesListPage("Audio", FileListPagePreviewSamples.audio, {})
 }
 
 @Preview
 @Composable
 fun FileListPageDocumentsPreview() {
-    FilesListPage("Documents", FileListPagePreviewSamples.documents) {}
+    FilesListPage("Documents", FileListPagePreviewSamples.documents, {})
 }
 
 @Preview
 @Composable
 fun FileListPageAPKsPreview() {
-    FilesListPage("APKs", FileListPagePreviewSamples.apks) {}
+    FilesListPage("APKs", FileListPagePreviewSamples.apks, {})
 }
 
 @Preview
 @Composable
 fun FileListPageArchivesPreview() {
-    FilesListPage("Archives", FileListPagePreviewSamples.archives) {}
+    FilesListPage("Archives", FileListPagePreviewSamples.archives, {})
 }

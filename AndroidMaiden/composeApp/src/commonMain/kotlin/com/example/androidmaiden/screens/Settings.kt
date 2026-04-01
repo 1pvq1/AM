@@ -24,12 +24,12 @@ import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.ButtonDisplayStyle
 import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.screens.settings.AboutSettingsGroup
-import com.example.androidmaiden.screens.settings.AppearanceSettingsGroup
-import com.example.androidmaiden.screens.settings.ChatPersonalizationSettingsGroup
-import com.example.androidmaiden.screens.settings.LanguageSettingsGroup
-import com.example.androidmaiden.screens.settings.LlmSettingsGroup
-import com.example.androidmaiden.screens.settings.NetworkSettingsGroup
-import com.example.androidmaiden.screens.settings.NotificationsSettingsGroup
+import com.example.androidmaiden.screens.settings.appearance.AppearanceSettingsGroup
+import com.example.androidmaiden.screens.settings.appearance.ChatPersonalizationSettingsGroup
+import com.example.androidmaiden.screens.settings.general.LanguageSettingsGroup
+import com.example.androidmaiden.screens.settings.llm.LlmSettingsGroup
+import com.example.androidmaiden.screens.settings.general.NetworkSettingsGroup
+import com.example.androidmaiden.screens.settings.general.NotificationsSettingsGroup
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 enum class ThemeMode {

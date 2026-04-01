@@ -6,62 +6,65 @@ The project follows a **Modular Monolith + Clean Architecture** approach with **
 
 ### Core Components:
 - **UI Layer (`FileClassifyPage`, `FilesListPage`)**:
-    - `FileClassifyPage`: High-level entry point showing file categories (Images, Videos, etc.) and analysis blocks (Large Files, Recent Files).
-    - `FilesListPage`: Detailed view for a specific category with support for List/Grid modes and sorting.
-    - **Responsibility**: Rendering state from ViewModels, handling user interactions, and navigating between views.
+    - `FileClassifyPage`: Entry point showing storage summary, search, file categories, and analysis blocks.
+    - `FilesListPage`: Detailed viewer for categories with List/Grid modes, sorting, and file operations.
+    - **Responsibility**: UI state observation, user interaction handling, and navigation.
 
 - **Presentation Layer (`PersistentFileViewModel`)**:
-    - Bridges the Repository and the UI.
-    - Transforms raw `FileMetadata` from the database into `FileCategory` models suitable for display.
-    - Manages UI state like `viewMode` and `selectedCategory`.
+    - Bridges Repository and UI.
+    - Handles data transformation (Classification, Stats calculation).
+    - Manages search state and UI view modes.
 
 - **Domain/Data Layer (`FileRepository`, `FileMetadataDao`)**:
-    - `FileRepository`: Single source of truth. Coordinates between the database (Room) and the scanner.
-    - `FileMetadata`: The core entity representing a file/folder with rich metadata (mimeType, duration, etc.).
-    - `FileMetadataDao`: Handles SQL queries for reactive UI updates (Flow).
+    - `FileRepository`: Single source of truth. Orchestrates DB and Scanner.
+    - `FileMetadata`: Core entity with rich metadata.
+    - `FileMetadataDao`: Reactive SQL queries (Flow).
 
 - **Infrastructure Layer (`AndroidFileSystemScanner`)**:
-    - Implements `FileSystemScanner` for Android.
-    - Performs incremental scanning by comparing timestamps.
-    - Extracts media metadata using `MediaMetadataRetriever`.
+    - Android-specific implementation of `FileSystemScanner`.
+    - Incremental scanning and media metadata extraction.
+    - Physical file operations (Delete, Rename, Move).
 
 ## 2. Implementation Level & Progress
 
 ### Accomplishments:
-- ✅ **Reactive Architecture**: Data flows from DB -> Repository -> ViewModel -> UI via Kotlin Flows.
-- ✅ **Incremental Scanning**: Basic implementation to skip unchanged directories is present.
-- ✅ **Rich Metadata**: Initial support for Image/Video/Audio metadata extraction.
-- ✅ **Adaptive UI**: `FilesListPage` supports different cell types (Images, Videos, APKs) and layout modes.
-- ✅ **Persistence**: Use of Room ensures data survives app restarts.
+- ✅ **Reactive Data Flow**: End-to-end Flow implementation from DB to UI.
+- ✅ **Incremental Scanning**: Efficient updates based on directory timestamps.
+- ✅ **Rich Metadata**: Video/Audio/Image tag extraction.
+- ✅ **Search**: Global real-time search with debounce.
+- ✅ **Storage Analysis**: "Large Files" (>50MB) and "Recent Files" (7 days) implemented.
+- ✅ **File Operations**: Delete and Rename integrated with UI and physical storage.
+- ✅ **Adaptive UI**: Category-specific layouts and density control.
 
-### Shortcomings & Remaining Tasks:
-- ⚠️ **Analysis Categories Incomplete**: "Large Files" and "Recent Files" in `PersistentFileViewModel` currently only show headers without real counts or file lists.
-- ⚠️ **UI Hardcoding**: `FileClassifyPage` uses fixed index sub-listing which is brittle if `FileTypeUtils` definitions change.
-- ⚠️ **Performance**: Large file systems might still see overhead during the initial scan; batching and prioritization could be improved.
-- ⚠️ **Feature Boundaries**: Some "Experimental" models (`FileSysNode`) still exist and should be fully migrated to `FileMetadata`.
-- ⚠️ **File Operations**: Basic operations (Delete, Rename, Move) are largely missing or not integrated into the UI.
+### Remaining Tasks & Shortcomings:
+- [ ] **Move Operation**: Infrastructure is ready, but UI needs a folder picker or "Move Mode".
+- [ ] **Deep Scan Optimization**: Two-pass scanning (Stats first, heavy tags later).
+- [ ] **Search Interaction**: Search results should open preview or navigate to location.
+- [ ] **Thumbnail Caching**: Improve performance of large list scrolling with optimized thumbnails.
+- [ ] **Batch Operations**: Allow selecting multiple files for delete/move.
+- [ ] **File Analysis Integration**: Sync "Real Data" mode in `FileAnalysisScreen` with the `FileRepository` database.
 
 ## 3. Improvement Suggestions
 
-1. **Dynamic Sectioning**: Replace hardcoded sub-lists in `FileClassifyPage` with a more robust grouping logic based on `CategoryDef` types.
-2. **Analysis Logic Implementation**: Implement the filtering logic for `LargeFiles` (>50MB) and `RecentFiles` (last 7 days) in `PersistentFileViewModel`.
-3. **Metadata Extraction Optimization**: Consider a two-pass scan: first pass for file paths/stats, second pass (background) for heavy metadata (thumbnails, media tags).
-4. **Scoped Storage Handling**: Ensure robust handling of Android's Scoped Storage permissions for all-file access.
-5. **Unified Model**: Remove `FileSysNode` dependencies in favor of `FileMetadata` to reduce complexity.
+1. **Background Syncing**: Move `syncRoot` to `WorkManager` for periodic background updates.
+2. **Unified Navigation**: clicking a file in search results should trigger the `FilePreviewOverlay` or navigate to its parent category.
+3. **Permission Handling**: Add a more graceful "Permission Denied" UI state.
+4. **MIME Type Mapping**: Use `mimeType` from `FileMetadata` for more accurate icon and viewer selection.
 
 ## 4. Development Plan
 
-### Phase 1: Stability & Completeness (Immediate)
-- [ ] Implement analysis logic in `PersistentFileViewModel`.
-- [ ] Refactor `FileClassifyPage` to use dynamic grouping.
-- [ ] Fix any remaining `FileSysNode` vs `FileMetadata` mapping issues.
+### Phase 1: Interaction & UX (Current)
+- [x] Implement search and storage stats.
+- [x] Implement file deletion and renaming.
+- [ ] Integrate Search Result interactions.
+- [ ] Add "Share" and "Copy Path" actions.
 
 ### Phase 2: Functional Enhancements
-- [ ] Add basic file operations (Delete) with UI confirmation.
-- [ ] Improve search functionality within categories.
-- [ ] Enhance thumbnail loading (integration with Coil).
+- [ ] Implement a simple "Move to Folder" selection dialog.
+- [ ] Add "Favorite" toggle functionality.
+- [ ] Implement batch selection mode.
 
 ### Phase 3: Performance & Polish
-- [ ] Optimize scanner with worker-based background processing.
-- [ ] Add "Deep Scan" progress indicators per folder.
-- [ ] Refine UI transitions and animations.
+- [ ] Integrate `WorkManager` for background indexing.
+- [ ] Refine Coil thumbnail loading for videos.
+- [ ] Add "Empty Category" placeholders with illustrations.

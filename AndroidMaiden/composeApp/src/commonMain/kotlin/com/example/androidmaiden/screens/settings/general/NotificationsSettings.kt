@@ -1,4 +1,4 @@
-package com.example.androidmaiden.screens.settings
+package com.example.androidmaiden.screens.settings.general
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

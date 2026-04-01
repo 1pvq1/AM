@@ -8,7 +8,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.androidmaiden.data.FileMetadata
-import com.example.androidmaiden.model.FileSysNode
 
 @Composable
 fun VideoPreview(file: FileMetadata) {

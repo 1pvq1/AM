@@ -15,6 +15,9 @@ interface FileMetadataDao {
     @Query("SELECT * FROM file_metadata")
     fun getAllFiles(): Flow<List<FileMetadata>>
 
+    @Query("SELECT * FROM file_metadata WHERE name LIKE '%' || :query || '%'")
+    fun searchFiles(query: String): Flow<List<FileMetadata>>
+
     // Optimization: Bulk insert/update
     @Upsert
     suspend fun upsertFiles(files: List<FileMetadata>)

@@ -1,4 +1,4 @@
-package com.example.androidmaiden.screens.settings
+package com.example.androidmaiden.screens.settings.llm
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth

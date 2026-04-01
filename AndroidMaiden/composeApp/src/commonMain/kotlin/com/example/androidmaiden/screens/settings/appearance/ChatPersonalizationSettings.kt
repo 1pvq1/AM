@@ -1,4 +1,4 @@
-package com.example.androidmaiden.screens.settings
+package com.example.androidmaiden.screens.settings.appearance
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border

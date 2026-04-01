@@ -1,4 +1,4 @@
-package com.example.androidmaiden.screens.pages
+package com.example.androidmaiden.screens.fileSystem
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

@@ -10,7 +10,11 @@ import androidx.compose.ui.Modifier
 import coil3.compose.setSingletonImageLoaderFactory
 import com.example.androidmaiden.model.Screen
 import com.example.androidmaiden.screens.*
+import com.example.androidmaiden.screens.fileSystem.analyze.FileAnalysisScreen
+import com.example.androidmaiden.screens.fileSystem.classify.FileClassifyPage
+import com.example.androidmaiden.screens.fileSystem.FilesScreen
 import com.example.androidmaiden.screens.pages.*
+import com.example.androidmaiden.screens.settings.llm.AdvancedLlmSettingsPage
 import com.example.androidmaiden.ui.AppNavigationBar
 import com.example.androidmaiden.utils.getAsyncImageLoader
 import com.example.androidmaiden.viewModels.NavigationViewModel

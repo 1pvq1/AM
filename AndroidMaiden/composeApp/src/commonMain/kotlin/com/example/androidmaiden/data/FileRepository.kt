@@ -52,8 +52,36 @@ class FileRepository(
         return fileDao.getFilesByParent(path)
     }
 
-    suspend fun deleteFileRecord(path: String) {
-        fileDao.deleteByPath(path)
+    /**
+     * Global search across all indexed files.
+     */
+    fun searchFiles(query: String): Flow<List<FileMetadata>> {
+        return fileDao.searchFiles(query)
+    }
+
+    /**
+     * Deletes a file physically and removes its record from the database.
+     */
+    suspend fun deleteFile(path: String): Boolean {
+        val success = scanner.deleteFile(path)
+        if (success) {
+            fileDao.deleteByPath(path)
+        }
+        return success
+    }
+
+    /**
+     * Renames a file physically and updates its record in the database.
+     */
+    suspend fun renameFile(oldPath: String, newName: String): Boolean {
+        val success = scanner.renameFile(oldPath, newName)
+        if (success) {
+            // Path is the primary key, so we delete old and let sync handle the new one,
+            // or we could manually trigger a folder re-sync.
+            fileDao.deleteByPath(oldPath)
+            // Note: The new file will be picked up by the next incremental sync of its parent.
+        }
+        return success
     }
 
     fun getScannedPath(): String {

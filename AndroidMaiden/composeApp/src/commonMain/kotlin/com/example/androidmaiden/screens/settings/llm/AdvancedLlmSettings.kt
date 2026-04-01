@@ -1,4 +1,4 @@
-package com.example.androidmaiden.screens.pages
+package com.example.androidmaiden.screens.settings.llm
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -35,7 +35,7 @@ fun AdvancedLlmSettingsPage(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    BasePage(
+    _root_ide_package_.com.example.androidmaiden.screens.pages.BasePage(
         title = stringResource(id = "settings_advanced_llm_title"),
         navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
         onNavigationIconClick = onNavigateBack

@@ -33,6 +33,46 @@ class AndroidFileSystemScanner(
         return rootPath
     }
 
+    override suspend fun deleteFile(path: String): Boolean = withContext(Dispatchers.IO) {
+        val file = File(path)
+        if (file.exists()) {
+            if (file.isDirectory) {
+                file.deleteRecursively()
+            } else {
+                file.delete()
+            }
+        } else {
+            true // Already gone
+        }
+    }
+
+    override suspend fun renameFile(oldPath: String, newName: String): Boolean = withContext(Dispatchers.IO) {
+        val oldFile = File(oldPath)
+        if (!oldFile.exists()) return@withContext false
+        
+        val parent = oldFile.parentFile ?: return@withContext false
+        val newFile = File(parent, newName)
+        
+        if (newFile.exists()) return@withContext false
+        
+        oldFile.renameTo(newFile)
+    }
+
+    override suspend fun moveFile(sourcePath: String, targetPath: String): Boolean = withContext(Dispatchers.IO) {
+        val sourceFile = File(sourcePath)
+        if (!sourceFile.exists()) return@withContext false
+        
+        val targetFile = File(targetPath)
+        if (targetFile.exists()) return@withContext false
+        
+        // Ensure parent directory exists
+        targetFile.parentFile?.let {
+            if (!it.exists()) it.mkdirs()
+        }
+        
+        sourceFile.renameTo(targetFile)
+    }
+
     private suspend fun scanDirectory(directory: File) {
         val path = directory.absolutePath
         val currentTimestamp = directory.lastModified()
