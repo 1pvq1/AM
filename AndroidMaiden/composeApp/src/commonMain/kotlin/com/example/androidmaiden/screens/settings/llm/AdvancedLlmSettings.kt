@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Res.stringResource
+import com.example.androidmaiden.screens.pages.BasePage
 import com.example.androidmaiden.viewModels.AdvancedLlmSettingsViewModel
 import com.example.androidmaiden.viewModels.rememberAdvancedLlmSettingsViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -35,7 +36,7 @@ fun AdvancedLlmSettingsPage(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    _root_ide_package_.com.example.androidmaiden.screens.pages.BasePage(
+    BasePage(
         title = stringResource(id = "settings_advanced_llm_title"),
         navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
         onNavigationIconClick = onNavigateBack

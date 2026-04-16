@@ -5,12 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import io.ktor.client.request.*
+import com.example.androidmaiden.data.SettingsHolder
+import io.ktor.client.statement.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.ktor.client.request.get
 
 @Composable
 actual fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel {
@@ -19,7 +21,11 @@ actual fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel 
 
 actual class AdvancedLlmSettingsViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AdvancedLlmSettingsUiState())
+    private val _uiState = MutableStateFlow(
+        AdvancedLlmSettingsUiState(
+            localLlmAddress = SettingsHolder.localLlmAddress
+        )
+    )
     actual val uiState = _uiState.asStateFlow()
 
     private val client = HttpClient(OkHttp)
@@ -52,6 +58,7 @@ actual class AdvancedLlmSettingsViewModel : ViewModel() {
 
     actual fun onLocalLlmAddressChange(address: String) {
         _uiState.update { it.copy(localLlmAddress = address) }
+        SettingsHolder.localLlmAddress = address
     }
 
     actual fun connectToLocalLlm() {

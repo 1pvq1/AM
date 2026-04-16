@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
@@ -15,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -93,8 +91,6 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
                     }
                 } else {
                     Column {
-                        StorageSummaryHeader(stats)
-                        
                         Box(modifier = Modifier.weight(1f)) {
                             if (viewMode == ViewMode.LIST) {
                                 CategoryListView(categories) { vm.selectCategory(it) }
@@ -124,45 +120,7 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
     }
 }
 
-@Composable
-private fun StorageSummaryHeader(stats: StorageStats) {
-    Surface(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-        color = MaterialTheme.colorScheme.primaryContainer,
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                Icons.Default.Storage,
-                contentDescription = null,
-                modifier = Modifier.size(40.dp),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-            Spacer(Modifier.width(16.dp))
-            Column {
-                Text(
-                    text = "Total Storage Used",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                )
-                Text(
-                    text = formatSize(stats.totalSize),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Text(
-                    text = "${stats.fileCount} Files • ${stats.folderCount} Folders",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-                )
-            }
-        }
-    }
-}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

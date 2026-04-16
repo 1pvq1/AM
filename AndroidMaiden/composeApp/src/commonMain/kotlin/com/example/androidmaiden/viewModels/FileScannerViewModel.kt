@@ -7,9 +7,8 @@ import com.example.androidmaiden.data.FileRepository
 import com.example.androidmaiden.model.*
 import com.example.androidmaiden.utils.FileTypeUtils
 import com.example.androidmaiden.views.eg.simFileNode
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -27,9 +26,9 @@ data class FolderAnalysisStats(
  * ViewModel for the File System Analysis screen.
  * Handles navigation, file operations, and content analysis.
  */
-class FileScannerViewModel(private val repository: FileRepository) : BaseViewModel() {
+class FileScannerViewModel(val repository: FileRepository) : BaseViewModel() {
 
-    private val defaultRoot = "/storage/emulated/0" // Public storage root
+    private val defaultRoot: String get() = repository.getScannedPath()
     private val mockRootPath = "mock_root"
 
     /**
@@ -63,7 +62,17 @@ class FileScannerViewModel(private val repository: FileRepository) : BaseViewMod
 
     init {
         // Initial load with default settings
+        _isLoading.value = true
         loadDirectory(if (useMock) mockRootPath else defaultRoot)
+    }
+
+    /**
+     * Triggers a manual sync of the real file system.
+     */
+    fun startSync() {
+        if (!useMock) {
+            repository.startIncrementalSync()
+        }
     }
 
     /**
@@ -114,14 +123,14 @@ class FileScannerViewModel(private val repository: FileRepository) : BaseViewMod
      * Navigates back to the parent directory.
      */
     fun navigateBack(): Boolean {
-        if (_pathStack.size > 1) {
+        if (_pathStack.isNotEmpty()) {
             _pathStack.removeAt(_pathStack.size - 1)
-            val parentPath = _pathStack.last()
+            val parentPath = if (_pathStack.isEmpty()) {
+                if (useMock) mockRootPath else defaultRoot
+            } else {
+                _pathStack.last()
+            }
             loadDirectory(parentPath)
-            return true
-        } else if (_pathStack.size == 1) {
-            _pathStack.clear()
-            loadDirectory(if (useMock) mockRootPath else defaultRoot)
             return true
         }
         return false
@@ -146,19 +155,17 @@ class FileScannerViewModel(private val repository: FileRepository) : BaseViewMod
     private fun loadMockDirectory(path: String) {
         viewModelScope.launch(Dispatchers.Default) {
             try {
-                // Fix issue 1: Ensure result is correctly assigned on initial load
                 val result = simFileNode()
-                currentDirectory = result
-                calculateStats(result.children)
-                
-                // Ensure breadcrumbs work for mock root too if it's the start
-                if (_pathStack.isEmpty() && path != mockRootPath) {
-                    _pathStack.add(path)
+                withContext(Dispatchers.Main) {
+                    currentDirectory = result
+                    calculateStats(result.children)
                 }
             } catch (e: Exception) {
                 _error.value = "Mock data error: ${e.message}"
             } finally {
-                _isLoading.value = false
+                withContext(Dispatchers.Main) {
+                    _isLoading.value = false
+                }
             }
         }
     }
@@ -168,16 +175,17 @@ class FileScannerViewModel(private val repository: FileRepository) : BaseViewMod
         realDataJob = repository.getFilesByParent(path)
             .onEach { metadataList ->
                 val node = mapMetadataToNode(path, metadataList)
-                currentDirectory = node
-                calculateStats(node.children)
-                _isLoading.value = false
-                if (_pathStack.isEmpty() && path == defaultRoot) {
-                    _pathStack.add(path)
+                withContext(Dispatchers.Main) {
+                    currentDirectory = node
+                    calculateStats(node.children)
+                    _isLoading.value = false
                 }
             }
             .catch { e ->
-                _error.value = "Database error: ${e.message}"
-                _isLoading.value = false
+                withContext(Dispatchers.Main) {
+                    _error.value = "Database error: ${e.message}"
+                    _isLoading.value = false
+                }
             }
             .launchIn(viewModelScope)
     }
@@ -251,7 +259,7 @@ class FileScannerViewModel(private val repository: FileRepository) : BaseViewMod
         }
 
         return FileSysNode(
-            name = path.substringAfterLast("/", "Internal Storage"),
+            name = if (path == defaultRoot || path == "/" || path == mockRootPath) "Internal Storage" else path.substringAfterLast("/"),
             nodeType = NodeType.FOLDER,
             folderType = FolderType.FOLDER,
             dataSource = DataSource.REAL,

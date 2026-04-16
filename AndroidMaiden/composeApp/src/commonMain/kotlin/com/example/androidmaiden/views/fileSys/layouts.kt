@@ -1,6 +1,7 @@
 package com.example.androidmaiden.views.fileSys
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,13 +17,56 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.model.FileSysNode
-import com.example.androidmaiden.screens.fileSystem.analyze.FileItem
 import com.example.androidmaiden.ui.icons.folderIcon
+
+import androidx.compose.foundation.shape.RoundedCornerShape
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * Supported view modes for file browsing.
  */
 enum class ViewMode { LIST, GRID, TREE }
+
+/**
+ * Skeleton loader for file analysis page.
+ */
+@Preview
+@Composable
+fun FileAnalysisSkeleton() {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        repeat(10) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(8.dp))
+                )
+                Spacer(Modifier.width(16.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f)
+                            .height(16.dp)
+                            .background(MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(4.dp))
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.3f)
+                            .height(12.dp)
+                            .background(MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(4.dp))
+                    )
+                }
+            }
+        }
+    }
+}
 
 /**
  * Standard list view for file nodes.

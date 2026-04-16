@@ -12,7 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.filled.SmartToy
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import com.example.androidmaiden.data.LlmProvider
+import com.example.androidmaiden.data.LlmProviderType
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -112,7 +118,13 @@ fun CharacterInteractionPage(
                     chatHistory = viewModel.chatHistory,
                     text = viewModel.text,
                     onTextChange = { viewModel.onTextChanged(it) },
-                    onSendMessage = { viewModel.sendMessage() }
+                    onSendMessage = { viewModel.sendMessage() },
+                    selectedProvider = viewModel.selectedProvider,
+                    onProviderClick = { viewModel.toggleProviderPicker() },
+                    showProviderPicker = viewModel.showProviderPicker,
+                    availableProviders = viewModel.availableProviders,
+                    onProviderSelect = { viewModel.onProviderSelect(it) },
+                    onDismissPicker = { viewModel.toggleProviderPicker() }
                 )
 
                 ChatViewMode.VIRTUAL -> VirtualChatView(
@@ -120,7 +132,13 @@ fun CharacterInteractionPage(
                     chatHistory = viewModel.chatHistory,
                     text = viewModel.text,
                     onTextChange = { viewModel.onTextChanged(it) },
-                    onSendMessage = { viewModel.sendMessage() }
+                    onSendMessage = { viewModel.sendMessage() },
+                    selectedProvider = viewModel.selectedProvider,
+                    onProviderClick = { viewModel.toggleProviderPicker() },
+                    showProviderPicker = viewModel.showProviderPicker,
+                    availableProviders = viewModel.availableProviders,
+                    onProviderSelect = { viewModel.onProviderSelect(it) },
+                    onDismissPicker = { viewModel.toggleProviderPicker() }
                 )
             }
         }
@@ -133,7 +151,13 @@ fun RegularChatView(
     chatHistory: List<ChatMessage>,
     text: String,
     onTextChange: (String) -> Unit,
-    onSendMessage: () -> Unit
+    onSendMessage: () -> Unit,
+    selectedProvider: LlmProvider,
+    onProviderClick: () -> Unit,
+    showProviderPicker: Boolean,
+    availableProviders: List<LlmProvider>,
+    onProviderSelect: (LlmProvider) -> Unit,
+    onDismissPicker: () -> Unit
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         LazyColumn(
@@ -148,7 +172,17 @@ fun RegularChatView(
             }
         }
 
-        ChatInput(text = text, onTextChange = onTextChange, onSendMessage = onSendMessage)
+        ChatInput(
+            text = text,
+            onTextChange = onTextChange,
+            onSendMessage = onSendMessage,
+            selectedProvider = selectedProvider,
+            onProviderClick = onProviderClick,
+            showProviderPicker = showProviderPicker,
+            availableProviders = availableProviders,
+            onProviderSelect = onProviderSelect,
+            onDismissPicker = onDismissPicker
+        )
     }
 }
 
@@ -158,7 +192,13 @@ fun VirtualChatView(
     chatHistory: List<ChatMessage>,
     text: String,
     onTextChange: (String) -> Unit,
-    onSendMessage: () -> Unit
+    onSendMessage: () -> Unit,
+    selectedProvider: LlmProvider,
+    onProviderClick: () -> Unit,
+    showProviderPicker: Boolean,
+    availableProviders: List<LlmProvider>,
+    onProviderSelect: (LlmProvider) -> Unit,
+    onDismissPicker: () -> Unit
 ) {
     val latestLlmMessage =
         chatHistory.lastOrNull { it.sender == Sender.CHARACTER }?.message ?: stringResource(id = "ellipsis")
@@ -188,7 +228,13 @@ fun VirtualChatView(
                 text = text,
                 onTextChange = onTextChange,
                 onSendMessage = onSendMessage,
-                useTransparentStyle = true
+                useTransparentStyle = true,
+                selectedProvider = selectedProvider,
+                onProviderClick = onProviderClick,
+                showProviderPicker = showProviderPicker,
+                availableProviders = availableProviders,
+                onProviderSelect = onProviderSelect,
+                onDismissPicker = onDismissPicker
             )
         }
     }
@@ -199,7 +245,13 @@ fun ChatInput(
     text: String,
     onTextChange: (String) -> Unit,
     onSendMessage: () -> Unit,
-    useTransparentStyle: Boolean = false
+    useTransparentStyle: Boolean = false,
+    selectedProvider: LlmProvider? = null,
+    onProviderClick: () -> Unit = {},
+    showProviderPicker: Boolean = false,
+    availableProviders: List<LlmProvider> = emptyList(),
+    onProviderSelect: (LlmProvider) -> Unit = {},
+    onDismissPicker: () -> Unit = {}
 ) {
     Surface(
         tonalElevation = if (useTransparentStyle) 0.dp else 3.dp,
@@ -210,6 +262,40 @@ fun ChatInput(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Provider Selection Button
+            Box {
+                IconButton(onClick = onProviderClick) {
+                    Icon(
+                        imageVector = Icons.Default.SmartToy,
+                        contentDescription = "Select Provider",
+                        tint = if (selectedProvider?.type == LlmProviderType.LOCAL_LM_STUDIO) 
+                            MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
+                    )
+                }
+                
+                DropdownMenu(
+                    expanded = showProviderPicker,
+                    onDismissRequest = onDismissPicker
+                ) {
+                    availableProviders.forEach { provider ->
+                        DropdownMenuItem(
+                            text = { Text(provider.name) },
+                            onClick = { onProviderSelect(provider) },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.SmartToy,
+                                    contentDescription = null,
+                                    tint = if (provider.type == LlmProviderType.LOCAL_LM_STUDIO) 
+                                        MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.width(4.dp))
+
             OutlinedTextField(
                 value = text,
                 onValueChange = onTextChange,
@@ -309,7 +395,13 @@ fun RegularChatViewPreview() {
             ),
             text = stringResource(id = "chat_preview_1"),
             onTextChange = {},
-            onSendMessage = {}
+            onSendMessage = {},
+            selectedProvider = LlmProvider("gemini", "Gemini", LlmProviderType.GEMINI),
+            onProviderClick = {},
+            showProviderPicker = false,
+            availableProviders = emptyList(),
+            onProviderSelect = {},
+            onDismissPicker = {}
         )
     }
 }
@@ -325,7 +417,13 @@ fun VirtualChatViewPreview() {
             ),
             text = stringResource(id = "chat_preview_2"),
             onTextChange = {},
-            onSendMessage = {}
+            onSendMessage = {},
+            selectedProvider = LlmProvider("gemini", "Gemini", LlmProviderType.GEMINI),
+            onProviderClick = {},
+            showProviderPicker = false,
+            availableProviders = emptyList(),
+            onProviderSelect = {},
+            onDismissPicker = {}
         )
     }
 }

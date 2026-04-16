@@ -87,4 +87,32 @@ class FileRepository(
     fun getScannedPath(): String {
         return scanner.getScannedPath()
     }
+
+    // --- Tag Operations ---
+
+    fun getAllTags(): Flow<List<Tag>> = fileDao.getAllTags()
+
+    suspend fun addTag(name: String, colorHex: String) {
+        fileDao.insertTag(Tag(name = name, colorHex = colorHex))
+    }
+
+    suspend fun updateTag(tag: Tag) {
+        fileDao.insertTag(tag)
+    }
+
+    suspend fun removeTag(tag: Tag) {
+        fileDao.deleteTag(tag)
+    }
+
+    fun getFileWithTags(path: String): Flow<FileWithTags?> = fileDao.getFileWithTags(path)
+
+    fun getTagWithFiles(tagId: Long): Flow<TagWithFiles?> = fileDao.getTagWithFiles(tagId)
+
+    suspend fun addTagToFile(path: String, tagId: Long) {
+        fileDao.insertFileTagXRef(FileTagXRef(path, tagId))
+    }
+
+    suspend fun removeTagFromFile(path: String, tagId: Long) {
+        fileDao.deleteFileTagXRef(FileTagXRef(path, tagId))
+    }
 }

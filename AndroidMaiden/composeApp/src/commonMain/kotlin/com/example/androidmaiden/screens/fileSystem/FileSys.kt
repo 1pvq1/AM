@@ -45,8 +45,8 @@ fun FilesScreen(onNavigate: (Screen) -> Unit) {
     val features = listOf(
         FileFeature(stringResource(id = "analyze"), stringResource(id = "analyze_description"), Icons.Default.Analytics, Screen.FileAnalysis),
         FileFeature(stringResource(id = "classify"), stringResource(id = "classify_description"), Icons.Default.Style, Screen.FileClassify),
-        FileFeature(stringResource(id = "organize"), stringResource(id = "organize_description"), Icons.Default.CreateNewFolder),
-        FileFeature(stringResource(id = "clean"), stringResource(id = "clean_description"), Icons.Default.CleaningServices)
+        FileFeature(stringResource(id = "organize"), stringResource(id = "organize_description"), Icons.Default.CreateNewFolder, Screen.FileOrganize),
+        FileFeature(stringResource(id = "clean"), stringResource(id = "clean_description"), Icons.Default.CleaningServices, Screen.FileClean)
     )
     val scrollState = rememberScrollState()
 

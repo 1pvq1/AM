@@ -12,7 +12,9 @@ import com.example.androidmaiden.model.Screen
 import com.example.androidmaiden.screens.*
 import com.example.androidmaiden.screens.fileSystem.analyze.FileAnalysisScreen
 import com.example.androidmaiden.screens.fileSystem.classify.FileClassifyPage
+import com.example.androidmaiden.screens.fileSystem.organize.FileOrganizePage
 import com.example.androidmaiden.screens.fileSystem.FilesScreen
+import com.example.androidmaiden.screens.fileSystem.clean.FileCleanPage
 import com.example.androidmaiden.screens.pages.*
 import com.example.androidmaiden.screens.settings.llm.AdvancedLlmSettingsPage
 import com.example.androidmaiden.ui.AppNavigationBar
@@ -51,14 +53,11 @@ fun App() {
                     bottomBar = {
                         if (isNavigationBarVisible) {
                             AppNavigationBar(
-                                currentScreen = currentScreen,
-                                onScreenSelected = { screen ->
+                                currentScreen = currentScreen, onScreenSelected = { screen ->
                                     navViewModel.navigateTo(screen)
-                                }
-                            )
+                                })
                         }
-                    }
-                ) { innerPadding ->
+                    }) { innerPadding ->
                     Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
                         when (currentScreen) {
                             is Screen.Home -> HomeScreen()
@@ -71,8 +70,7 @@ fun App() {
                                     navViewModel.navigateTo(Screen.AdvancedLlmSettings)
                                 },
                                 language = Language.FOLLOW_SYSTEM,
-                                onLanguageChange = {}
-                            )
+                                onLanguageChange = {})
 
                             is Screen.Skills -> SkillsPage(onNavigate = { screen ->
                                 navViewModel.navigateTo(screen)
@@ -89,8 +87,17 @@ fun App() {
                             is Screen.FileClassify -> FileClassifyPage(
                                 onBack = {
                                     navViewModel.navigateTo(Screen.Files)
-                                }
-                            )
+                                })
+
+                            is Screen.FileOrganize -> FileOrganizePage(
+                                onBack = {
+                                    navViewModel.navigateTo(Screen.Files)
+                                })
+
+                            is Screen.FileClean -> FileCleanPage(
+                                onBack = {
+                                    navViewModel.navigateTo(Screen.Files)
+                                })
 
                             is Screen.Todo -> TodoPage()
 
@@ -100,12 +107,12 @@ fun App() {
                                 },
                                 onNavigateUp = {
                                     navViewModel.navigateTo(Screen.Home)
-                                }
-                            )
+                                })
 
                             is Screen.AdvancedLlmSettings -> AdvancedLlmSettingsPage(onNavigateBack = {
                                 navViewModel.navigateTo(Screen.Settings)
                             })
+
                         }
                     }
                 }
