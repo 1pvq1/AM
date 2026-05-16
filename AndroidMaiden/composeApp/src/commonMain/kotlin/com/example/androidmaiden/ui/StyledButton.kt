@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.example.androidmaiden.ButtonDisplayStyle
-import com.example.androidmaiden.LocalButtonDisplayStyle
+import com.example.androidmaiden.ui.theme.core.ButtonDisplayStyle
+import com.example.androidmaiden.ui.theme.core.LocalButtonDisplayStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

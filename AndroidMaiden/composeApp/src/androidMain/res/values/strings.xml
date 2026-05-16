@@ -171,6 +171,8 @@
     <string name="settings_appearance_button_style_both">Both</string>
     <string name="settings_appearance_button_style_icon_only">Icon Only</string>
     <string name="settings_appearance_button_style_text_only">Text Only</string>
+    <string name="settings_appearance_dynamic_color">Dynamic Color</string>
+    <string name="settings_appearance_dynamic_color_desc">Follow system wallpaper colors (Android 12+)</string>
 
     <!-- Settings - Chat Personalization Page -->
     <string name="settings_chat_personalization_title">Chat Personalization</string>

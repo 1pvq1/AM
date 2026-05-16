@@ -7,7 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.androidmaiden.screens.pages.TodoItem
+import com.example.androidmaiden.model.TodoItem
 import com.example.androidmaiden.viewModels.TodoViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 

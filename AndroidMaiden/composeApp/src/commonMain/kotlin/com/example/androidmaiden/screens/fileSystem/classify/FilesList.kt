@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import com.example.androidmaiden.utils.*
 import com.example.androidmaiden.views.*
+import com.example.androidmaiden.ui.theme.core.*
 import coil3.compose.*
 import com.example.androidmaiden.data.*
 import com.example.androidmaiden.views.eg.*
@@ -427,7 +428,7 @@ private fun GenericItemCell(file: FileMetadata, viewMode: ViewMode, modifier: Mo
 @Composable
 private fun ImagesCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier = Modifier) {
     if (viewMode == ViewMode.GRID) {
-        Card(shape = RoundedCornerShape(8.dp), modifier = modifier) {
+        Card(shape = MaterialTheme.shapes.small, modifier = modifier) {
             Box {
                 AsyncImage(
                     model = file.path,
@@ -461,7 +462,7 @@ private fun ImagesCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifie
                 AsyncImage(
                     model = file.path,
                     contentDescription = null,
-                    modifier = Modifier.size(40.dp).clip(RoundedCornerShape(4.dp)),
+                    modifier = Modifier.size(40.dp).clip(MaterialTheme.shapes.extraSmall),
                     contentScale = ContentScale.Crop
                 )
             },
@@ -506,7 +507,7 @@ private fun VideosCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifie
                     "$resolutionText • $durationText",
                     color = Color.White,
                     modifier = Modifier.align(Alignment.BottomEnd).padding(4.dp)
-                        .background(Color.Black.copy(0.6f), RoundedCornerShape(2.dp)).padding(horizontal = 4.dp),
+                        .background(Color.Black.copy(0.6f), MaterialTheme.shapes.extraSmall).padding(horizontal = 4.dp),
                     style = MaterialTheme.typography.labelSmall
                 )
             }
@@ -525,7 +526,7 @@ private fun VideosCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifie
                     AsyncImage(
                         model = file.path,
                         contentDescription = null,
-                        modifier = Modifier.size(40.dp).clip(RoundedCornerShape(4.dp)),
+                        modifier = Modifier.size(40.dp).clip(MaterialTheme.shapes.extraSmall),
                         contentScale = ContentScale.Crop
                     )
                     Icon(
@@ -542,6 +543,7 @@ private fun VideosCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifie
 
 @Composable
 private fun AudioCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier = Modifier) {
+    val fileTypeColors = LocalFileTypeColors.current
     val path = file.path
     val isRecording = remember(path) {
         val keywords = listOf("record", "voice")
@@ -562,7 +564,7 @@ private fun AudioCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier
                 AsyncImage(
                     model = file.path,
                     contentDescription = null,
-                    modifier = Modifier.size(40.dp).clip(RoundedCornerShape(4.dp)),
+                    modifier = Modifier.size(40.dp).clip(MaterialTheme.shapes.extraSmall),
                     contentScale = ContentScale.Crop,
                     error = null
                 )
@@ -573,7 +575,7 @@ private fun AudioCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier
                         else -> Icons.Default.Audiotrack
                     },
                     contentDescription = null,
-                    tint = if (isRecording) MaterialTheme.colorScheme.secondary else Color(0xFFE91E63),
+                    tint = if (isRecording) MaterialTheme.colorScheme.secondary else fileTypeColors.audio,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -588,6 +590,7 @@ private fun AudioCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier
 
 @Composable
 private fun DocumentsCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier = Modifier) {
+    val fileTypeColors = LocalFileTypeColors.current
     val ext = file.name.substringAfterLast(".").uppercase()
     ListItem(
         headlineContent = { Text(file.name) },
@@ -595,13 +598,13 @@ private fun DocumentsCell(file: FileMetadata, viewMode: ViewMode, modifier: Modi
         leadingContent = {
             Surface(
                 color = when(ext) {
-                    "PDF" -> Color(0xFFF44336)
-                    "DOC", "DOCX" -> Color(0xFF2196F3)
-                    "XLS", "XLSX" -> Color(0xFF4CAF50)
-                    "TXT", "MD" -> Color(0xFF9C27B0)
+                    "PDF" -> fileTypeColors.pdf
+                    "DOC", "DOCX" -> fileTypeColors.doc
+                    "XLS", "XLSX" -> fileTypeColors.xls
+                    "TXT", "MD" -> fileTypeColors.txt
                     else -> MaterialTheme.colorScheme.secondary
                 },
-                shape = RoundedCornerShape(4.dp)
+                shape = MaterialTheme.shapes.extraSmall
             ) {
                 Text(ext, color = Color.White, modifier = Modifier.padding(4.dp), fontWeight = FontWeight.Bold, fontSize = 10.sp)
             }
@@ -612,10 +615,11 @@ private fun DocumentsCell(file: FileMetadata, viewMode: ViewMode, modifier: Modi
 
 @Composable
 private fun APKCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier = Modifier) {
+    val fileTypeColors = LocalFileTypeColors.current
     if (viewMode == ViewMode.GRID) {
         Card(modifier = modifier.fillMaxWidth().padding(4.dp)) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
-                Icon(Icons.Default.Android, null, modifier = Modifier.size(48.dp), tint = Color(0xFF3DDC84))
+                Icon(Icons.Default.Android, null, modifier = Modifier.size(48.dp), tint = fileTypeColors.apk)
                 Text(file.name, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text("v1.0.2", style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp), color = MaterialTheme.colorScheme.outline)
             }
@@ -624,7 +628,7 @@ private fun APKCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier =
         ListItem(
             headlineContent = { Text(file.name) },
             supportingContent = { Text("com.example.app • ${formatSize(file.size)}") },
-            leadingContent = { Icon(Icons.Default.Android, null, tint = Color(0xFF3DDC84)) },
+            leadingContent = { Icon(Icons.Default.Android, null, tint = fileTypeColors.apk) },
             modifier = modifier
         )
     }
@@ -632,10 +636,11 @@ private fun APKCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier =
 
 @Composable
 private fun ArchiveCell(file: FileMetadata, viewMode: ViewMode, modifier: Modifier = Modifier) {
+    val fileTypeColors = LocalFileTypeColors.current
     ListItem(
         headlineContent = { Text(file.name) },
         supportingContent = { Text("${formatSize(file.size)} • ${formatDateTime(file.lastModified)}") },
-        leadingContent = { Icon(Icons.Default.Archive, null, tint = Color(0xFFFF9800)) },
+        leadingContent = { Icon(Icons.Default.Archive, null, tint = fileTypeColors.archive) },
         modifier = modifier
     )
 }

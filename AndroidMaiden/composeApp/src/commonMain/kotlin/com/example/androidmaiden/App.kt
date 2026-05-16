@@ -10,16 +10,21 @@ import androidx.compose.ui.Modifier
 import coil3.compose.setSingletonImageLoaderFactory
 import com.example.androidmaiden.model.Screen
 import com.example.androidmaiden.screens.*
+import com.example.androidmaiden.screens.fileSystem.FilesScreen
 import com.example.androidmaiden.screens.fileSystem.analyze.FileAnalysisScreen
 import com.example.androidmaiden.screens.fileSystem.classify.FileClassifyPage
-import com.example.androidmaiden.screens.fileSystem.organize.FileOrganizePage
-import com.example.androidmaiden.screens.fileSystem.FilesScreen
 import com.example.androidmaiden.screens.fileSystem.clean.FileCleanPage
+import com.example.androidmaiden.screens.fileSystem.organize.FileOrganizePage
 import com.example.androidmaiden.screens.pages.*
 import com.example.androidmaiden.screens.settings.llm.AdvancedLlmSettingsPage
 import com.example.androidmaiden.ui.AppNavigationBar
+import com.example.androidmaiden.ui.theme.AppTheme
+import com.example.androidmaiden.ui.theme.core.AppThemeType
+import com.example.androidmaiden.ui.theme.core.ButtonDisplayStyle
+import com.example.androidmaiden.ui.theme.core.ThemeMode
 import com.example.androidmaiden.utils.getAsyncImageLoader
 import com.example.androidmaiden.viewModels.NavigationViewModel
+import com.example.androidmaiden.viewModels.TodoViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
@@ -35,35 +40,39 @@ fun App() {
         val isNavigationBarVisible by navViewModel.isNavigationBarVisible.collectAsState()
 
         var themeMode by remember { mutableStateOf(ThemeMode.SYSTEM) }
+        var themeType by remember { mutableStateOf(AppThemeType.DEFAULT) }
+        var useDynamicColor by remember { mutableStateOf(false) }
         var buttonDisplayStyle by remember { mutableStateOf(ButtonDisplayStyle.ICON_ONLY) }
-
-        val isDarkTheme = when (themeMode) {
-            ThemeMode.LIGHT -> false
-            ThemeMode.DARK -> true
-            ThemeMode.SYSTEM -> isSystemInDarkTheme()
-        }
 
         setSingletonImageLoaderFactory { context ->
             getAsyncImageLoader(context)
         }
 
-        CompositionLocalProvider(LocalButtonDisplayStyle provides buttonDisplayStyle) {
-            MaterialTheme(colorScheme = if (isDarkTheme) darkColorScheme() else lightColorScheme()) {
-                Scaffold(
-                    bottomBar = {
-                        if (isNavigationBarVisible) {
-                            AppNavigationBar(
-                                currentScreen = currentScreen, onScreenSelected = { screen ->
-                                    navViewModel.navigateTo(screen)
-                                })
-                        }
-                    }) { innerPadding ->
+        AppTheme(
+            themeType = themeType,
+            themeMode = themeMode,
+            useDynamicColor = useDynamicColor,
+            buttonDisplayStyle = buttonDisplayStyle
+        ) {
+            Scaffold(
+                bottomBar = {
+                    if (isNavigationBarVisible) {
+                        AppNavigationBar(
+                            currentScreen = currentScreen, onScreenSelected = { screen ->
+                                navViewModel.navigateTo(screen)
+                            })
+                    }
+                }) { innerPadding ->
                     Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
                         when (currentScreen) {
                             is Screen.Home -> HomeScreen()
                             is Screen.Settings -> SettingsScreen(
                                 previewThemeMode = themeMode,
                                 onThemePreview = { themeMode = it },
+                                currentThemeType = themeType,
+                                onThemeTypeChange = { themeType = it },
+                                useDynamicColor = useDynamicColor,
+                                onDynamicColorChange = { useDynamicColor = it },
                                 buttonDisplayStyle = buttonDisplayStyle,
                                 onButtonDisplayStyleChange = { buttonDisplayStyle = it },
                                 onNavigateToAdvancedLlmSettings = {
@@ -74,6 +83,7 @@ fun App() {
 
                             is Screen.Skills -> SkillsPage(onNavigate = { screen ->
                                 navViewModel.navigateTo(screen)
+
                             })
 
                             is Screen.Files -> FilesScreen(onNavigate = { screen ->
@@ -99,7 +109,10 @@ fun App() {
                                     navViewModel.navigateTo(Screen.Files)
                                 })
 
-                            is Screen.Todo -> TodoPage()
+                            is Screen.Todo -> {
+                                val todoViewModel: TodoViewModel = koinViewModel()
+                                TodoPage(viewModel = todoViewModel)
+                            }
 
                             is Screen.CharacterInteraction -> CharacterInteractionPage(
                                 onFullScreenChange = { isFullScreen: Boolean ->
@@ -116,7 +129,6 @@ fun App() {
                         }
                     }
                 }
-            }
         }
     }
 }

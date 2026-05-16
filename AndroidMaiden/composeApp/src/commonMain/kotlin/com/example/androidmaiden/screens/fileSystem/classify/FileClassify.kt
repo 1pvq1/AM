@@ -92,10 +92,10 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
                 } else {
                     Column {
                         Box(modifier = Modifier.weight(1f)) {
-                            if (viewMode == ViewMode.LIST) {
-                                CategoryListView(categories) { vm.selectCategory(it) }
-                            } else {
+                            if (viewMode == ViewMode.GRID) {
                                 CategoryGridView(categories) { vm.selectCategory(it) }
+                            } else {
+                                CategoryListView(categories) { vm.selectCategory(it) }
                             }
 
                             if (isSyncing && categories.isEmpty()) {

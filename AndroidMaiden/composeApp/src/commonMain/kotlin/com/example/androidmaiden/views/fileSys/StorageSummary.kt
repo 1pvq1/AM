@@ -41,7 +41,7 @@ fun StorageSummaryHeader(stats: StorageStats) {
     Surface(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         color = MaterialTheme.colorScheme.primaryContainer,
-        shape = RoundedCornerShape(16.dp)
+        shape = MaterialTheme.shapes.large
     ) {
         Row(
             modifier = Modifier.padding(16.dp),

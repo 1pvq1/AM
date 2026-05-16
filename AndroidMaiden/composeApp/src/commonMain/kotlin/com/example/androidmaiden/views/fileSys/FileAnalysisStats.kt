@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.androidmaiden.ui.theme.core.*
 import com.example.androidmaiden.utils.formatSize
 import com.example.androidmaiden.viewModels.FolderAnalysisStats
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -30,7 +31,7 @@ fun StatsPopUp(stats: FolderAnalysisStats, onDismiss: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            shape = RoundedCornerShape(16.dp)
+            shape = MaterialTheme.shapes.large
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -87,15 +88,16 @@ private fun StatItem(label: String, value: String) {
  */
 @Composable
 fun DistributionBar(distribution: Map<String, Long>, totalSize: Long) {
-    val categoryColors = remember {
+    val fileTypeColors = LocalFileTypeColors.current
+    val categoryColors = remember(fileTypeColors) {
         mapOf(
-            "Images" to Color(0xFF4CAF50),
-            "Videos" to Color(0xFF2196F3),
-            "Audio" to Color(0xFFE91E63),
-            "Documents" to Color(0xFFFF9800),
-            "APKs" to Color(0xFF3DDC84),
-            "Archives" to Color(0xFF9C27B0),
-            "Other" to Color(0xFF9E9E9E)
+            "Images" to fileTypeColors.image,
+            "Videos" to fileTypeColors.video,
+            "Audio" to fileTypeColors.audio,
+            "Documents" to fileTypeColors.document,
+            "APKs" to fileTypeColors.apk,
+            "Archives" to fileTypeColors.archive,
+            "Other" to fileTypeColors.other
         )
     }
 
@@ -104,7 +106,7 @@ fun DistributionBar(distribution: Map<String, Long>, totalSize: Long) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(16.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .clip(MaterialTheme.shapes.small)
         ) {
             distribution.forEach { (type, size) ->
                 val weight = size.toFloat() / totalSize
@@ -128,7 +130,7 @@ fun DistributionBar(distribution: Map<String, Long>, totalSize: Long) {
                     Box(
                         modifier = Modifier
                             .size(12.dp)
-                            .clip(RoundedCornerShape(3.dp))
+                            .clip(MaterialTheme.shapes.extraSmall)
                             .background(categoryColors[type] ?: categoryColors["Other"]!!)
                     )
                     Spacer(Modifier.width(8.dp))

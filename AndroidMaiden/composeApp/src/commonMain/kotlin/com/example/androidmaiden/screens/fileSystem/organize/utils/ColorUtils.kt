@@ -24,6 +24,6 @@ object ColorUtils {
 
     val tagPalette = listOf(
         "#FF0000", "#00FF00", "#0000FF", "#FFFF00", 
-        "#FF00FF", "#00FFFF", "#FFA500", "#800080"
+        "#FF0   0FF", "#00FFFF", "#FFA500", "#800080"
     )
 }

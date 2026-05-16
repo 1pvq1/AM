@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
  */
 @Database(
     entities = [FileMetadata::class, Tag::class, FileTagXRef::class, TrashEntry::class],
-    version = 4
+    version = 1
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun fileMetadataDao(): FileMetadataDao

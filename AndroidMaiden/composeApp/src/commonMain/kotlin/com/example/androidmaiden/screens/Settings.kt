@@ -21,8 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.example.androidmaiden.ButtonDisplayStyle
 import com.example.androidmaiden.Res.stringResource
+import com.example.androidmaiden.ui.theme.core.AppThemeType
+import com.example.androidmaiden.ui.theme.core.ButtonDisplayStyle
+import com.example.androidmaiden.ui.theme.core.ThemeMode
 import com.example.androidmaiden.screens.settings.AboutSettingsGroup
 import com.example.androidmaiden.screens.settings.appearance.AppearanceSettingsGroup
 import com.example.androidmaiden.screens.settings.appearance.ChatPersonalizationSettingsGroup
@@ -31,10 +33,6 @@ import com.example.androidmaiden.screens.settings.llm.LlmSettingsGroup
 import com.example.androidmaiden.screens.settings.general.NetworkSettingsGroup
 import com.example.androidmaiden.screens.settings.general.NotificationsSettingsGroup
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
-enum class ThemeMode {
-    LIGHT, DARK, SYSTEM
-}
 
 enum class Language(val stringResId: String, val tag: String) {
     FOLLOW_SYSTEM("settings_language_system", "system"),
@@ -55,11 +53,17 @@ enum class Language(val stringResId: String, val tag: String) {
 @Composable
 fun SettingsScreenPreview() {
     var previewThemeMode by remember { mutableStateOf(ThemeMode.SYSTEM) }
+    var previewThemeType by remember { mutableStateOf(AppThemeType.DEFAULT) }
     var buttonDisplayStyle by remember { mutableStateOf(ButtonDisplayStyle.ICON_ONLY) }
+    var useDynamicColor by remember { mutableStateOf(true) }
     var language by remember { mutableStateOf(Language.FOLLOW_SYSTEM) }
     SettingsScreen(
         previewThemeMode = previewThemeMode,
         onThemePreview = { previewThemeMode = it },
+        currentThemeType = previewThemeType,
+        onThemeTypeChange = { previewThemeType = it },
+        useDynamicColor = useDynamicColor,
+        onDynamicColorChange = { useDynamicColor = it },
         buttonDisplayStyle = buttonDisplayStyle,
         onButtonDisplayStyleChange = { buttonDisplayStyle = it },
         language = language,
@@ -73,6 +77,10 @@ fun SettingsScreenPreview() {
 fun SettingsScreen(
     previewThemeMode: ThemeMode,
     onThemePreview: (ThemeMode) -> Unit,
+    currentThemeType: AppThemeType,
+    onThemeTypeChange: (AppThemeType) -> Unit,
+    useDynamicColor: Boolean,
+    onDynamicColorChange: (Boolean) -> Unit,
     buttonDisplayStyle: ButtonDisplayStyle,
     onButtonDisplayStyleChange: (ButtonDisplayStyle) -> Unit,
     language: Language,
@@ -120,6 +128,10 @@ fun SettingsScreen(
                 AppearanceSettingsGroup(
                     previewThemeMode = previewThemeMode,
                     onThemePreview = onThemePreview,
+                    currentThemeType = currentThemeType,
+                    onThemeTypeChange = onThemeTypeChange,
+                    useDynamicColor = useDynamicColor,
+                    onDynamicColorChange = onDynamicColorChange,
                     buttonDisplayStyle = buttonDisplayStyle,
                     onButtonDisplayStyleChange = onButtonDisplayStyleChange
                 )

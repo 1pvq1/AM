@@ -1,10 +1,10 @@
 package com.example.androidmaiden.viewModels
 
 import androidx.compose.runtime.*
-import com.example.androidmaiden.screens.pages.TodoItem
+import com.example.androidmaiden.model.TodoItem
 
 // commonMain/viewmodel/TodoViewModel.kt
-class TodoViewModel {
+class TodoViewModel : BaseViewModel() {
     private val _items = mutableStateListOf<TodoItem>()
     val items: List<TodoItem> get() = _items
 

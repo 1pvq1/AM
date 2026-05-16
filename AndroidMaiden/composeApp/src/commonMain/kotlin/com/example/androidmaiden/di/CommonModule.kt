@@ -27,4 +27,5 @@ val commonModule = module {
     factory { FileScannerViewModel(get()) }
     factory { FileOrganizeViewModel(get()) }
     factory { FileClearViewModel(get()) }
+    factory { TodoViewModel() }
 }
