@@ -1,31 +1,35 @@
 package com.example.androidmaiden.viewModels
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import com.example.androidmaiden.data.SettingsHolder
+import com.example.androidmaiden.data.SettingsRepository
 import com.example.androidmaiden.data.validateApiKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @Composable
 actual fun rememberLlmSettingsViewModel(): LlmSettingsViewModel {
-    return remember { LlmSettingsViewModel() }
+    val repository: SettingsRepository = koinInject()
+    return LlmSettingsViewModel(repository)
 }
 
-actual class LlmSettingsViewModel {
-
+actual class LlmSettingsViewModel(
+    private val settingsRepository: SettingsRepository
+) {
     private val viewModelScope = CoroutineScope(Dispatchers.IO)
 
-    private val _uiState = MutableStateFlow(
-        LlmSettingsUiState(
-            apiKey = SettingsHolder.apiKey ?: ""
-        )
-    )
+    private val _uiState = MutableStateFlow(LlmSettingsUiState())
     actual val uiState = _uiState.asStateFlow()
+
+    init {
+        settingsRepository.apiKey
+            .onEach { key ->
+                _uiState.update { it.copy(apiKey = key ?: "") }
+            }
+            .launchIn(viewModelScope)
+    }
 
     actual fun onApiKeyChange(apiKey: String) {
         _uiState.update { it.copy(apiKey = apiKey, apiKeyValidated = false) }
@@ -36,31 +40,21 @@ actual class LlmSettingsViewModel {
             _uiState.update { it.copy(isLoading = true, error = null, apiKeyValidated = false) }
             try {
                 val key = _uiState.value.apiKey
-                if (key.isBlank()) {
-                    throw Exception("API key cannot be empty")
-                }
+                if (key.isBlank()) throw Exception("API key cannot be empty")
+                
                 val isValid = validateApiKey(key)
                 if (isValid) {
-                    SettingsHolder.apiKey = key
+                    settingsRepository.saveApiKey(key)
                     val models = listOf("gemini-1.5-pro-latest", "gemini-1.5-flash-latest", "gemini-1.0-pro")
                     _uiState.update {
-                        it.copy(
-                            models = models,
-                            isLoading = false,
-                            apiKeyValidated = true
-                        )
+                        it.copy(models = models, isLoading = false, apiKeyValidated = true)
                     }
                 } else {
                     throw Exception("Invalid API key")
                 }
-
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(
-                        error = e.message ?: "An unknown error occurred",
-                        isLoading = false,
-                        models = emptyList()
-                    )
+                    it.copy(error = e.message ?: "An unknown error occurred", isLoading = false, models = emptyList())
                 }
             }
         }

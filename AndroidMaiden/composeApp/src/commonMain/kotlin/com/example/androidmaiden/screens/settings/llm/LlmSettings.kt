@@ -33,8 +33,13 @@ import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.screens.SettingsGroup
 import com.example.androidmaiden.screens.AboutSetting
-import com.example.androidmaiden.data.SettingsHolder
+import com.example.androidmaiden.data.SettingsRepository
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.flow.first
+import org.koin.compose.koinInject
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
 
 @Preview
 @Composable
@@ -44,7 +49,13 @@ fun PreviewLlmSettingsGroup() {
 
 @Composable
 fun LlmSettingsGroup(onNavigateToAdvancedLlmSettings: () -> Unit) {
-    var apiKey by remember { mutableStateOf(SettingsHolder.apiKey ?: "") }
+    val settingsRepository = koinInject<SettingsRepository>()
+    var apiKey by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        apiKey = settingsRepository.apiKey.first() ?: ""
+    }
 
     SettingsGroup(title = stringResource(id = "settings_llm_title")) {
         ModelSelectionSetting()
@@ -52,7 +63,9 @@ fun LlmSettingsGroup(onNavigateToAdvancedLlmSettings: () -> Unit) {
             apiKey = apiKey,
             onApiKeyChange = {
                 apiKey = it
-                SettingsHolder.apiKey = it
+                scope.launch {
+                    settingsRepository.saveApiKey(it)
+                }
             }
         )
 
@@ -60,7 +73,7 @@ fun LlmSettingsGroup(onNavigateToAdvancedLlmSettings: () -> Unit) {
             // ModelProvidersSetting()
         }
 
-        LocalLlmAddressSetting()
+        LocalLlmAddressSetting(settingsRepository)
 
         AboutSetting(
             icon = Icons.Default.Tune,
@@ -158,15 +171,22 @@ private fun ApiKeySetting(apiKey: String, onApiKeyChange: (String) -> Unit) {
 }
 
 @Composable
-private fun LocalLlmAddressSetting() {
-    var address by remember { mutableStateOf(SettingsHolder.localLlmAddress) }
+private fun LocalLlmAddressSetting(settingsRepository: SettingsRepository) {
+    var address by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        address = settingsRepository.localLlmAddress.first()
+    }
 
     OutlinedTextField(
         value = address,
         onValueChange = {
             address = it
-            SettingsHolder.localLlmAddress = it
+            scope.launch {
+                settingsRepository.saveLocalLlmAddress(it)
+            }
         },
         label = { Text(stringResource(id = "settings_advanced_llm_local_address_label")) },
         placeholder = { Text("http://192.168.1.x:1234/v1") },

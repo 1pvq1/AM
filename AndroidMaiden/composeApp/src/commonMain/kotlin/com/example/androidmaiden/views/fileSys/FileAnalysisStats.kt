@@ -2,18 +2,17 @@ package com.example.androidmaiden.views.fileSys
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.androidmaiden.ui.theme.core.*
+import com.example.androidmaiden.ui.theme.AppTheme
 import com.example.androidmaiden.utils.formatSize
 import com.example.androidmaiden.viewModels.FolderAnalysisStats
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -28,10 +27,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun StatsPopUp(stats: FolderAnalysisStats, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            shape = MaterialTheme.shapes.large
+            modifier = Modifier.fillMaxWidth().padding(16.dp), shape = MaterialTheme.shapes.large
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -57,7 +53,9 @@ fun StatsPopUp(stats: FolderAnalysisStats, onDismiss: () -> Unit) {
                 Spacer(Modifier.height(24.dp))
 
                 if (stats.totalSize > 0) {
-                    DistributionBar(distribution = stats.typeDistribution, totalSize = stats.totalSize)
+                    DistributionBar(
+                        distribution = stats.typeDistribution, totalSize = stats.totalSize
+                    )
                 } else {
                     Text("No data to analyze", color = MaterialTheme.colorScheme.outline)
                 }
@@ -75,11 +73,18 @@ fun StatsPopUp(stats: FolderAnalysisStats, onDismiss: () -> Unit) {
 /**
  * A single statistic item with a label and value.
  */
+
 @Composable
-private fun StatItem(label: String, value: String) {
+fun StatItem(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        Text(text = label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.outline)
+        Text(
+            text = value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.outline
+        )
     }
 }
 
@@ -103,18 +108,13 @@ fun DistributionBar(distribution: Map<String, Long>, totalSize: Long) {
 
     Column {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(16.dp)
-                .clip(MaterialTheme.shapes.small)
+            modifier = Modifier.fillMaxWidth().height(16.dp).clip(MaterialTheme.shapes.small)
         ) {
             distribution.forEach { (type, size) ->
                 val weight = size.toFloat() / totalSize
                 if (weight > 0.01f) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(weight)
+                        modifier = Modifier.fillMaxHeight().weight(weight)
                             .background(categoryColors[type] ?: categoryColors["Other"]!!)
                     )
                 }
@@ -128,9 +128,7 @@ fun DistributionBar(distribution: Map<String, Long>, totalSize: Long) {
             distribution.filter { it.value > 0 }.forEach { (type, size) ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .clip(MaterialTheme.shapes.extraSmall)
+                        modifier = Modifier.size(12.dp).clip(MaterialTheme.shapes.extraSmall)
                             .background(categoryColors[type] ?: categoryColors["Other"]!!)
                     )
                     Spacer(Modifier.width(8.dp))
@@ -141,5 +139,43 @@ fun DistributionBar(distribution: Map<String, Long>, totalSize: Long) {
                 }
             }
         }
+    }
+}
+
+
+private val SampleFolderAnalysisStats = FolderAnalysisStats(
+    typeDistribution = mapOf(
+        "Images" to 1024L * 1024 * 50,
+        "Videos" to 1024L * 1024 * 200,
+        "Documents" to 1024L * 1024 * 10,
+        "Other" to 1024L * 1024 * 5
+    ), totalSize = 1024L * 1024 * 265, fileCount = 124, folderCount = 12
+)
+
+@Preview(showBackground = true)
+@Composable
+fun StatsPopUpPreview() {
+    AppTheme {
+        StatsPopUp(
+            stats = SampleFolderAnalysisStats, onDismiss = {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun StatItemPreview() {
+    AppTheme {
+        StatItem(label = "Files", value = "124")
+    }
+}
+
+@Preview
+@Composable
+fun DistributionBarPreview() {
+    AppTheme {
+        DistributionBar(
+            distribution = SampleFolderAnalysisStats.typeDistribution,
+            totalSize = SampleFolderAnalysisStats.totalSize,
+        )
     }
 }

@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.model.FileSysNode
+import com.example.androidmaiden.model.FolderType
+import com.example.androidmaiden.model.NodeType
 import com.example.androidmaiden.ui.icons.fileIcon
 import com.example.androidmaiden.ui.icons.folderIcon
 import com.example.androidmaiden.utils.formatSize
@@ -97,4 +99,28 @@ private fun DetailRow(label: String, value: String) {
         Text(text = label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.outline)
         Text(text = value, style = MaterialTheme.typography.bodyMedium)
     }
+}
+
+@Preview
+@Composable
+fun FileActionSheetContentPreview() {
+    val FileSys = FileSysNode(
+        name = "Documents",
+        nodeType = NodeType.FOLDER,
+        folderType = FolderType.DOCUMENT,
+        description = "User Documents",
+    )
+
+    FileActionSheetContent(
+        node = FileSys, // Replace with your test data
+        onEnterClick = {},
+        onRenameClick = {},
+        onDeleteClick = {}
+        )
+}
+
+@Preview
+@Composable
+fun DetailRowPreview() {
+    DetailRow("Size", "10 MB")
 }

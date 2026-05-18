@@ -2,12 +2,16 @@ package com.example.androidmaiden.di
 
 import androidx.room.Room
 import com.example.androidmaiden.data.AppDatabase
+import com.example.androidmaiden.data.createDataStore
 import com.example.androidmaiden.utils.AndroidFileSystemScanner
 import com.example.androidmaiden.utils.FileSystemScanner
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val platformModule = module {
+    // 0. Provide DataStore
+    single { createDataStore(androidContext()) }
+
     // 1. Database Builder (Android-specific)
     single {
         val dbFile = androidContext().getDatabasePath("app_database.db")

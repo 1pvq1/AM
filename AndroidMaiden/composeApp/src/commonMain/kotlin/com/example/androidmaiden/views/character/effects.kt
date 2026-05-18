@@ -9,19 +9,25 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Applies a continuous floating animation to its content.
+ * Improved with natural easing for a "weightless" effect.
+ *
+ * @param modifier The modifier to be applied to the layout.
  * @param content The composable content to be animated.
  */
 @Composable
-fun AnimatedFloating(content: @Composable (modifier: Modifier) -> Unit) {
+fun AnimatedFloating(
+    modifier: Modifier = Modifier,
+    content: @Composable (modifier: Modifier) -> Unit
+) {
     val infiniteTransition = rememberInfiniteTransition(label = "floatAnim")
     val offsetY by infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = 12f, // The vertical floating distance
+        targetValue = 12f,
         animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing),
+            animation = tween(2000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "offsetY"
     )
-    content(Modifier.offset(y = offsetY.dp))
+    content(modifier.then(Modifier.offset(y = offsetY.dp)))
 }

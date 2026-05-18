@@ -17,7 +17,6 @@ import com.example.androidmaiden.ui.theme.core.*
 expect fun rememberDynamicColorScheme(darkTheme: Boolean): ColorScheme?
 
 expect val isDynamicColorSupported: Boolean
-
 @Composable
 fun AppTheme(
     themeType: AppThemeType = AppThemeType.DEFAULT,

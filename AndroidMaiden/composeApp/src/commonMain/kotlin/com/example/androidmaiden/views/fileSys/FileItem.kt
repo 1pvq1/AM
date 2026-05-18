@@ -9,10 +9,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.model.FileSysNode
+import com.example.androidmaiden.model.FolderType
+import com.example.androidmaiden.model.NodeType
+import com.example.androidmaiden.ui.theme.AppTheme
 import com.example.androidmaiden.ui.icons.fileIcon
 import com.example.androidmaiden.ui.icons.folderIcon
 import com.example.androidmaiden.utils.formatSize
 import com.example.androidmaiden.utils.formatDateTime
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * Item component representing a single file or folder.
@@ -91,3 +95,36 @@ fun FileItem(
             )
     )
 }
+
+@Preview
+@Composable
+fun FileItemPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                FileItem(
+                    node = FileSysNode(
+                        name = "Documents",
+                        nodeType = NodeType.FOLDER,
+                        folderType = FolderType.DOCUMENT,
+                        description = "User Documents",
+                        children = listOf(
+                            FileSysNode(name = "Resume.pdf", nodeType = NodeType.FILE),
+                            FileSysNode(name = "Images", nodeType = NodeType.FOLDER)
+                        ),
+                        lastModified = 1715856000000L
+                    )
+                )
+                FileItem(
+                    node = FileSysNode(
+                        name = "Beach_Sunset.jpg",
+                        nodeType = NodeType.FILE,
+                        size = 3500000L,
+                        lastModified = 1715856000000L
+                    )
+                )
+            }
+        }
+    }
+}
+

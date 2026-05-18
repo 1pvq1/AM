@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -22,13 +22,12 @@ import com.example.androidmaiden.data.LlmProviderType
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,11 +43,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidmaiden.Res.stringResource
 import com.example.androidmaiden.viewModels.CharacterInteractionViewModel
 import com.example.androidmaiden.views.character.CharacterIllustrationBox
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 // Data models for chat messages
 data class ChatMessage(val message: String, val sender: Sender)
@@ -62,7 +61,7 @@ enum class ChatViewMode { REGULAR, VIRTUAL }
 fun CharacterInteractionPage(
     onFullScreenChange: (Boolean) -> Unit = {},
     onNavigateUp: () -> Unit = {},
-    viewModel: CharacterInteractionViewModel = viewModel { CharacterInteractionViewModel() }
+    viewModel: CharacterInteractionViewModel = koinViewModel()
 ) {
     // Load strings for initial chat history
     val initialChatMessages = listOf(
@@ -152,7 +151,7 @@ fun RegularChatView(
     text: String,
     onTextChange: (String) -> Unit,
     onSendMessage: () -> Unit,
-    selectedProvider: LlmProvider,
+    selectedProvider: LlmProvider?,
     onProviderClick: () -> Unit,
     showProviderPicker: Boolean,
     availableProviders: List<LlmProvider>,
@@ -193,7 +192,7 @@ fun VirtualChatView(
     text: String,
     onTextChange: (String) -> Unit,
     onSendMessage: () -> Unit,
-    selectedProvider: LlmProvider,
+    selectedProvider: LlmProvider?,
     onProviderClick: () -> Unit,
     showProviderPicker: Boolean,
     availableProviders: List<LlmProvider>,
@@ -319,7 +318,7 @@ fun ChatInput(
                 onClick = onSendMessage,
                 enabled = text.isNotBlank()
             ) {
-                Icon(Icons.Default.Send, contentDescription = stringResource(id = "send_message"))
+                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(id = "send_message"))
             }
         }
     }

@@ -150,9 +150,3 @@ private fun BarCharacterSection(
     }
 }
 
-@Composable
-fun CharacterPreview() {
-    CharacterWithDialog("horizontical", layout = CharacterLayout.Horizontal)
-    CharacterWithDialog("vertical", layout = CharacterLayout.Vertical)
-    CharacterWithDialog("Floating", layout = CharacterLayout.Floating) // bugs
-}

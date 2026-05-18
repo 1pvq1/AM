@@ -76,4 +76,6 @@ fun PathBreadcrumbs(
 @Composable
 fun PathBreadcrumbsPreview(){
     val pathStack = listOf("Folder1", "Folder2", "File.txt")
+    PathBreadcrumbs(pathStack, {}, {})
+
 }

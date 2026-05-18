@@ -24,6 +24,7 @@ import com.example.androidmaiden.ui.theme.core.ButtonDisplayStyle
 import com.example.androidmaiden.ui.theme.core.ThemeMode
 import com.example.androidmaiden.utils.getAsyncImageLoader
 import com.example.androidmaiden.viewModels.NavigationViewModel
+import com.example.androidmaiden.viewModels.SettingsViewModel
 import com.example.androidmaiden.viewModels.TodoViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
@@ -35,14 +36,15 @@ import kotlin.time.ExperimentalTime
 @Composable
 fun App() {
     KoinContext {
-        val navViewModel: NavigationViewModel = koinViewModel()
+        val navViewModel = koinViewModel<NavigationViewModel>()
         val currentScreen by navViewModel.currentScreen.collectAsState()
         val isNavigationBarVisible by navViewModel.isNavigationBarVisible.collectAsState()
 
-        var themeMode by remember { mutableStateOf(ThemeMode.SYSTEM) }
-        var themeType by remember { mutableStateOf(AppThemeType.DEFAULT) }
-        var useDynamicColor by remember { mutableStateOf(false) }
-        var buttonDisplayStyle by remember { mutableStateOf(ButtonDisplayStyle.ICON_ONLY) }
+        val settingsViewModel = koinViewModel<SettingsViewModel>()
+        val themeMode by settingsViewModel.themeMode.collectAsState()
+        val themeType by settingsViewModel.themeType.collectAsState()
+        val useDynamicColor by settingsViewModel.useDynamicColor.collectAsState()
+        val buttonDisplayStyle by settingsViewModel.buttonDisplayStyle.collectAsState()
 
         setSingletonImageLoaderFactory { context ->
             getAsyncImageLoader(context)
@@ -68,13 +70,13 @@ fun App() {
                             is Screen.Home -> HomeScreen()
                             is Screen.Settings -> SettingsScreen(
                                 previewThemeMode = themeMode,
-                                onThemePreview = { themeMode = it },
+                                onThemePreview = { settingsViewModel.setThemeMode(it) },
                                 currentThemeType = themeType,
-                                onThemeTypeChange = { themeType = it },
+                                onThemeTypeChange = { settingsViewModel.setThemeType(it) },
                                 useDynamicColor = useDynamicColor,
-                                onDynamicColorChange = { useDynamicColor = it },
+                                onDynamicColorChange = { settingsViewModel.setUseDynamicColor(it) },
                                 buttonDisplayStyle = buttonDisplayStyle,
-                                onButtonDisplayStyleChange = { buttonDisplayStyle = it },
+                                onButtonDisplayStyleChange = { settingsViewModel.setButtonDisplayStyle(it) },
                                 onNavigateToAdvancedLlmSettings = {
                                     navViewModel.navigateTo(Screen.AdvancedLlmSettings)
                                 },

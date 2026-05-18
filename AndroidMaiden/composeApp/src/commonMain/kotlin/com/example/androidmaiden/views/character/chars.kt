@@ -2,7 +2,6 @@ package com.example.androidmaiden.views.character
 
 import androidmaiden.composeapp.generated.resources.Res
 import androidmaiden.composeapp.generated.resources.am_bit
-import androidmaiden.composeapp.generated.resources.char_androidMaiden_full
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -22,51 +21,68 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.room.util.TableInfo
 import com.example.androidmaiden.views.PreviewItem
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
-
+/**
+ * Preview items for the character components.
+ * Translated to English for professional standards.
+ */
 @Composable
 fun charPreviewItems() = listOf(
     PreviewItem("CharacterIllustrationBox") { CharacterIllustrationBox() },
     PreviewItem("CharacterIllustration") { CharacterIllustration() },
-    PreviewItem("Dialog 短文本") { CharacterDialog("Hi") },
-    PreviewItem("Dialog 长文本") { CharacterDialog("这是一个比较长的对话框文本") },
-    PreviewItem("WithDialog 横向") { CharacterWithDialog("横向布局", layout = CharacterLayout.Horizontal) },
-    PreviewItem("WithDialog 纵向") { CharacterWithDialog("纵向布局", layout = CharacterLayout.Vertical) }
+    PreviewItem("Dialog Short") { CharacterDialog("Hi") },
+    PreviewItem("Dialog Long") { CharacterDialog("This is a much longer dialog text for testing layout.") },
+    PreviewItem("WithDialog Horizontal") {
+        CharacterWithDialog(
+            "Horizontal Layout",
+            layout = CharacterLayout.Horizontal
+        )
+    },
+    PreviewItem("WithDialog Vertical") {
+        CharacterWithDialog(
+            "Vertical Layout",
+            layout = CharacterLayout.Vertical
+        )
+    }
 )
 
+@Preview
 @Composable
 fun CharacterIllustration(modifier: Modifier = Modifier) {
     Image(
-        painter = painterResource(Res.drawable.am_bit), // TODO: 换成角色立绘资源
-        contentDescription = "角色展示",
-        contentScale = ContentScale.Fit, // This will ensure the image fits and is not cropped
+        painter = painterResource(Res.drawable.am_bit),
+        contentDescription = "Character illustration",
+        contentScale = ContentScale.Fit,
         modifier = modifier
     )
 }
 
+@Preview
 @Composable
 fun CharacterIllustrationBox(modifier: Modifier = Modifier) {
     Surface(
-        shape = RoundedCornerShape(16.dp), // 圆角边框
-        tonalElevation = 4.dp,             // 阴影/浮起效果
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline), // 边框
-        color = MaterialTheme.colorScheme.surfaceVariant, // 背景色
-        modifier = modifier // Apply modifier for size here
+        shape = RoundedCornerShape(16.dp),
+        tonalElevation = 4.dp,
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = modifier
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize().padding(8.dp) // Padding inside the box
+            modifier = Modifier.fillMaxSize().padding(8.dp)
         ) {
             AnimatedFloating { animationModifier ->
                 CharacterIllustration(
-                    // Apply animation after sizing
                     modifier = Modifier.fillMaxSize().then(animationModifier)
                 )
             }
@@ -74,6 +90,10 @@ fun CharacterIllustrationBox(modifier: Modifier = Modifier) {
     }
 }
 
+/**
+ * A custom shape for dialog bubbles that supports RTL (Right-to-Left) layout directions.
+ * The arrow always points towards the character (assuming character is at the start).
+ */
 private class DialogBubbleShape(
     private val cornerRadius: Dp,
     private val arrowWidth: Dp,
@@ -87,20 +107,31 @@ private class DialogBubbleShape(
         val cornerRadiusPx = with(density) { cornerRadius.toPx() }
         val arrowWidthPx = with(density) { arrowWidth.toPx() }
         val arrowHeightPx = with(density) { arrowHeight.toPx() }
-        // 三角形指向人物
+        val isLtr = layoutDirection == LayoutDirection.Ltr
+
         val path = Path().apply {
+            val left = if (isLtr) arrowWidthPx else 0f
+            val right = if (isLtr) size.width else size.width - arrowWidthPx
+
             val roundRect = RoundRect(
-                left = arrowWidthPx,
+                left = left,
                 top = 0f,
-                right = size.width,
+                right = right,
                 bottom = size.height,
                 cornerRadius = CornerRadius(cornerRadiusPx, cornerRadiusPx)
             )
             addRoundRect(roundRect)
 
-            moveTo(0f, size.height / 2)
-            lineTo(arrowWidthPx, size.height / 2 - arrowHeightPx / 2)
-            lineTo(arrowWidthPx, size.height / 2 + arrowHeightPx / 2)
+            // Arrow points towards the character side
+            if (isLtr) {
+                moveTo(0f, size.height / 2)
+                lineTo(arrowWidthPx, size.height / 2 - arrowHeightPx / 2)
+                lineTo(arrowWidthPx, size.height / 2 + arrowHeightPx / 2)
+            } else {
+                moveTo(size.width, size.height / 2)
+                lineTo(size.width - arrowWidthPx, size.height / 2 - arrowHeightPx / 2)
+                lineTo(size.width - arrowWidthPx, size.height / 2 + arrowHeightPx / 2)
+            }
             close()
         }
         return Outline.Generic(path)
@@ -108,12 +139,17 @@ private class DialogBubbleShape(
 }
 
 @Composable
-fun CharacterDialog(dialogText: String, modifier: Modifier = Modifier) {
-    val arrowWidth = 8.dp
-    val arrowHeight = 16.dp
+fun CharacterDialog(
+    dialogText: String,
+    modifier: Modifier = Modifier,
+    cornerRadius: Dp = 12.dp,
+    arrowWidth: Dp = 8.dp,
+    arrowHeight: Dp = 16.dp
+) {
+    val isLtr = LocalLayoutDirection.current == LayoutDirection.Ltr
     Surface(
         modifier = modifier,
-        shape = DialogBubbleShape(cornerRadius = 12.dp, arrowWidth = arrowWidth, arrowHeight = arrowHeight),
+        shape = DialogBubbleShape(cornerRadius, arrowWidth, arrowHeight),
         tonalElevation = 2.dp,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         color = MaterialTheme.colorScheme.surface
@@ -123,14 +159,24 @@ fun CharacterDialog(dialogText: String, modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(
-                start = arrowWidth + 12.dp,
-                end = 12.dp,
+                start = if (isLtr) arrowWidth + 12.dp else 12.dp,
+                end = if (isLtr) 12.dp else arrowWidth + 12.dp,
                 top = 12.dp,
                 bottom = 12.dp
             )
         )
     }
 }
+
+@Preview
+@Composable
+fun DialogPreview() {
+    Column {
+        CharacterDialog("Hi")
+        CharacterDialog("This is a much longer dialog text for testing layout.")
+    }
+}
+
 
 enum class CharacterLayout {
     Horizontal, Vertical, Floating
@@ -139,65 +185,94 @@ enum class CharacterLayout {
 @Composable
 fun CharacterWithDialog(
     dialogText: String,
+    modifier: Modifier = Modifier,
     layout: CharacterLayout = CharacterLayout.Horizontal
 ) {
-    when (layout) {
-        CharacterLayout.Horizontal -> {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.Bottom
-            ) {
-                CharacterIllustrationBox(modifier = Modifier.size(width = 200.dp, height = 240.dp))
-                Spacer(Modifier.width(12.dp))
-                CharacterDialog(dialogText)
-            }
-        }
-
-        CharacterLayout.Vertical -> {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CharacterIllustrationBox(modifier = Modifier.size(width = 200.dp, height = 240.dp))
-                Spacer(Modifier.height(12.dp))
-                CharacterDialog(dialogText)
-            }
-        }
-
-        CharacterLayout.Floating -> {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-
+    Box(modifier = modifier.padding(16.dp)) {
+        when (layout) {
+            CharacterLayout.Horizontal -> {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Bottom
                 ) {
-                CharacterIllustrationBox(modifier = Modifier.size(width = 200.dp, height = 240.dp))
+                    CharacterIllustrationBox(
+                        modifier = Modifier.size(
+                            width = 200.dp,
+                            height = 240.dp
+                        )
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    CharacterDialog(dialogText, modifier = Modifier.weight(1f))
+                }
+            }
 
-                // 可拖动对话框
-                MovableDialog(dialogText)
+            CharacterLayout.Vertical -> {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CharacterIllustrationBox(
+                        modifier = Modifier.size(
+                            width = 200.dp,
+                            height = 240.dp
+                        )
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    CharacterDialog(dialogText)
+                }
+            }
+
+            CharacterLayout.Floating -> {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    CharacterIllustrationBox(
+                        modifier = Modifier.size(
+                            width = 200.dp,
+                            height = 240.dp
+                        )
+                    )
+                    MovableDialog(dialogText)
+                }
             }
         }
     }
 }
 
+@Preview
 @Composable
-fun MovableDialog(dialogText: String) {
-    var offsetX by remember { mutableStateOf(0f) }
-    var offsetY by remember { mutableStateOf(0f) }
+fun CharacterPreview() {
+
+        CharacterWithDialog("horizontical", layout = CharacterLayout.Horizontal)
+//        CharacterWithDialog("vertical", layout = CharacterLayout.Vertical)
+//        CharacterWithDialog("Floating", layout = CharacterLayout.Floating) // bugs
+
+}
+
+/**
+ * A draggable dialog box. State is hoisted for better testability and persistence.
+ * @param initialOffset Initial position relative to its default placement.
+ */
+@Composable
+fun MovableDialog(
+    dialogText: String,
+    modifier: Modifier = Modifier,
+    initialOffset: IntOffset = IntOffset.Zero,
+    onOffsetChange: (IntOffset) -> Unit = {}
+) {
+    var offset by remember { mutableStateOf(initialOffset) }
 
     CharacterDialog(
         dialogText = dialogText,
-        modifier = Modifier
-            .offset { IntOffset(offsetX.toInt(), offsetY.toInt()) }
+        modifier = modifier
+            .offset { offset }
             .pointerInput(Unit) {
                 detectDragGestures { change, dragAmount ->
-                    change.consume() // 消费事件，避免冲突
-                    offsetX += dragAmount.x
-                    offsetY += dragAmount.y
+                    change.consume()
+                    val newOffset = IntOffset(
+                        x = offset.x + dragAmount.x.toInt(),
+                        y = offset.y + dragAmount.y.toInt()
+                    )
+                    offset = newOffset
+                    onOffsetChange(newOffset)
                 }
             }
     )

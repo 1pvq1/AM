@@ -13,12 +13,18 @@ import com.example.androidmaiden.data.ChatSender
 import com.example.androidmaiden.data.LlmProvider
 import com.example.androidmaiden.data.LlmProviderType
 import com.example.androidmaiden.data.LlmService
-import com.example.androidmaiden.data.SettingsHolder
+import com.example.androidmaiden.data.SettingsRepository
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
-class CharacterInteractionViewModel(private val llmService: LlmService? = null) : BaseViewModel() {
+class CharacterInteractionViewModel(
+    private val settingsRepository: SettingsRepository,
+    private val llmService: LlmService? = null
+) : BaseViewModel() {
     var viewMode by mutableStateOf(ChatViewMode.REGULAR)
         private set
 
@@ -37,21 +43,31 @@ class CharacterInteractionViewModel(private val llmService: LlmService? = null) 
     private val _chatHistory = mutableStateListOf<ChatMessage>()
     val chatHistory: List<ChatMessage> get() = _chatHistory
 
-    val availableProviders: List<LlmProvider>
-        get() = listOf(
-            LlmProvider("gemini", "Gemini (Online)", LlmProviderType.GEMINI),
-            LlmProvider("local", "LM Studio (Local)", LlmProviderType.LOCAL_LM_STUDIO, baseUrl = SettingsHolder.localLlmAddress)
-        )
+    val availableProviders = mutableStateListOf<LlmProvider>()
 
-    var selectedProvider by mutableStateOf(
-        availableProviders.find { it.id == SettingsHolder.selectedProviderId } ?: availableProviders.first()
-    )
+    var selectedProvider by mutableStateOf<LlmProvider?>(null)
         private set
 
+    init {
+        // Reactively update available providers and selection when settings change
+        combine(
+            settingsRepository.localLlmAddress,
+            settingsRepository.selectedProviderId
+        ) { localAddress, selectedId ->
+            availableProviders.clear()
+            availableProviders.addAll(listOf(
+                LlmProvider("gemini", "Gemini (Online)", LlmProviderType.GEMINI),
+                LlmProvider("local", "LM Studio (Local)", LlmProviderType.LOCAL_LM_STUDIO, baseUrl = localAddress)
+            ))
+            selectedProvider = availableProviders.find { it.id == selectedId } ?: availableProviders.first()
+        }.launchIn(viewModelScope)
+    }
+
     fun onProviderSelect(provider: LlmProvider) {
-        selectedProvider = provider
-        SettingsHolder.selectedProviderId = provider.id
-        showProviderPicker = false
+        viewModelScope.launch {
+            settingsRepository.saveSelectedProviderId(provider.id)
+            showProviderPicker = false
+        }
     }
 
     fun toggleProviderPicker() {

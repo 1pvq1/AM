@@ -3,6 +3,7 @@ package com.example.androidmaiden.di
 import com.example.androidmaiden.data.FileClearRepository
 import com.example.androidmaiden.data.FileClearRepositoryImpl
 import com.example.androidmaiden.data.FileRepository
+import com.example.androidmaiden.data.SettingsRepository
 import com.example.androidmaiden.viewModels.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -17,6 +18,7 @@ val commonModule = module {
 
     // 2. Provide the Repository
     single { FileRepository(get(), get(), get()) }
+    single { SettingsRepository(get()) }
     single<FileClearRepository> { 
         FileClearRepositoryImpl(get(), get(), "/tmp/trash") // Trash dir should be platform-specific in a real app
     }
@@ -28,4 +30,6 @@ val commonModule = module {
     factory { FileOrganizeViewModel(get()) }
     factory { FileClearViewModel(get()) }
     factory { TodoViewModel() }
+    factory { CharacterInteractionViewModel(get(), null) } // null for now, or get() if LlmService is in DI
+    single { SettingsViewModel(get()) }
 }

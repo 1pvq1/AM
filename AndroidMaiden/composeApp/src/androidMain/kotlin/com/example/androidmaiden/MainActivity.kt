@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -17,10 +18,14 @@ import com.example.androidmaiden.di.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.*
 
+
+private const val TAG = "MainActivity"
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate Called")
 
         // Initialize Koin BEFORE setContent so ViewModels can be injected immediately
         initKoin(this)

@@ -5,30 +5,34 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import com.example.androidmaiden.data.SettingsHolder
+import com.example.androidmaiden.data.SettingsRepository
 import io.ktor.client.statement.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.annotation.KoinExperimentalAPI
 import io.ktor.client.request.get
 
+@OptIn(KoinExperimentalAPI::class)
 @Composable
-actual fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel {
-    return viewModel()
-}
+actual fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel = koinViewModel()
 
-actual class AdvancedLlmSettingsViewModel : ViewModel() {
+actual class AdvancedLlmSettingsViewModel(
+    private val settingsRepository: SettingsRepository
+) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(
-        AdvancedLlmSettingsUiState(
-            localLlmAddress = SettingsHolder.localLlmAddress
-        )
-    )
+    private val _uiState = MutableStateFlow(AdvancedLlmSettingsUiState())
     actual val uiState = _uiState.asStateFlow()
 
     private val client = HttpClient(OkHttp)
+
+    init {
+        settingsRepository.localLlmAddress
+            .onEach { address ->
+                _uiState.update { it.copy(localLlmAddress = address) }
+            }
+            .launchIn(viewModelScope)
+    }
 
     actual fun onWebsiteUrlChange(url: String) {
         _uiState.update { it.copy(websiteUrl = url) }
@@ -58,7 +62,9 @@ actual class AdvancedLlmSettingsViewModel : ViewModel() {
 
     actual fun onLocalLlmAddressChange(address: String) {
         _uiState.update { it.copy(localLlmAddress = address) }
-        SettingsHolder.localLlmAddress = address
+        viewModelScope.launch {
+            settingsRepository.saveLocalLlmAddress(address)
+        }
     }
 
     actual fun connectToLocalLlm() {
