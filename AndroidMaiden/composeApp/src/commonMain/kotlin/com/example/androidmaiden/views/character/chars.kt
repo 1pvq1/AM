@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.room.util.TableInfo
 import com.example.androidmaiden.views.PreviewItem
+import com.example.androidmaiden.ui.theme.core.LocalAppExtraShapes
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -71,9 +72,9 @@ fun CharacterIllustration(modifier: Modifier = Modifier) {
 @Composable
 fun CharacterIllustrationBox(modifier: Modifier = Modifier) {
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = LocalAppExtraShapes.current.characterBox,
         tonalElevation = 4.dp,
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant),
         color = MaterialTheme.colorScheme.surfaceVariant,
         modifier = modifier
     ) {
@@ -151,7 +152,7 @@ fun CharacterDialog(
         modifier = modifier,
         shape = DialogBubbleShape(cornerRadius, arrowWidth, arrowHeight),
         tonalElevation = 2.dp,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         color = MaterialTheme.colorScheme.surface
     ) {
         Text(

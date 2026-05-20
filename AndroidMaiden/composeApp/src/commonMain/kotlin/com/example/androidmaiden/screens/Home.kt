@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
 import androidmaiden.composeapp.generated.resources.Res
 import androidmaiden.composeapp.generated.resources.compose_multiplatform
 import androidx.compose.foundation.horizontalScroll
@@ -22,6 +21,7 @@ import com.example.androidmaiden.ui.ShowDialogButton
 import com.example.androidmaiden.ui.SwitchLayoutButton
 import com.example.androidmaiden.views.character.*
 import com.example.androidmaiden.views.panel.PanelOfTask
+import com.example.androidmaiden.ui.theme.core.LocalAppExtraShapes
 import org.jetbrains.compose.resources.stringResource
 import androidmaiden.composeapp.generated.resources.*
 import com.example.androidmaiden.Res.stringResource
@@ -61,7 +61,7 @@ fun CharacterSection() {
         )
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.large,
+            shape = LocalAppExtraShapes.current.characterBox,
             tonalElevation = 1.dp
         ) {
             Column(

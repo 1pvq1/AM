@@ -47,7 +47,8 @@ fun AppTheme(
 
     CompositionLocalProvider(
         LocalButtonDisplayStyle provides buttonDisplayStyle,
-        LocalFileTypeColors provides DefaultFileTypeColors
+        LocalFileTypeColors provides DefaultFileTypeColors,
+        LocalAppExtraShapes provides AppExtraShapes()
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

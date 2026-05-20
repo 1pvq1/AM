@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.ui.theme.core.LocalAppExtraShapes
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Preview
@@ -59,7 +60,7 @@ fun BaseCard(
     Card(
         onClick = { if (isClickable) onClick() },
         modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
+        shape = LocalAppExtraShapes.current.cardClickable,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp, hoveredElevation = 4.dp, pressedElevation = 1.dp),
         colors = cardColors
     ) {
