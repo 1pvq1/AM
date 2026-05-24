@@ -1,13 +1,15 @@
 package com.example.androidmaiden.di
 
 import androidx.room.Room
-import com.example.androidmaiden.data.AppDatabase
-import com.example.androidmaiden.data.createDataStore
-import com.example.androidmaiden.utils.AndroidFileSystemScanner
-import com.example.androidmaiden.utils.FileSystemScanner
+import com.example.androidmaiden.data.local.*
+import com.example.androidmaiden.platform.*
+import com.example.androidmaiden.util.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
+/**
+ * Android-specific dependency injection module.
+ */
 val platformModule = module {
     // 0. Provide DataStore
     single { createDataStore(androidContext()) }

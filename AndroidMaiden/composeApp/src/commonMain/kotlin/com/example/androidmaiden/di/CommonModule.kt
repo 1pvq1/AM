@@ -1,16 +1,19 @@
 package com.example.androidmaiden.di
 
-import com.example.androidmaiden.data.FileClearRepository
-import com.example.androidmaiden.data.FileClearRepositoryImpl
-import com.example.androidmaiden.data.FileRepository
-import com.example.androidmaiden.data.SettingsRepository
-import com.example.androidmaiden.viewModels.*
+import com.example.androidmaiden.data.repository.FileClearRepository
+import com.example.androidmaiden.data.repository.FileClearRepositoryImpl
+import com.example.androidmaiden.data.repository.FileRepository
+import com.example.androidmaiden.data.repository.SettingsRepository
+import com.example.androidmaiden.presentation.viewmodel.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.Dispatchers
 import org.koin.dsl.module
 import kotlin.time.ExperimentalTime
 
+/**
+ * Dependency injection module for core application components.
+ */
 @OptIn(ExperimentalTime::class)
 val commonModule = module {
     // 1. Provide a long-lived scope for the Repository

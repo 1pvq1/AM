@@ -1,36 +1,33 @@
 package com.example.androidmaiden
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import coil3.compose.setSingletonImageLoaderFactory
-import com.example.androidmaiden.model.Screen
-import com.example.androidmaiden.screens.*
-import com.example.androidmaiden.screens.fileSystem.FilesScreen
-import com.example.androidmaiden.screens.fileSystem.analyze.FileAnalysisScreen
-import com.example.androidmaiden.screens.fileSystem.classify.FileClassifyPage
-import com.example.androidmaiden.screens.fileSystem.clean.FileCleanPage
-import com.example.androidmaiden.screens.fileSystem.organize.FileOrganizePage
-import com.example.androidmaiden.screens.pages.*
-import com.example.androidmaiden.screens.settings.llm.AdvancedLlmSettingsPage
-import com.example.androidmaiden.ui.AppNavigationBar
-import com.example.androidmaiden.ui.theme.AppTheme
-import com.example.androidmaiden.ui.theme.core.AppThemeType
-import com.example.androidmaiden.ui.theme.core.ButtonDisplayStyle
-import com.example.androidmaiden.ui.theme.core.ThemeMode
-import com.example.androidmaiden.utils.getAsyncImageLoader
-import com.example.androidmaiden.viewModels.NavigationViewModel
-import com.example.androidmaiden.viewModels.SettingsViewModel
-import com.example.androidmaiden.viewModels.TodoViewModel
+import com.example.androidmaiden.domain.model.*
+import com.example.androidmaiden.presentation.ui.screens.*
+import com.example.androidmaiden.presentation.ui.screens.fileSystem.*
+import com.example.androidmaiden.presentation.ui.screens.fileSystem.analyze.*
+import com.example.androidmaiden.presentation.ui.screens.fileSystem.classify.*
+import com.example.androidmaiden.presentation.ui.screens.fileSystem.clean.*
+import com.example.androidmaiden.presentation.ui.screens.fileSystem.organize.*
+import com.example.androidmaiden.presentation.ui.screens.pages.*
+import com.example.androidmaiden.presentation.ui.screens.settings.llm.*
+import com.example.androidmaiden.presentation.ui.components.*
+import com.example.androidmaiden.presentation.ui.theme.*
+import com.example.androidmaiden.presentation.ui.theme.core.*
+import com.example.androidmaiden.util.*
+import com.example.androidmaiden.presentation.viewmodel.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.ExperimentalTime
 
+/**
+ * The main entry point for the Compose Multiplatform application.
+ */
 @OptIn(ExperimentalTime::class)
 @Preview
 @Composable
