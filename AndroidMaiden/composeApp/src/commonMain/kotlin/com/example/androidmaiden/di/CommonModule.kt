@@ -34,5 +34,6 @@ val commonModule = module {
     factory { FileClearViewModel(get()) }
     factory { TodoViewModel() }
     factory { CharacterInteractionViewModel(get(), null) } // null for now, or get() if LlmService is in DI
+    factory { AdvancedLlmSettingsViewModel(get()) }
     single { SettingsViewModel(get()) }
 }

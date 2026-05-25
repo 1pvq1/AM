@@ -17,7 +17,7 @@ import io.ktor.client.request.get
 @Composable
 actual fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel = koinViewModel()
 
-actual class AdvancedLlmSettingsViewModel(
+actual class AdvancedLlmSettingsViewModel actual constructor(
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 

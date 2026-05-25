@@ -1,10 +1,10 @@
-package com.example.androidmaiden.viewModels
+package com.example.androidmaiden.presentation.viewmodel
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import io.ktor.client.*
 import io.ktor.client.engine.java.*
-import com.example.androidmaiden.data.SettingsRepository
+import com.example.androidmaiden.data.repository.SettingsRepository
 import io.ktor.client.statement.*
 import io.ktor.client.request.get
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +24,7 @@ actual fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel 
     return remember { AdvancedLlmSettingsViewModel(repository) }
 }
 
-actual class AdvancedLlmSettingsViewModel(
+actual class AdvancedLlmSettingsViewModel actual constructor(
     private val settingsRepository: SettingsRepository
 ) {
 

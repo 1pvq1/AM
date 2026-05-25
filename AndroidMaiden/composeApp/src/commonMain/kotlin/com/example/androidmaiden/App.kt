@@ -1,6 +1,5 @@
 package com.example.androidmaiden
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,7 +16,6 @@ import com.example.androidmaiden.presentation.ui.screens.pages.*
 import com.example.androidmaiden.presentation.ui.screens.settings.llm.*
 import com.example.androidmaiden.presentation.ui.components.*
 import com.example.androidmaiden.presentation.ui.theme.*
-import com.example.androidmaiden.presentation.ui.theme.core.*
 import com.example.androidmaiden.util.*
 import com.example.androidmaiden.presentation.viewmodel.*
 import org.jetbrains.compose.ui.tooling.preview.Preview

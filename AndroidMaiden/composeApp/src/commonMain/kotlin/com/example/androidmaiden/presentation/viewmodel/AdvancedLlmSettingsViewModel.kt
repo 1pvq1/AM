@@ -16,7 +16,7 @@ data class AdvancedLlmSettingsUiState(
 @Composable
 expect fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel
 
-expect class AdvancedLlmSettingsViewModel {
+expect class AdvancedLlmSettingsViewModel(settingsRepository: SettingsRepository) {
     val uiState: StateFlow<AdvancedLlmSettingsUiState>
 
     fun onWebsiteUrlChange(url: String)
