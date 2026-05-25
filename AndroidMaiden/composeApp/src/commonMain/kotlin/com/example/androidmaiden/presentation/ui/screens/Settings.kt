@@ -18,7 +18,9 @@ import com.example.androidmaiden.presentation.ui.screens.settings.*
 import com.example.androidmaiden.presentation.ui.screens.settings.appearance.*
 import com.example.androidmaiden.presentation.ui.screens.settings.general.*
 import com.example.androidmaiden.presentation.ui.screens.settings.llm.*
+import com.example.androidmaiden.presentation.viewmodel.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Enum representing supported application languages.
@@ -43,36 +45,77 @@ enum class Language(val stringResId: String, val tag: String) {
 /**
  * Preview for the main Settings screen.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun SettingsScreenPreview() {
-    var previewThemeMode by remember { mutableStateOf(ThemeMode.SYSTEM) }
-    var previewThemeType by remember { mutableStateOf(AppThemeType.DEFAULT) }
-    var buttonDisplayStyle by remember { mutableStateOf(ButtonDisplayStyle.ICON_ONLY) }
-    var useDynamicColor by remember { mutableStateOf(true) }
-    var language by remember { mutableStateOf(Language.FOLLOW_SYSTEM) }
-    SettingsScreen(
-        previewThemeMode = previewThemeMode,
-        onThemePreview = { previewThemeMode = it },
-        currentThemeType = previewThemeType,
-        onThemeTypeChange = { previewThemeType = it },
-        useDynamicColor = useDynamicColor,
-        onDynamicColorChange = { useDynamicColor = it },
-        buttonDisplayStyle = buttonDisplayStyle,
-        onButtonDisplayStyleChange = { buttonDisplayStyle = it },
-        language = language,
-        onLanguageChange = { language = it },
-        onNavigateToAdvancedLlmSettings = {}
+    SettingsContent(
+        previewThemeMode = ThemeMode.SYSTEM,
+        onThemePreview = { },
+        currentThemeType = AppThemeType.DEFAULT,
+        onThemeTypeChange = { },
+        useDynamicColor = true,
+        onDynamicColorChange = { },
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_ONLY,
+        onButtonDisplayStyleChange = { },
+        language = Language.FOLLOW_SYSTEM,
+        onLanguageChange = { },
+        onNavigateToAdvancedLlmSettings = {},
+        networkUiState = AdvancedLlmSettingsUiState(),
+        onWebsiteUrlChange = {},
+        checkWebsiteConnectivity = {},
+        apiKey = "preview-api-key",
+        onApiKeyChange = {},
+        localLlmAddress = "http://localhost:1234/v1",
+        onLocalLlmAddressChange = {}
     )
 }
 
 /**
- * The main Settings screen of the application.
+ * Stateful wrapper for the Settings screen.
+ */
+@Composable
+fun SettingsScreen(
+    onNavigateToAdvancedLlmSettings: () -> Unit,
+    settingsViewModel: SettingsViewModel = koinViewModel(),
+    advancedLlmViewModel: AdvancedLlmSettingsViewModel = rememberAdvancedLlmSettingsViewModel()
+) {
+    val themeMode by settingsViewModel.themeMode.collectAsState()
+    val themeType by settingsViewModel.themeType.collectAsState()
+    val useDynamicColor by settingsViewModel.useDynamicColor.collectAsState()
+    val buttonDisplayStyle by settingsViewModel.buttonDisplayStyle.collectAsState()
+    val apiKey by settingsViewModel.apiKey.collectAsState()
+    val localLlmAddress by settingsViewModel.localLlmAddress.collectAsState()
+
+    val networkUiState by advancedLlmViewModel.uiState.collectAsState()
+
+    SettingsContent(
+        previewThemeMode = themeMode,
+        onThemePreview = settingsViewModel::setThemeMode,
+        currentThemeType = themeType,
+        onThemeTypeChange = settingsViewModel::setThemeType,
+        useDynamicColor = useDynamicColor,
+        onDynamicColorChange = settingsViewModel::setUseDynamicColor,
+        buttonDisplayStyle = buttonDisplayStyle,
+        onButtonDisplayStyleChange = settingsViewModel::setButtonDisplayStyle,
+        language = Language.FOLLOW_SYSTEM, // TODO: Get from ViewModel
+        onLanguageChange = { },
+        onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings,
+        networkUiState = networkUiState,
+        onWebsiteUrlChange = advancedLlmViewModel::onWebsiteUrlChange,
+        checkWebsiteConnectivity = advancedLlmViewModel::checkWebsiteConnectivity,
+        apiKey = apiKey,
+        onApiKeyChange = settingsViewModel::setApiKey,
+        localLlmAddress = localLlmAddress,
+        onLocalLlmAddressChange = settingsViewModel::setLocalLlmAddress
+    )
+}
+
+/**
+ * The stateless content of the Settings screen.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(
+fun SettingsContent(
     previewThemeMode: ThemeMode,
     onThemePreview: (ThemeMode) -> Unit,
     currentThemeType: AppThemeType,
@@ -83,7 +126,16 @@ fun SettingsScreen(
     onButtonDisplayStyleChange: (ButtonDisplayStyle) -> Unit,
     language: Language,
     onLanguageChange: (Language) -> Unit,
-    onNavigateToAdvancedLlmSettings: () -> Unit
+    onNavigateToAdvancedLlmSettings: () -> Unit,
+    // Network Settings
+    networkUiState: AdvancedLlmSettingsUiState,
+    onWebsiteUrlChange: (String) -> Unit,
+    checkWebsiteConnectivity: () -> Unit,
+    // LLM Settings
+    apiKey: String,
+    onApiKeyChange: (String) -> Unit,
+    localLlmAddress: String,
+    onLocalLlmAddressChange: (String) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
@@ -156,14 +208,24 @@ fun SettingsScreen(
 
             // Network Section
             item {
-                NetworkSettingsGroup()
+                NetworkSettingsContent(
+                    uiState = networkUiState,
+                    onWebsiteUrlChange = onWebsiteUrlChange,
+                    checkWebsiteConnectivity = checkWebsiteConnectivity
+                )
             }
 
             item { Spacer(modifier = Modifier.height(16.dp)) }
 
             // LLM Settings Section
             item {
-                LlmSettingsGroup(onNavigateToAdvancedLlmSettings)
+                LlmSettingsContent(
+                    apiKey = apiKey,
+                    onApiKeyChange = onApiKeyChange,
+                    localLlmAddress = localLlmAddress,
+                    onLocalLlmAddressChange = onLocalLlmAddressChange,
+                    onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings
+                )
             }
 
             item { Spacer(modifier = Modifier.height(16.dp)) }

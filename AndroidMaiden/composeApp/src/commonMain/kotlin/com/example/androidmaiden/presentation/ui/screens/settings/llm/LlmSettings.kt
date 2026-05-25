@@ -20,12 +20,24 @@ import org.koin.compose.koinInject
 import kotlinx.coroutines.launch
 
 /**
- * Preview for the LLM settings group.
+ * Preview for the LLM settings Content.
  */
 @Preview
 @Composable
-fun PreviewLlmSettingsGroup() {
-    LlmSettingsGroup(onNavigateToAdvancedLlmSettings = {})
+fun PreviewLlmSettingsContent() {
+    LlmSettingsContent(
+        apiKey = "preview-api-key",
+        onApiKeyChange = {},
+        localLlmAddress = "http://localhost:1234/v1",
+        onLocalLlmAddressChange = {},
+        onNavigateToAdvancedLlmSettings = {}
+    )
+}
+
+@Preview
+@Composable
+fun PreviewSettingsGroup(){
+    LlmSettingsGroup(TODO())
 }
 
 /**
@@ -35,25 +47,55 @@ fun PreviewLlmSettingsGroup() {
 fun LlmSettingsGroup(onNavigateToAdvancedLlmSettings: () -> Unit) {
     val settingsRepository = koinInject<SettingsRepository>()
     var apiKey by remember { mutableStateOf("") }
+    var localLlmAddress by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         apiKey = settingsRepository.apiKey.first() ?: ""
+        localLlmAddress = settingsRepository.localLlmAddress.first()
     }
 
+    LlmSettingsContent(
+        apiKey = apiKey,
+        onApiKeyChange = {
+            apiKey = it
+            scope.launch {
+                settingsRepository.saveApiKey(it)
+            }
+        },
+        localLlmAddress = localLlmAddress,
+        onLocalLlmAddressChange = {
+            localLlmAddress = it
+            scope.launch {
+                settingsRepository.saveLocalLlmAddress(it)
+            }
+        },
+        onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings
+    )
+}
+
+/**
+ * Stateless content for LLM settings group.
+ */
+@Composable
+fun LlmSettingsContent(
+    apiKey: String,
+    onApiKeyChange: (String) -> Unit,
+    localLlmAddress: String,
+    onLocalLlmAddressChange: (String) -> Unit,
+    onNavigateToAdvancedLlmSettings: () -> Unit
+) {
     SettingsGroup(title = stringResource(id = "settings_llm_title")) {
         ModelSelectionSetting()
         ApiKeySetting(
             apiKey = apiKey,
-            onApiKeyChange = {
-                apiKey = it
-                scope.launch {
-                    settingsRepository.saveApiKey(it)
-                }
-            }
+            onApiKeyChange = onApiKeyChange
         )
 
-        LocalLlmAddressSetting(settingsRepository)
+        LocalLlmAddressSetting(
+            address = localLlmAddress,
+            onAddressChange = onLocalLlmAddressChange
+        )
 
         AboutSetting(
             icon = Icons.Default.Tune,
@@ -160,23 +202,15 @@ private fun ApiKeySetting(apiKey: String, onApiKeyChange: (String) -> Unit) {
  * Composable for configuring the local LLM address.
  */
 @Composable
-private fun LocalLlmAddressSetting(settingsRepository: SettingsRepository) {
-    var address by remember { mutableStateOf("") }
+private fun LocalLlmAddressSetting(
+    address: String,
+    onAddressChange: (String) -> Unit
+) {
     val focusManager = LocalFocusManager.current
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        address = settingsRepository.localLlmAddress.first()
-    }
 
     OutlinedTextField(
         value = address,
-        onValueChange = {
-            address = it
-            scope.launch {
-                settingsRepository.saveLocalLlmAddress(it)
-            }
-        },
+        onValueChange = onAddressChange,
         label = { Text(stringResource(id = "settings_advanced_llm_local_address_label")) },
         placeholder = { Text("http://192.168.1.x:1234/v1") },
         leadingIcon = { Icon(Icons.Default.Computer, contentDescription = null) },

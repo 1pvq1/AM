@@ -22,6 +22,13 @@ class SettingsViewModel(private val repository: SettingsRepository) : BaseViewMo
     val buttonDisplayStyle: StateFlow<ButtonDisplayStyle> = repository.buttonDisplayStyle
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ButtonDisplayStyle.ICON_ONLY)
 
+    val apiKey: StateFlow<String> = repository.apiKey
+        .map { it ?: "" }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    val localLlmAddress: StateFlow<String> = repository.localLlmAddress
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch { repository.saveThemeMode(mode) }
     }
@@ -36,5 +43,13 @@ class SettingsViewModel(private val repository: SettingsRepository) : BaseViewMo
 
     fun setButtonDisplayStyle(style: ButtonDisplayStyle) {
         viewModelScope.launch { repository.saveButtonDisplayStyle(style) }
+    }
+
+    fun setApiKey(key: String) {
+        viewModelScope.launch { repository.saveApiKey(key) }
+    }
+
+    fun setLocalLlmAddress(address: String) {
+        viewModelScope.launch { repository.saveLocalLlmAddress(address) }
     }
 }

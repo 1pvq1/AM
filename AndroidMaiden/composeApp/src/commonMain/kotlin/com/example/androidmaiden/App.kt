@@ -66,19 +66,10 @@ fun App() {
                         when (currentScreen) {
                             is Screen.Home -> HomeScreen()
                             is Screen.Settings -> SettingsScreen(
-                                previewThemeMode = themeMode,
-                                onThemePreview = { settingsViewModel.setThemeMode(it) },
-                                currentThemeType = themeType,
-                                onThemeTypeChange = { settingsViewModel.setThemeType(it) },
-                                useDynamicColor = useDynamicColor,
-                                onDynamicColorChange = { settingsViewModel.setUseDynamicColor(it) },
-                                buttonDisplayStyle = buttonDisplayStyle,
-                                onButtonDisplayStyleChange = { settingsViewModel.setButtonDisplayStyle(it) },
                                 onNavigateToAdvancedLlmSettings = {
                                     navViewModel.navigateTo(Screen.AdvancedLlmSettings)
-                                },
-                                language = Language.FOLLOW_SYSTEM,
-                                onLanguageChange = {})
+                                }
+                            )
 
                             is Screen.Skills -> SkillsPage(onNavigate = { screen ->
                                 navViewModel.navigateTo(screen)

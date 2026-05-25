@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.platform.*
 import com.example.androidmaiden.presentation.ui.screens.pages.*
-import com.example.androidmaiden.presentation.ui.components.*import com.example.androidmaiden.presentation.viewmodel.*
+import com.example.androidmaiden.presentation.viewmodel.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -18,14 +18,18 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 @Composable
 fun AdvancedLlmSettingsPagePreview() {
-    AdvancedLlmSettingsPage(onNavigateBack = {})
+    AdvancedLlmSettingsContent(
+        uiState = AdvancedLlmSettingsUiState(),
+        onNavigateBack = {},
+        onLocalLlmAddressChange = {},
+        onConnect = {}
+    )
 }
 
 
 /**
  * Screen for configuring advanced LLM settings like local addresses.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdvancedLlmSettingsPage(
     onNavigateBack: () -> Unit,
@@ -33,6 +37,25 @@ fun AdvancedLlmSettingsPage(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    AdvancedLlmSettingsContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onLocalLlmAddressChange = viewModel::onLocalLlmAddressChange,
+        onConnect = viewModel::connectToLocalLlm
+    )
+}
+
+/**
+ * Content of the Advanced LLM Settings page, separated for preview support.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AdvancedLlmSettingsContent(
+    uiState: AdvancedLlmSettingsUiState,
+    onNavigateBack: () -> Unit,
+    onLocalLlmAddressChange: (String) -> Unit,
+    onConnect: () -> Unit
+) {
     BasePage(
         title = stringResource(id = "settings_advanced_llm_title"),
         navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
@@ -48,8 +71,8 @@ fun AdvancedLlmSettingsPage(
                 address = uiState.localLlmAddress,
                 status = uiState.localLlmStatus,
                 isConnecting = uiState.isConnectingToLocalLlm,
-                onAddressChange = viewModel::onLocalLlmAddressChange,
-                onConnect = viewModel::connectToLocalLlm
+                onAddressChange = onLocalLlmAddressChange,
+                onConnect = onConnect
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
             Text(

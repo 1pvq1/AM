@@ -11,14 +11,43 @@ import com.example.androidmaiden.presentation.ui.components.*import com.example.
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
- * A group of settings related to network connectivity.
+ * Preview for the Network settings group.
  */
 @Preview
 @Composable
-fun NetworkSettingsGroup() {
-    val viewModel = rememberAdvancedLlmSettingsViewModel()
+fun NetworkSettingsGroupPreview() {
+    NetworkSettingsContent(
+        uiState = AdvancedLlmSettingsUiState(),
+        onWebsiteUrlChange = {},
+        checkWebsiteConnectivity = {}
+    )
+}
+
+/**
+ * A group of settings related to network connectivity.
+ */
+@Composable
+fun NetworkSettingsGroup(
+    viewModel: AdvancedLlmSettingsViewModel = rememberAdvancedLlmSettingsViewModel()
+) {
     val uiState by viewModel.uiState.collectAsState()
 
+    NetworkSettingsContent(
+        uiState = uiState,
+        onWebsiteUrlChange = viewModel::onWebsiteUrlChange,
+        checkWebsiteConnectivity = viewModel::checkWebsiteConnectivity
+    )
+}
+
+/**
+ * Stateless content of the Network settings group.
+ */
+@Composable
+fun NetworkSettingsContent(
+    uiState: AdvancedLlmSettingsUiState,
+    onWebsiteUrlChange: (String) -> Unit,
+    checkWebsiteConnectivity: () -> Unit
+) {
     SettingsGroup(stringResource(id = "settings_network_title")) {
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             Text(
@@ -28,13 +57,13 @@ fun NetworkSettingsGroup() {
             )
             OutlinedTextField(
                 value = uiState.websiteUrl,
-                onValueChange = viewModel::onWebsiteUrlChange,
+                onValueChange = onWebsiteUrlChange,
                 label = { Text(stringResource(id = "settings_network_website_url_label")) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(8.dp))
             Button(
-                onClick = viewModel::checkWebsiteConnectivity,
+                onClick = checkWebsiteConnectivity,
                 enabled = !uiState.isCheckingWebsite,
                 modifier = Modifier.fillMaxWidth()
             ) {
