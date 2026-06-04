@@ -1,18 +1,22 @@
 package com.example.androidmaiden.presentation.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.ui.components.*
+import com.example.androidmaiden.presentation.ui.features.others.DraftSkillTreeV2
 import com.example.androidmaiden.platform.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -75,23 +79,87 @@ fun SkillsPage(onNavigate: (Screen) -> Unit = {}) {
             Icons.Default.Hardware
         )
     )
-    val scrollState = rememberScrollState()
+
+    var isTreeViewActive by remember { mutableStateOf(false) }
+
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = stringResource(id = "skills_title"),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        // Render feature cards
-        features.forEach { feature ->
-            FeatureCard(feature) {
-                feature.screen?.let { onNavigate(it) }
+        // Top Toolbar with view switching buttons
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(id = "skills_title"),
+                style = MaterialTheme.typography.headlineMedium
+            )
+            
+            // View Mode Toggle Icons (List vs Tree)
+            Row(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(20.dp))
+                    .padding(4.dp)
+            ) {
+                IconButton(
+                    onClick = { isTreeViewActive = false },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = if (!isTreeViewActive) MaterialTheme.colorScheme.primary else Color.Transparent,
+                        contentColor = if (!isTreeViewActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.List,
+                        contentDescription = "List View",
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                IconButton(
+                    onClick = { isTreeViewActive = true },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = if (isTreeViewActive) MaterialTheme.colorScheme.primary else Color.Transparent,
+                        contentColor = if (isTreeViewActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AccountTree,
+                        contentDescription = "Interactive Skill Tree",
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+        ) {
+            if (!isTreeViewActive) {
+                // Classic card list view (Default View)
+                val scrollState = rememberScrollState()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                        .verticalScroll(scrollState),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    features.forEach { feature ->
+                        FeatureCard(feature) {
+                            feature.screen?.let { onNavigate(it) }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            } else {
+                // RPG Skill Tree Interactive View V2
+                DraftSkillTreeV2(onNavigate = onNavigate)
             }
         }
     }
