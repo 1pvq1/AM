@@ -50,6 +50,9 @@ private fun initKoin(context: Context) {
 @Preview
 @Composable
 fun AppAndroidPreview() {
+    val context = LocalContext.current
+    // Initialize Koin for the preview environment
+    initKoin(context)
     App()
 }
 

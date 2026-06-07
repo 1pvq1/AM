@@ -13,6 +13,7 @@ import com.example.androidmaiden.presentation.ui.screens.fileSystem.classify.*
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.clean.*
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.organize.*
 import com.example.androidmaiden.presentation.ui.screens.pages.*
+import com.example.androidmaiden.presentation.ui.screens.interaction.CharacterInteractionPage
 import com.example.androidmaiden.presentation.ui.screens.settings.llm.*
 import com.example.androidmaiden.presentation.ui.components.*
 import com.example.androidmaiden.presentation.ui.theme.*
@@ -105,10 +106,8 @@ fun App() {
                             is Screen.CharacterInteraction -> CharacterInteractionPage(
                                 onFullScreenChange = { isFullScreen: Boolean ->
                                     navViewModel.setNavigationBarVisible(!isFullScreen)
-                                },
-                                onNavigateUp = {
-                                    navViewModel.navigateTo(Screen.Home)
-                                })
+                                }
+                            )
 
                             is Screen.AdvancedLlmSettings -> AdvancedLlmSettingsPage(onNavigateBack = {
                                 navViewModel.navigateTo(Screen.Settings)

@@ -2,7 +2,9 @@ package com.example.androidmaiden.presentation.viewmodel
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewModelScope
-import com.example.androidmaiden.presentation.ui.screens.pages.*
+import com.example.androidmaiden.domain.model.ChatMessage as DomainChatMessage
+import com.example.androidmaiden.domain.model.ChatViewMode
+import com.example.androidmaiden.domain.model.Sender
 import com.example.androidmaiden.data.network.*
 import com.example.androidmaiden.data.repository.*
 import kotlinx.coroutines.flow.*
@@ -30,8 +32,8 @@ class CharacterInteractionViewModel(
     var showProviderPicker by mutableStateOf(false)
         private set
 
-    private val _chatHistory = mutableStateListOf<com.example.androidmaiden.presentation.ui.screens.pages.ChatMessage>()
-    val chatHistory: List<com.example.androidmaiden.presentation.ui.screens.pages.ChatMessage> get() = _chatHistory
+    private val _chatHistory = mutableStateListOf<DomainChatMessage>()
+    val chatHistory: List<DomainChatMessage> get() = _chatHistory
 
     val availableProviders = mutableStateListOf<LlmProvider>()
 
@@ -73,7 +75,7 @@ class CharacterInteractionViewModel(
     /**
      * Initializes the chat history with starting messages.
      */
-    fun initChat(initialMessages: List<com.example.androidmaiden.presentation.ui.screens.pages.ChatMessage>) {
+    fun initChat(initialMessages: List<DomainChatMessage>) {
         if (_chatHistory.isEmpty()) {
             _chatHistory.addAll(initialMessages)
         }
@@ -107,14 +109,14 @@ class CharacterInteractionViewModel(
     fun sendMessage() {
         if (text.isNotBlank() && !isSending) {
             val userText = text
-            _chatHistory.add(com.example.androidmaiden.presentation.ui.screens.pages.ChatMessage(userText, Sender.USER))
+            _chatHistory.add(DomainChatMessage(userText, Sender.USER))
             text = ""
             isSending = true
 
             viewModelScope.launch {
                 // Prepare history for LLM
                 val historyForLlm = _chatHistory.map {
-                    com.example.androidmaiden.data.network.ChatMessage(
+                    ChatMessage(
                         it.message,
                         if (it.sender == Sender.USER) ChatSender.USER else ChatSender.CHARACTER
                     )
@@ -122,7 +124,7 @@ class CharacterInteractionViewModel(
 
                 // Add placeholder for character response
                 val responseIndex = _chatHistory.size
-                _chatHistory.add(com.example.androidmaiden.presentation.ui.screens.pages.ChatMessage("", Sender.CHARACTER))
+                _chatHistory.add(DomainChatMessage("", Sender.CHARACTER))
 
                 llmService?.generateContentStream(userText, historyForLlm)
                     ?.onStart { /* Handle start */ }
@@ -132,7 +134,7 @@ class CharacterInteractionViewModel(
                         _chatHistory[responseIndex] = currentMsg.copy(message = currentMsg.message + chunk)
                     } ?: run {
                     // Fallback if service is null
-                    _chatHistory[responseIndex] = com.example.androidmaiden.presentation.ui.screens.pages.ChatMessage("LLM Service not initialized", Sender.CHARACTER)
+                    _chatHistory[responseIndex] = DomainChatMessage("LLM Service not initialized", Sender.CHARACTER)
                     isSending = false
                 }
             }
