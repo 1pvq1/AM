@@ -13,13 +13,14 @@ import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.domain.model.ChatMessage
 import com.example.androidmaiden.domain.model.Sender
 import com.example.androidmaiden.platform.stringResource
+import com.example.androidmaiden.presentation.ui.markdown.MarkdownRenderer
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * Composable for a single message bubble in the chat list.
  */
 @Composable
-fun ChatMessageBubble(chatMessage: ChatMessage) {
+fun ChatMessageBubble(chatMessage: ChatMessage, isStreaming: Boolean = false) {
     val isUserMessage = chatMessage.sender == Sender.USER
     val bubbleColor =
         if (isUserMessage) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
@@ -43,10 +44,12 @@ fun ChatMessageBubble(chatMessage: ChatMessage) {
             color = bubbleColor,
             tonalElevation = 1.dp
         ) {
-            Text(
-                text = chatMessage.message,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
-            )
+            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
+                MarkdownRenderer(
+                    content = chatMessage.message,
+                    isStreaming = isStreaming && !isUserMessage
+                )
+            }
         }
 
         if (isUserMessage) {

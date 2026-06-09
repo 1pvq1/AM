@@ -67,6 +67,39 @@ data class FileTagXRef(
     val tagId: Long
 )
 
+/**
+ * Entity representing a chat session.
+ */
+@Entity
+data class ChatSession(
+    @PrimaryKey val id: String,
+    val title: String,
+    val lastMessageAt: Long,
+    val providerId: String? = null
+)
+
+/**
+ * Entity representing a single message in a chat session.
+ */
+@Entity(
+    foreignKeys = [
+        ForeignKey(
+            entity = ChatSession::class,
+            parentColumns = ["id"],
+            childColumns = ["sessionId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index("sessionId")]
+)
+data class ChatMessageEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val sessionId: String,
+    val message: String,
+    val sender: String, // USER or CHARACTER
+    val timestamp: Long
+)
+
 data class FileWithTags(
     @Embedded val file: FileMetadata,
     @Relation(

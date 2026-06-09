@@ -66,7 +66,10 @@ fun SettingsScreenPreview() {
         apiKey = "preview-api-key",
         onApiKeyChange = {},
         localLlmAddress = "http://localhost:1234/v1",
-        onLocalLlmAddressChange = {}
+        onLocalLlmAddressChange = {},
+        useMatureMarkdown=true,
+        onMatureMarkdownToggle= {},
+
     )
 }
 
@@ -85,6 +88,7 @@ fun SettingsScreen(
     val buttonDisplayStyle by settingsViewModel.buttonDisplayStyle.collectAsState()
     val apiKey by settingsViewModel.apiKey.collectAsState()
     val localLlmAddress by settingsViewModel.localLlmAddress.collectAsState()
+    val useMatureMarkdown by settingsViewModel.useMatureMarkdown.collectAsState()
 
     val networkUiState by advancedLlmViewModel.uiState.collectAsState()
 
@@ -106,7 +110,9 @@ fun SettingsScreen(
         apiKey = apiKey,
         onApiKeyChange = settingsViewModel::setApiKey,
         localLlmAddress = localLlmAddress,
-        onLocalLlmAddressChange = settingsViewModel::setLocalLlmAddress
+        onLocalLlmAddressChange = settingsViewModel::setLocalLlmAddress,
+        useMatureMarkdown = useMatureMarkdown,
+        onMatureMarkdownToggle = settingsViewModel::setUseMatureMarkdown,
     )
 }
 
@@ -135,7 +141,9 @@ fun SettingsContent(
     apiKey: String,
     onApiKeyChange: (String) -> Unit,
     localLlmAddress: String,
-    onLocalLlmAddressChange: (String) -> Unit
+    onLocalLlmAddressChange: (String) -> Unit,
+    useMatureMarkdown: Boolean,
+    onMatureMarkdownToggle: (Boolean) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
@@ -224,7 +232,9 @@ fun SettingsContent(
                     onApiKeyChange = onApiKeyChange,
                     localLlmAddress = localLlmAddress,
                     onLocalLlmAddressChange = onLocalLlmAddressChange,
-                    onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings
+                    onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings,
+                    useMatureMarkdown = useMatureMarkdown,
+                    onMatureMarkdownToggle = onMatureMarkdownToggle
                 )
             }
 

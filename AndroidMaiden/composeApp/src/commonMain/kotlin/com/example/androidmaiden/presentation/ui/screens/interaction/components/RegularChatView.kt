@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,6 +27,7 @@ fun RegularChatView(
     text: String,
     onTextChange: (String) -> Unit,
     onSendMessage: () -> Unit,
+    isSending: Boolean = false,
     selectedProvider: LlmProvider?,
     onProviderClick: () -> Unit,
     showProviderPicker: Boolean,
@@ -42,8 +43,14 @@ fun RegularChatView(
             reverseLayout = true,
             contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp)
         ) {
-            items(chatHistory.asReversed()) { message ->
-                ChatMessageBubble(chatMessage = message)
+            val reversedHistory = chatHistory.asReversed()
+            itemsIndexed(reversedHistory) { index, message ->
+                // The first item in reversed list (index 0) is the last message in chat history
+                val isLastMessage = index == 0
+                ChatMessageBubble(
+                    chatMessage = message,
+                    isStreaming = isLastMessage && isSending
+                )
             }
         }
 

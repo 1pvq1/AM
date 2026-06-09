@@ -29,6 +29,7 @@ val platformModule = module {
 
     // 2. Provide the DAO from the Database
     single { get<AppDatabase>().fileMetadataDao() }
+    single { get<AppDatabase>().chatDao() }
 
     // 3. Provide the Android-specific Scanner implementation
     single<FileSystemScanner> { AndroidFileSystemScanner(get()) }

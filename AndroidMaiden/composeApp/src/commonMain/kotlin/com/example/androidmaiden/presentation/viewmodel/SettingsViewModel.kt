@@ -29,6 +29,9 @@ class SettingsViewModel(private val repository: SettingsRepository) : BaseViewMo
     val localLlmAddress: StateFlow<String> = repository.localLlmAddress
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
+    val useMatureMarkdown: StateFlow<Boolean> = repository.useMatureMarkdown
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch { repository.saveThemeMode(mode) }
     }
@@ -51,5 +54,9 @@ class SettingsViewModel(private val repository: SettingsRepository) : BaseViewMo
 
     fun setLocalLlmAddress(address: String) {
         viewModelScope.launch { repository.saveLocalLlmAddress(address) }
+    }
+
+    fun setUseMatureMarkdown(use: Boolean) {
+        viewModelScope.launch { repository.saveUseMatureMarkdown(use) }
     }
 }

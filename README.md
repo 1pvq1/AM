@@ -68,7 +68,7 @@ Current Phase: **v0.1.0 Foundation** 🏗️
 - [ ] **AI File Agent:** Permit the AI character to perform file operations via natural language commands.
 - [ ] **iOS Deployment:** Full support and optimization for the iOS target.
 
-*See [Roadmap.md](../Roadmap.md) for a detailed development timeline.*
+*See [Roadmap.md](Roadmap.md) for a detailed development timeline.*
 
 ---
 

@@ -23,6 +23,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         val THEME_TYPE = stringPreferencesKey("theme_type")
         val USE_DYNAMIC_COLOR = booleanPreferencesKey("use_dynamic_color")
         val BUTTON_DISPLAY_STYLE = stringPreferencesKey("button_display_style")
+        val USE_MATURE_MARKDOWN = booleanPreferencesKey("use_mature_markdown")
     }
 
     // LLM Settings
@@ -42,6 +43,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     val buttonDisplayStyle: Flow<ButtonDisplayStyle> = dataStore.data.map { pref ->
         ButtonDisplayStyle.entries.find { it.name == pref[Keys.BUTTON_DISPLAY_STYLE] } ?: ButtonDisplayStyle.ICON_ONLY
     }
+    val useMatureMarkdown: Flow<Boolean> = dataStore.data.map { it[Keys.USE_MATURE_MARKDOWN] ?: false }
 
     // Save Methods
     suspend fun saveApiKey(key: String) = dataStore.edit { it[Keys.API_KEY] = key }
@@ -53,4 +55,5 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     suspend fun saveThemeType(type: AppThemeType) = dataStore.edit { it[Keys.THEME_TYPE] = type.name }
     suspend fun saveUseDynamicColor(use: Boolean) = dataStore.edit { it[Keys.USE_DYNAMIC_COLOR] = use }
     suspend fun saveButtonDisplayStyle(style: ButtonDisplayStyle) = dataStore.edit { it[Keys.BUTTON_DISPLAY_STYLE] = style.name }
+    suspend fun saveUseMatureMarkdown(use: Boolean) = dataStore.edit { it[Keys.USE_MATURE_MARKDOWN] = use }
 }

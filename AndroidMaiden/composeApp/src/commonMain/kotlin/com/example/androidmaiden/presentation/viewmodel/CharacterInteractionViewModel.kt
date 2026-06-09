@@ -15,8 +15,15 @@ import kotlinx.coroutines.launch
  */
 class CharacterInteractionViewModel(
     private val settingsRepository: SettingsRepository,
+    private val chatRepository: ChatRepository,
     private val llmService: LlmService? = null
 ) : BaseViewModel() {
+    
+    private var currentSessionId by mutableStateOf("default-session")
+    
+    private val _allSessions = mutableStateListOf<com.example.androidmaiden.data.local.ChatSession>()
+    val allSessions: List<com.example.androidmaiden.data.local.ChatSession> get() = _allSessions
+
     var viewMode by mutableStateOf(ChatViewMode.REGULAR)
         private set
 
@@ -41,6 +48,14 @@ class CharacterInteractionViewModel(
         private set
 
     init {
+        // Load messages from repository
+        chatRepository.getMessagesForSession(currentSessionId)
+            .onEach { messages ->
+                _chatHistory.clear()
+                _chatHistory.addAll(messages)
+            }
+            .launchIn(viewModelScope)
+
         // Reactively update available providers and selection when settings change
         combine(
             settingsRepository.localLlmAddress,
@@ -109,11 +124,13 @@ class CharacterInteractionViewModel(
     fun sendMessage() {
         if (text.isNotBlank() && !isSending) {
             val userText = text
-            _chatHistory.add(DomainChatMessage(userText, Sender.USER))
             text = ""
             isSending = true
 
             viewModelScope.launch {
+                // Save user message
+                chatRepository.saveMessage(currentSessionId, userText, Sender.USER)
+
                 // Prepare history for LLM
                 val historyForLlm = _chatHistory.map {
                     ChatMessage(
@@ -122,19 +139,26 @@ class CharacterInteractionViewModel(
                     )
                 }
 
-                // Add placeholder for character response
-                val responseIndex = _chatHistory.size
-                _chatHistory.add(DomainChatMessage("", Sender.CHARACTER))
-
+                var fullResponse = ""
                 llmService?.generateContentStream(userText, historyForLlm)
-                    ?.onStart { /* Handle start */ }
-                    ?.onCompletion { isSending = false }
+                    ?.onCompletion { 
+                        isSending = false
+                        // Save full character response
+                        if (fullResponse.isNotBlank()) {
+                            chatRepository.saveMessage(currentSessionId, fullResponse, Sender.CHARACTER)
+                        }
+                    }
                     ?.collect { chunk ->
-                        val currentMsg = _chatHistory[responseIndex]
-                        _chatHistory[responseIndex] = currentMsg.copy(message = currentMsg.message + chunk)
+                        fullResponse += chunk
+                        // Optionally update UI in real-time if Flow is slow
+                        val lastMsg = _chatHistory.lastOrNull()
+                        if (lastMsg?.sender == Sender.CHARACTER) {
+                             val index = _chatHistory.size - 1
+                             _chatHistory[index] = lastMsg.copy(message = lastMsg.message + chunk)
+                        } else {
+                             _chatHistory.add(DomainChatMessage(chunk, Sender.CHARACTER))
+                        }
                     } ?: run {
-                    // Fallback if service is null
-                    _chatHistory[responseIndex] = DomainChatMessage("LLM Service not initialized", Sender.CHARACTER)
                     isSending = false
                 }
             }
