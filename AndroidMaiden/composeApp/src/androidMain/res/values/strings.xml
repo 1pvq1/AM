@@ -41,6 +41,11 @@
     <string name="user_avatar_name">Me</string>
     <string name="character_avatar_name">AM</string>
 
+    <!-- Chat History -->
+    <string name="new_chat">New Chat</string>
+    <string name="delete_session">Delete</string>
+    <string name="no_sessions">No chat history</string>
+
     <!-- Character Interaction - Greeting Messages (for initial chat history) -->
     <string name="chat_greeting_1">Hello!</string>
     <string name="chat_greeting_2">How are you?</string>

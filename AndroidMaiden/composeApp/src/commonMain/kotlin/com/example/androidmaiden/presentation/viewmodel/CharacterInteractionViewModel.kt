@@ -7,19 +7,24 @@ import com.example.androidmaiden.domain.model.ChatViewMode
 import com.example.androidmaiden.domain.model.Sender
 import com.example.androidmaiden.data.network.*
 import com.example.androidmaiden.data.repository.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 /**
  * ViewModel for managing the character interaction screen state and logic.
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class CharacterInteractionViewModel(
     private val settingsRepository: SettingsRepository,
     private val chatRepository: ChatRepository,
     private val llmService: LlmService? = null
 ) : BaseViewModel() {
     
-    private var currentSessionId by mutableStateOf("default-session")
+    var currentSessionId by mutableStateOf("default-session")
+        private set
     
     private val _allSessions = mutableStateListOf<com.example.androidmaiden.data.local.ChatSession>()
     val allSessions: List<com.example.androidmaiden.data.local.ChatSession> get() = _allSessions
@@ -47,9 +52,32 @@ class CharacterInteractionViewModel(
     var selectedProvider by mutableStateOf<LlmProvider?>(null)
         private set
 
+    var availableModels = mutableStateListOf<String>()
+        private set
+
+    var selectedModel by mutableStateOf<String?>(null)
+        private set
+
+    var tokenUsage by mutableStateOf(0f) // 0.0 to 1.0
+        private set
+
+    var showModelPicker by mutableStateOf(false)
+        private set
+
     init {
-        // Load messages from repository
-        chatRepository.getMessagesForSession(currentSessionId)
+        // Load all sessions
+        chatRepository.getAllSessions()
+            .onEach { sessions ->
+                _allSessions.clear()
+                _allSessions.addAll(sessions)
+            }
+            .launchIn(viewModelScope)
+
+        // Reactively load messages when currentSessionId changes
+        snapshotFlow { currentSessionId }
+            .flatMapLatest { sessionId ->
+                chatRepository.getMessagesForSession(sessionId)
+            }
             .onEach { messages ->
                 _chatHistory.clear()
                 _chatHistory.addAll(messages)
@@ -67,7 +95,33 @@ class CharacterInteractionViewModel(
                 LlmProvider("local", "LM Studio (Local)", LlmProviderType.LOCAL_LM_STUDIO, baseUrl = localAddress)
             ))
             selectedProvider = availableProviders.find { it.id == selectedId } ?: availableProviders.first()
+            
+            // Fetch models for the selected provider
+            viewModelScope.launch {
+                val models = llmService?.getAvailableModels() ?: emptyList()
+                availableModels.clear()
+                availableModels.addAll(models)
+                
+                // Set selected model from repository or default
+                val savedModel = settingsRepository.selectedModel.first()
+                selectedModel = if (models.contains(savedModel)) savedModel else models.firstOrNull()
+            }
         }.launchIn(viewModelScope)
+    }
+
+    /**
+     * Selects a new model and saves the preference.
+     */
+    fun onModelSelect(model: String) {
+        viewModelScope.launch {
+            settingsRepository.saveSelectedModel(model)
+            selectedModel = model
+            showModelPicker = false
+        }
+    }
+
+    fun toggleModelPicker() {
+        showModelPicker = !showModelPicker
     }
 
     /**
@@ -85,6 +139,52 @@ class CharacterInteractionViewModel(
      */
     fun toggleProviderPicker() {
         showProviderPicker = !showProviderPicker
+    }
+
+    /**
+     * Starts a new chat session.
+     */
+    @OptIn(ExperimentalTime::class)
+    fun createNewSession() {
+        val newId = "session_${Clock.System.now().toEpochMilliseconds()}"
+        currentSessionId = newId
+    }
+
+    /**
+     * Selects an existing chat session.
+     */
+    fun onSessionSelect(session: com.example.androidmaiden.data.local.ChatSession) {
+        currentSessionId = session.id
+    }
+
+    /**
+     * Deletes a chat session.
+     */
+    fun deleteSession(session: com.example.androidmaiden.data.local.ChatSession) {
+        viewModelScope.launch {
+            chatRepository.deleteSession(session.id)
+            if (currentSessionId == session.id) {
+                currentSessionId = _allSessions.firstOrNull()?.id ?: "default-session"
+            }
+        }
+    }
+
+    /**
+     * Renames a chat session.
+     */
+    fun renameSession(session: com.example.androidmaiden.data.local.ChatSession, newTitle: String) {
+        viewModelScope.launch {
+            chatRepository.renameSession(session.id, newTitle)
+        }
+    }
+
+    /**
+     * Toggles the pin status of a chat session.
+     */
+    fun togglePinSession(session: com.example.androidmaiden.data.local.ChatSession) {
+        viewModelScope.launch {
+            chatRepository.togglePinSession(session.id)
+        }
     }
 
     /**

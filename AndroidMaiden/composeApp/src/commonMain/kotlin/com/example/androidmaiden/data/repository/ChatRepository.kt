@@ -51,4 +51,22 @@ class ChatRepository(private val chatDao: ChatDao) {
     suspend fun deleteSession(sessionId: String) {
         chatDao.deleteSession(sessionId)
     }
+
+    /**
+     * Renames a chat session.
+     */
+    suspend fun renameSession(sessionId: String, newTitle: String) {
+        chatDao.getSessionById(sessionId)?.let {
+            chatDao.upsertSession(it.copy(title = newTitle))
+        }
+    }
+
+    /**
+     * Pins or unpins a chat session.
+     */
+    suspend fun togglePinSession(sessionId: String) {
+        chatDao.getSessionById(sessionId)?.let {
+            chatDao.upsertSession(it.copy(isPinned = !it.isPinned))
+        }
+    }
 }

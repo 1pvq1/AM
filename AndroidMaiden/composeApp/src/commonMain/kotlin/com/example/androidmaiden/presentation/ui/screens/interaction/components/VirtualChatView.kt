@@ -24,6 +24,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun VirtualChatView(
     modifier: Modifier = Modifier,
     chatHistory: List<ChatMessage>,
+    isSending: Boolean = false,
     text: String,
     onTextChange: (String) -> Unit,
     onSendMessage: () -> Unit,
@@ -32,7 +33,14 @@ fun VirtualChatView(
     showProviderPicker: Boolean,
     availableProviders: List<LlmProvider>,
     onProviderSelect: (LlmProvider) -> Unit,
-    onDismissPicker: () -> Unit
+    onDismissPicker: () -> Unit,
+    selectedModel: String?,
+    availableModels: List<String>,
+    onModelSelect: (String) -> Unit,
+    showModelPicker: Boolean,
+    onModelClick: () -> Unit,
+    onDismissModelPicker: () -> Unit,
+    tokenUsage: Float
 ) {
     val latestLlmMessage =
         chatHistory.lastOrNull { it.sender == Sender.CHARACTER }?.message ?: stringResource(id = "ellipsis")
@@ -68,7 +76,14 @@ fun VirtualChatView(
                 showProviderPicker = showProviderPicker,
                 availableProviders = availableProviders,
                 onProviderSelect = onProviderSelect,
-                onDismissPicker = onDismissPicker
+                onDismissPicker = onDismissPicker,
+                selectedModel = selectedModel,
+                availableModels = availableModels,
+                onModelSelect = onModelSelect,
+                showModelPicker = showModelPicker,
+                onModelClick = onModelClick,
+                onDismissModelPicker = onDismissModelPicker,
+                tokenUsage = tokenUsage
             )
         }
     }
@@ -86,6 +101,7 @@ fun VirtualChatViewPreview() {
                 ChatMessage(stringResource(id = "chat_greeting_3"), Sender.CHARACTER),
                 ChatMessage(stringResource(id = "chat_greeting_5"), Sender.USER)
             ),
+            isSending = false,
             text = stringResource(id = "chat_preview_2"),
             onTextChange = {},
             onSendMessage = {},
@@ -94,7 +110,14 @@ fun VirtualChatViewPreview() {
             showProviderPicker = false,
             availableProviders = emptyList(),
             onProviderSelect = {},
-            onDismissPicker = {}
+            onDismissPicker = {},
+            selectedModel = "gemini-1.5-pro",
+            availableModels = listOf("gemini-1.5-pro"),
+            onModelSelect = {},
+            showModelPicker = false,
+            onModelClick = {},
+            onDismissModelPicker = {},
+            tokenUsage = 0.6f
         )
     }
 }

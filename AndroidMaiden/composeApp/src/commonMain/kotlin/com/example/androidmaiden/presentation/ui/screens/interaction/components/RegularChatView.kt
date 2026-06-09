@@ -24,16 +24,23 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun RegularChatView(
     modifier: Modifier = Modifier,
     chatHistory: List<ChatMessage>,
+    isSending: Boolean = false,
     text: String,
     onTextChange: (String) -> Unit,
     onSendMessage: () -> Unit,
-    isSending: Boolean = false,
     selectedProvider: LlmProvider?,
     onProviderClick: () -> Unit,
     showProviderPicker: Boolean,
     availableProviders: List<LlmProvider>,
     onProviderSelect: (LlmProvider) -> Unit,
-    onDismissPicker: () -> Unit
+    onDismissPicker: () -> Unit,
+    selectedModel: String?,
+    availableModels: List<String>,
+    onModelSelect: (String) -> Unit,
+    showModelPicker: Boolean,
+    onModelClick: () -> Unit,
+    onDismissModelPicker: () -> Unit,
+    tokenUsage: Float
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         LazyColumn(
@@ -63,7 +70,14 @@ fun RegularChatView(
             showProviderPicker = showProviderPicker,
             availableProviders = availableProviders,
             onProviderSelect = onProviderSelect,
-            onDismissPicker = onDismissPicker
+            onDismissPicker = onDismissPicker,
+            selectedModel = selectedModel,
+            availableModels = availableModels,
+            onModelSelect = onModelSelect,
+            showModelPicker = showModelPicker,
+            onModelClick = onModelClick,
+            onDismissModelPicker = onDismissModelPicker,
+            tokenUsage = tokenUsage
         )
     }
 }
@@ -88,7 +102,14 @@ fun RegularChatViewPreview() {
             showProviderPicker = false,
             availableProviders = emptyList(),
             onProviderSelect = {},
-            onDismissPicker = {}
+            onDismissPicker = {},
+            selectedModel = "gemini-1.5-pro",
+            availableModels = listOf("gemini-1.5-pro"),
+            onModelSelect = {},
+            showModelPicker = false,
+            onModelClick = {},
+            onDismissModelPicker = {},
+            tokenUsage = 0.4f
         )
     }
 }

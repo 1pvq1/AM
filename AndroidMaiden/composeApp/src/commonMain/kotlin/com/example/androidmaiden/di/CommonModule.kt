@@ -4,6 +4,7 @@ import com.example.androidmaiden.data.network.LlmService
 import com.example.androidmaiden.data.network.LlmServiceImpl
 import com.example.androidmaiden.data.repository.*
 import com.example.androidmaiden.presentation.viewmodel.*
+import com.example.androidmaiden.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.Dispatchers
@@ -39,5 +40,6 @@ val commonModule = module {
     single { SettingsViewModel(get()) }
 
     // 4. Provide LlmService
-    single<LlmService> { LlmServiceImpl(get(), get()) }
+    single<HostResolver> { DefaultHostResolver() }
+    single<LlmService> { LlmServiceImpl(get(), get(), get()) }
 }

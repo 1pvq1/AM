@@ -2,4 +2,4 @@
 *.log
 
 AndroidMaiden/gradle/gradle-daemon-jvm.properties
-/AndroidMaiden/.artifacts
+/AndroidMaiden/.artifacts/

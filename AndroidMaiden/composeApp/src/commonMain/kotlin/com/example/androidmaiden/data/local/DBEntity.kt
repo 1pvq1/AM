@@ -75,7 +75,8 @@ data class ChatSession(
     @PrimaryKey val id: String,
     val title: String,
     val lastMessageAt: Long,
-    val providerId: String? = null
+    val providerId: String? = null,
+    val isPinned: Boolean = false
 )
 
 /**

@@ -21,8 +21,8 @@ val platformModule = module {
             context = androidContext(),
             name = dbFile.absolutePath
         )
-        // This tells Room to clear the database if the schema version changes.
-        // Useful for development to avoid manual migrations.
+        .addMigrations(AppDatabase.MIGRATION_2_3)
+        // This tells Room to clear the database if the schema version changes and no migration is found.
         .fallbackToDestructiveMigration(dropAllTables = true)
         .build()
     }
@@ -31,6 +31,9 @@ val platformModule = module {
     single { get<AppDatabase>().fileMetadataDao() }
     single { get<AppDatabase>().chatDao() }
 
-    // 3. Provide the Android-specific Scanner implementation
+    // 3. Provide the Android-specific HostResolver
+    single<HostResolver> { AndroidHostResolver() }
+
+    // 4. Provide the Android-specific Scanner implementation
     single<FileSystemScanner> { AndroidFileSystemScanner(get()) }
 }

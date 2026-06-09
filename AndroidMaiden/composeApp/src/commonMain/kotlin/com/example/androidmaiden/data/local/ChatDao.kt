@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ChatDao {
 
-    @Query("SELECT * FROM ChatSession ORDER BY lastMessageAt DESC")
+    @Query("SELECT * FROM ChatSession ORDER BY isPinned DESC, lastMessageAt DESC")
     fun getAllSessions(): Flow<List<ChatSession>>
 
     @Query("SELECT * FROM ChatSession WHERE id = :sessionId")

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.data.repository.SettingsRepository
 import com.example.androidmaiden.presentation.ui.markdown.components.MarkdownCell
@@ -22,15 +23,21 @@ fun MarkdownRenderer(
     isStreaming: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val settingsRepository = koinInject<SettingsRepository>()
-    var useMatureEngine by remember { mutableStateOf(true) }
+    // In preview mode, we avoid koinInject to prevent "KoinApplication has not been started" errors.
+    // We also avoid the Mature engine in Preview because it currently causes a NoSuchMethodError
+    // in LayoutLib due to binary compatibility issues with internal Compose APIs.
+    val isPreview = LocalInspectionMode.current
+    var useMatureEngine by remember { mutableStateOf(!isPreview) }
+
+    if (!isPreview) {
+        val settingsRepository = koinInject<SettingsRepository>()
+        LaunchedEffect(settingsRepository) {
+            useMatureEngine = settingsRepository.useMatureMarkdown.first()
+        }
+    }
     
     val toyEngine = remember { ToyMarkdownEngine() }
     val matureEngine = remember { MatureMarkdownEngine() }
-
-    LaunchedEffect(Unit) {
-        useMatureEngine = settingsRepository.useMatureMarkdown.first()
-    }
 
     val engine = if (useMatureEngine) matureEngine else toyEngine
     

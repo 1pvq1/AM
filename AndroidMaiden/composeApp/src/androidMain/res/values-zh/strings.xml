@@ -40,6 +40,11 @@
     <string name="user_avatar_name">我</string>
     <string name="character_avatar_name">AM</string>
 
+    <!-- 聊天历史 -->
+    <string name="new_chat">新建对话</string>
+    <string name="delete_session">删除</string>
+    <string name="no_sessions">暂无历史记录</string>
+
     <!-- 角色互动 - 问候消息 (用于初始聊天记录) -->
     <string name="chat_greeting_1">你好！</string>
     <string name="chat_greeting_2">你好吗？</string>

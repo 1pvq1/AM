@@ -20,10 +20,12 @@ import com.example.androidmaiden.presentation.ui.markdown.model.MarkdownNode
  */
 @Composable
 fun MarkdownCell(node: MarkdownNode, isMature: Boolean = false) {
+    val isPreview = androidx.compose.ui.platform.LocalInspectionMode.current
     when (node) {
         is MarkdownNode.RichText -> {
-            if (isMature) {
-                // If it crashes, we use a simple text display
+            if (isMature && !isPreview) {
+                // If it crashes (e.g. in Preview), we use a simple text display fallback.
+                // Note: The Mature engine is known to cause NoSuchMethodError in LayoutLib (AS Preview).
                 Box(modifier = Modifier.fillMaxWidth()) {
                     com.mikepenz.markdown.m3.Markdown(
                         content = node.content,
