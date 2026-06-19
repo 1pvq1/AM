@@ -24,7 +24,7 @@ actual class LlmSettingsViewModel(private val settingsRepository: SettingsReposi
 
     init {
         viewModelScope.launch {
-            val savedKey = settingsRepository.apiKey.first() ?: ""
+            val savedKey = settingsRepository.geminiApiKey.first()
             _uiState.update { it.copy(apiKey = savedKey) }
         }
     }
@@ -43,7 +43,7 @@ actual class LlmSettingsViewModel(private val settingsRepository: SettingsReposi
                 }
                 val isValid = validateApiKey(key)
                 if (isValid) {
-                    settingsRepository.saveApiKey(key)
+                    settingsRepository.saveGeminiApiKey(key)
                     val version = 2.5
                     val llmSize = listOf("pro", "flash","flash lite")
                     val models = listOf("gemini$version-$llmSize", "gemini-$version-$llmSize", "gemini-$version-$llmSize")

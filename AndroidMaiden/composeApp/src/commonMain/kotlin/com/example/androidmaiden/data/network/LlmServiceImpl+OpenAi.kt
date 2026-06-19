@@ -17,12 +17,16 @@ internal fun LlmServiceImpl.generateOpenAiStream(
     prompt: String,
     history: List<ChatMessage>,
     baseUrl: String,
-    modelId: String
+    modelId: String,
+    apiKey: String? = null
 ): Flow<String> = flow {
     try {
         val cleanedBaseUrl = baseUrl.trimEnd('/')
         val response = client.post("$cleanedBaseUrl/chat/completions") {
             contentType(ContentType.Application.Json)
+            if (!apiKey.isNullOrBlank()) {
+                header("Authorization", "Bearer $apiKey")
+            }
             setBody(
                 OpenAiChatRequest(
                     model = modelId,
@@ -102,10 +106,14 @@ internal fun LlmServiceImpl.generateOpenAiStream(
 /**
  * Validates connection to an OpenAI-compatible host.
  */
-internal suspend fun LlmServiceImpl.validateOpenAi(baseUrl: String): Boolean {
+internal suspend fun LlmServiceImpl.validateOpenAi(baseUrl: String, apiKey: String? = null): Boolean {
     return try {
         val cleanedBaseUrl = baseUrl.trimEnd('/')
-        val response = client.get("$cleanedBaseUrl/models")
+        val response = client.get("$cleanedBaseUrl/models") {
+            if (!apiKey.isNullOrBlank()) {
+                header("Authorization", "Bearer $apiKey")
+            }
+        }
         response.status == HttpStatusCode.OK
     } catch (e: Exception) {
         false
@@ -115,10 +123,14 @@ internal suspend fun LlmServiceImpl.validateOpenAi(baseUrl: String): Boolean {
 /**
  * Fetches available models from an OpenAI-compatible host.
  */
-internal suspend fun LlmServiceImpl.getOpenAiModels(baseUrl: String): List<String> {
+internal suspend fun LlmServiceImpl.getOpenAiModels(baseUrl: String, apiKey: String? = null): List<String> {
     return try {
         val cleanedBaseUrl = baseUrl.trimEnd('/')
-        val response = client.get("$cleanedBaseUrl/models")
+        val response = client.get("$cleanedBaseUrl/models") {
+            if (!apiKey.isNullOrBlank()) {
+                header("Authorization", "Bearer $apiKey")
+            }
+        }
         if (response.status == HttpStatusCode.OK) {
             val modelList = json.decodeFromString<OpenAiModelList>(response.bodyAsText())
             modelList.data.map { it.id }

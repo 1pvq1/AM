@@ -158,7 +158,7 @@ private fun SessionItem(
                     Icon(
                         Icons.Default.PushPin,
                         contentDescription = "Pinned",
-                        modifier = Modifier.size(14.dp).padding(horizontal = 4.dp),
+                        modifier = Modifier.size(24.dp).padding(horizontal = 4.dp),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                     )
                 }
@@ -219,7 +219,7 @@ private fun SessionItem(
 @Composable
 fun ChatHistoryDrawerContentPreview() {
     val sampleSessions = listOf(
-        ChatSession("1", "Project Discussion", 1717750000000L),
+        ChatSession("1", "Project Discussion", 1717750000000L, isPinned = true),
         ChatSession("2", "Shopping List", 1717751000000L),
         ChatSession("3", "Vacation Planning", 1717752000000L)
     )

@@ -22,12 +22,25 @@ class SettingsViewModel(private val repository: SettingsRepository) : BaseViewMo
     val buttonDisplayStyle: StateFlow<ButtonDisplayStyle> = repository.buttonDisplayStyle
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ButtonDisplayStyle.ICON_ONLY)
 
-    val apiKey: StateFlow<String> = repository.apiKey
-        .map { it ?: "" }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+    val apiKey: StateFlow<String> = combine(
+        repository.selectedProviderId,
+        repository.geminiApiKey,
+        repository.openaiApiKey,
+        repository.customProviderApiKey
+    ) { providerId, gemini, openai, custom ->
+        when (providerId) {
+            "gemini" -> gemini
+            "openai" -> openai
+            "custom" -> custom
+            else -> ""
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
     val localLlmAddress: StateFlow<String> = repository.localLlmAddress
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    val selectedModel: StateFlow<String?> = repository.selectedModel
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     val useMatureMarkdown: StateFlow<Boolean> = repository.useMatureMarkdown
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
@@ -49,11 +62,22 @@ class SettingsViewModel(private val repository: SettingsRepository) : BaseViewMo
     }
 
     fun setApiKey(key: String) {
-        viewModelScope.launch { repository.saveApiKey(key) }
+        viewModelScope.launch {
+            val providerId = repository.selectedProviderId.first()
+            when (providerId) {
+                "gemini" -> repository.saveGeminiApiKey(key)
+                "openai" -> repository.saveOpenAiApiKey(key)
+                "custom" -> repository.saveCustomProviderApiKey(key)
+            }
+        }
     }
 
     fun setLocalLlmAddress(address: String) {
         viewModelScope.launch { repository.saveLocalLlmAddress(address) }
+    }
+
+    fun setSelectedModel(model: String) {
+        viewModelScope.launch { repository.saveSelectedModel(model) }
     }
 
     fun setUseMatureMarkdown(use: Boolean) {

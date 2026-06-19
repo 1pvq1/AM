@@ -1,19 +1,11 @@
 package com.example.androidmaiden.presentation.ui.screens.settings.llm
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.input.*
-import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.platform.stringResource
 import com.example.androidmaiden.presentation.ui.components.*
+import com.example.androidmaiden.presentation.ui.screens.settings.llm.components.*
 import com.example.androidmaiden.data.repository.SettingsRepository
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.flow.first
@@ -33,7 +25,7 @@ fun PreviewLlmSettingsContent() {
         onLocalLlmAddressChange = {},
         useMatureMarkdown = true,
         onMatureMarkdownToggle = {},
-        onNavigateToAdvancedLlmSettings = {}
+        onNavigateToAdvancedLlmSettings = {},
     )
 }
 
@@ -48,7 +40,7 @@ fun PreviewSettingsGroup() {
         onLocalLlmAddressChange = {},
         useMatureMarkdown = true,
         onMatureMarkdownToggle = {},
-        onNavigateToAdvancedLlmSettings = {}
+        onNavigateToAdvancedLlmSettings = {},
     )
 }
 
@@ -64,7 +56,13 @@ fun LlmSettingsGroup(onNavigateToAdvancedLlmSettings: () -> Unit) {
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        apiKey = settingsRepository.apiKey.first() ?: ""
+        val providerId = settingsRepository.selectedProviderId.first()
+        apiKey = when (providerId) {
+            "gemini" -> settingsRepository.geminiApiKey.first()
+            "openai" -> settingsRepository.openaiApiKey.first()
+            "custom" -> settingsRepository.customProviderApiKey.first()
+            else -> ""
+        }
         localLlmAddress = settingsRepository.localLlmAddress.first()
         useMatureMarkdown = settingsRepository.useMatureMarkdown.first()
     }
@@ -74,7 +72,12 @@ fun LlmSettingsGroup(onNavigateToAdvancedLlmSettings: () -> Unit) {
         onApiKeyChange = {
             apiKey = it
             scope.launch {
-                settingsRepository.saveApiKey(it)
+                val providerId = settingsRepository.selectedProviderId.first()
+                when (providerId) {
+                    "gemini" -> settingsRepository.saveGeminiApiKey(it)
+                    "openai" -> settingsRepository.saveOpenAiApiKey(it)
+                    "custom" -> settingsRepository.saveCustomProviderApiKey(it)
+                }
             }
         },
         localLlmAddress = localLlmAddress,
@@ -135,184 +138,4 @@ fun LlmSettingsContent(
             onClick = onNavigateToAdvancedLlmSettings
         )
     }
-}
-
-/**
- * Composable for selecting the LLM model.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ModelSelectionSetting() {
-    val settingsRepository = koinInject<SettingsRepository>()
-    val scope = rememberCoroutineScope()
-
-    val localModels = listOf(
-        "Maiden-1.0-alpha",
-        "Maiden-1.5-pro",
-        "local-model"
-    )
-
-// TODO: use real gemini version
-    val onlineModels = listOf("gemini")
-
-    val models = localModels + onlineModels
-
-    var expanded by remember { mutableStateOf(false) }
-    var selectedModel by remember { mutableStateOf(models[0]) }
-
-    LaunchedEffect(Unit) {
-        settingsRepository.selectedModel.first()?.let { savedModel ->
-            if (models.contains(savedModel)) {
-                selectedModel = savedModel
-            }
-        }
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            Icons.Default.AutoAwesome,
-            contentDescription = stringResource(id = "settings_llm_model_version"),
-            modifier = Modifier.padding(end = 16.dp)
-        )
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded },
-            modifier = Modifier.weight(1f)
-        ) {
-            OutlinedTextField(
-                value = selectedModel,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(stringResource(id = "settings_llm_default_model")) },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                models.forEach { model ->
-                    DropdownMenuItem(
-                        text = { Text(model) },
-                        onClick = {
-                            selectedModel = model
-                            expanded = false
-                            scope.launch {
-                                settingsRepository.saveSelectedModel(model)
-                            }
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
-/**
- * Composable for entering the API key.
- */
-@Composable
-private fun ApiKeySetting(apiKey: String, onApiKeyChange: (String) -> Unit) {
-    val focusManager = LocalFocusManager.current
-    OutlinedTextField(
-        value = apiKey,
-        onValueChange = onApiKeyChange,
-        label = { Text(stringResource(id = "settings_llm_api_key")) },
-        placeholder = { Text(stringResource(id = "settings_llm_api_key_placeholder")) },
-        leadingIcon = {
-            Icon(
-                Icons.Default.Key,
-                contentDescription = stringResource(id = "settings_llm_api_key")
-            )
-        },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = {
-                focusManager.clearFocus()
-            }
-        ),
-        singleLine = true,
-        visualTransformation = PasswordVisualTransformation(),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    )
-}
-
-/**
- * Composable for toggling the mature markdown engine.
- */
-@Composable
-private fun MatureMarkdownToggleSetting(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            Icons.Default.Verified,
-            contentDescription = null,
-            modifier = Modifier.padding(end = 16.dp)
-        )
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = "Use Mature Markdown Engine",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = "Enable high-fidelity rendering for stable content.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange
-        )
-    }
-}
-
-/**
- * Composable for configuring the local LLM address.
- */
-@Composable
-private fun LocalLlmAddressSetting(
-    address: String,
-    onAddressChange: (String) -> Unit
-) {
-    val focusManager = LocalFocusManager.current
-
-    OutlinedTextField(
-        value = address,
-        onValueChange = onAddressChange,
-        label = { Text(stringResource(id = "settings_advanced_llm_local_address_label")) },
-        placeholder = { Text("http://192.168.1.x:1234/v1") },
-        leadingIcon = { Icon(Icons.Default.Computer, contentDescription = null) },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Uri,
-            imeAction = ImeAction.Done
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = {
-                focusManager.clearFocus()
-            }
-        ),
-        singleLine = true,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    )
 }

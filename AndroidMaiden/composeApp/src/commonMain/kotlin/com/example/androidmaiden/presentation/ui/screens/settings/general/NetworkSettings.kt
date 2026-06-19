@@ -18,8 +18,9 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun NetworkSettingsGroupPreview() {
     NetworkSettingsContent(
         uiState = AdvancedLlmSettingsUiState(),
-        onWebsiteUrlChange = {},
-        checkWebsiteConnectivity = {}
+        onUrlChange = {},
+        checkConnection = {},
+        checkLocalConnection = {}
     )
 }
 
@@ -34,8 +35,9 @@ fun NetworkSettingsGroup(
 
     NetworkSettingsContent(
         uiState = uiState,
-        onWebsiteUrlChange = viewModel::onWebsiteUrlChange,
-        checkWebsiteConnectivity = viewModel::checkWebsiteConnectivity
+        onUrlChange = viewModel::onOnlineCheckUrlChange,
+        checkConnection = viewModel::checkOnlineConnection,
+        checkLocalConnection = viewModel::checkLocalLlmConnection
     )
 }
 
@@ -45,42 +47,74 @@ fun NetworkSettingsGroup(
 @Composable
 fun NetworkSettingsContent(
     uiState: AdvancedLlmSettingsUiState,
-    onWebsiteUrlChange: (String) -> Unit,
-    checkWebsiteConnectivity: () -> Unit
+    onUrlChange: (String) -> Unit,
+    checkConnection: () -> Unit,
+    checkLocalConnection: () -> Unit
 ) {
     SettingsGroup(stringResource(id = "settings_network_title")) {
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             Text(
-                stringResource(id = "settings_network_description"),
+                "Verify your device's connectivity to both local and online resources.",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
+            
+            // Online Check
             OutlinedTextField(
-                value = uiState.websiteUrl,
-                onValueChange = onWebsiteUrlChange,
-                label = { Text(stringResource(id = "settings_network_website_url_label")) },
+                value = uiState.onlineCheckUrl,
+                onValueChange = onUrlChange,
+                label = { Text("Online Check URL") },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(8.dp))
             Button(
-                onClick = checkWebsiteConnectivity,
-                enabled = !uiState.isCheckingWebsite,
+                onClick = checkConnection,
+                enabled = !uiState.isCheckingOnline,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if (uiState.isCheckingWebsite) {
+                if (uiState.isCheckingOnline) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp))
                 } else {
-                    Text(stringResource(id = "settings_network_check_connectivity_button"))
+                    Text("Check Online Connection")
                 }
             }
-            Spacer(Modifier.height(8.dp))
-            if (uiState.websiteStatus.isNotBlank()) {
+            if (uiState.onlineCheckStatus.isNotBlank()) {
                 Text(
-                    uiState.websiteStatus,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    uiState.onlineCheckStatus,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (uiState.onlineCheckStatus.contains("OK")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 4.dp)
                 )
             }
+            
+            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+            
+            // Local Check
+            Text(
+                "Local Model: ${uiState.localLlmAddress}",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Spacer(Modifier.height(8.dp))
+            Button(
+                onClick = checkLocalConnection,
+                enabled = !uiState.isCheckingLocalLlm,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (uiState.isCheckingLocalLlm) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                } else {
+                    Text("Check Local Model Connection")
+                }
+            }
+            if (uiState.localLlmStatus.isNotBlank()) {
+                Text(
+                    uiState.localLlmStatus,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (uiState.localLlmStatus.contains("OK")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+            Spacer(Modifier.height(16.dp))
         }
     }
 }

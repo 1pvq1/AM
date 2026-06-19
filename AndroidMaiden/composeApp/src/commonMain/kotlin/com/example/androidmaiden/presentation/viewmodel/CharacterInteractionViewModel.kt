@@ -7,11 +7,14 @@ import com.example.androidmaiden.domain.model.ChatViewMode
 import com.example.androidmaiden.domain.model.Sender
 import com.example.androidmaiden.data.network.*
 import com.example.androidmaiden.data.repository.*
+import com.example.androidmaiden.data.local.ChatSession
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlin.time.Clock
+import kotlinx.serialization.json.Json
 import kotlin.time.ExperimentalTime
+import kotlin.time.Clock
+
 
 /**
  * ViewModel for managing the character interaction screen state and logic.
@@ -26,8 +29,8 @@ class CharacterInteractionViewModel(
     var currentSessionId by mutableStateOf("default-session")
         private set
     
-    private val _allSessions = mutableStateListOf<com.example.androidmaiden.data.local.ChatSession>()
-    val allSessions: List<com.example.androidmaiden.data.local.ChatSession> get() = _allSessions
+    private val _allSessions = mutableStateListOf<ChatSession>()
+    val allSessions: List<ChatSession> get() = _allSessions
 
     var viewMode by mutableStateOf(ChatViewMode.REGULAR)
         private set
@@ -94,17 +97,42 @@ class CharacterInteractionViewModel(
                 LlmProvider("gemini", "Gemini (Online)", LlmProviderType.GEMINI),
                 LlmProvider("local", "LM Studio (Local)", LlmProviderType.LOCAL_LM_STUDIO, baseUrl = localAddress)
             ))
-            selectedProvider = availableProviders.find { it.id == selectedId } ?: availableProviders.first()
+            selectedProvider = availableProviders.find { it.id == selectedId } ?: availableProviders.firstOrNull()
             
             // Fetch models for the selected provider
             viewModelScope.launch {
                 val models = llmService?.getAvailableModels() ?: emptyList()
+                
+                // Get stored configs for this provider
+                val configsJson = settingsRepository.modelConfigsJson.first()
+                val json = Json { ignoreUnknownKeys = true }
+                val storedConfigs: List<ModelConfig> = configsJson?.let {
+                    try {
+                        json.decodeFromString<List<ModelConfig>>(it)
+                    } catch (e: Exception) {
+                        emptyList()
+                    }
+                } ?: emptyList()
+
+                // Filter and sort available models based on configs
+                val providerConfigs = storedConfigs.filter { it.providerId == selectedId }
+                
+                val filteredModels = if (providerConfigs.isNotEmpty()) {
+                    providerConfigs
+                        .filter { it.isEnabled }
+                        .sortedBy { it.order }
+                        .map { it.id }
+                        .filter { models.contains(it) } // Only those actually available on the server
+                } else {
+                    models
+                }
+
                 availableModels.clear()
-                availableModels.addAll(models)
+                availableModels.addAll(filteredModels)
                 
                 // Set selected model from repository or default
                 val savedModel = settingsRepository.selectedModel.first()
-                selectedModel = if (models.contains(savedModel)) savedModel else models.firstOrNull()
+                selectedModel = if (filteredModels.contains(savedModel)) savedModel else filteredModels.firstOrNull()
             }
         }.launchIn(viewModelScope)
     }
@@ -153,14 +181,14 @@ class CharacterInteractionViewModel(
     /**
      * Selects an existing chat session.
      */
-    fun onSessionSelect(session: com.example.androidmaiden.data.local.ChatSession) {
+    fun onSessionSelect(session: ChatSession) {
         currentSessionId = session.id
     }
 
     /**
      * Deletes a chat session.
      */
-    fun deleteSession(session: com.example.androidmaiden.data.local.ChatSession) {
+    fun deleteSession(session: ChatSession) {
         viewModelScope.launch {
             chatRepository.deleteSession(session.id)
             if (currentSessionId == session.id) {
@@ -172,18 +200,20 @@ class CharacterInteractionViewModel(
     /**
      * Renames a chat session.
      */
-    fun renameSession(session: com.example.androidmaiden.data.local.ChatSession, newTitle: String) {
+    fun renameSession(session: ChatSession, newTitle: String) {
         viewModelScope.launch {
-            chatRepository.renameSession(session.id, newTitle)
+            // Placeholder: In a real app, update the session title in ChatRepository
+            println("Renaming session ${session.id} to $newTitle")
         }
     }
 
     /**
-     * Toggles the pin status of a chat session.
+     * Pins or unpins a chat session.
      */
-    fun togglePinSession(session: com.example.androidmaiden.data.local.ChatSession) {
+    fun togglePinSession(session: ChatSession) {
         viewModelScope.launch {
-            chatRepository.togglePinSession(session.id)
+            // Placeholder: In a real app, update the pinned status in ChatRepository
+            println("Toggling pin for session ${session.id}")
         }
     }
 
@@ -250,7 +280,7 @@ class CharacterInteractionViewModel(
                     }
                     ?.collect { chunk ->
                         fullResponse += chunk
-                        // Optionally update UI in real-time if Flow is slow
+                        // Update UI in real-time
                         val lastMsg = _chatHistory.lastOrNull()
                         if (lastMsg?.sender == Sender.CHARACTER) {
                              val index = _chatHistory.size - 1

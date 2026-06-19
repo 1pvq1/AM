@@ -7,12 +7,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.platform.*
-import com.example.androidmaiden.presentation.ui.components.*
 import com.example.androidmaiden.presentation.ui.theme.core.*
 import com.example.androidmaiden.presentation.ui.screens.settings.*
 import com.example.androidmaiden.presentation.ui.screens.settings.appearance.*
@@ -61,15 +58,15 @@ fun SettingsScreenPreview() {
         onLanguageChange = { },
         onNavigateToAdvancedLlmSettings = {},
         networkUiState = AdvancedLlmSettingsUiState(),
-        onWebsiteUrlChange = {},
-        checkWebsiteConnectivity = {},
+        onOnlineCheckUrlChange = {},
+        checkOnlineConnection = {},
+        checkLocalLlmConnection = {},
         apiKey = "preview-api-key",
         onApiKeyChange = {},
         localLlmAddress = "http://localhost:1234/v1",
         onLocalLlmAddressChange = {},
-        useMatureMarkdown=true,
-        onMatureMarkdownToggle= {},
-
+        useMatureMarkdown = true,
+        onMatureMarkdownToggle = {},
     )
 }
 
@@ -80,7 +77,7 @@ fun SettingsScreenPreview() {
 fun SettingsScreen(
     onNavigateToAdvancedLlmSettings: () -> Unit,
     settingsViewModel: SettingsViewModel = koinViewModel(),
-    advancedLlmViewModel: AdvancedLlmSettingsViewModel = rememberAdvancedLlmSettingsViewModel()
+    advancedLlmViewModel: AdvancedLlmSettingsViewModel = rememberAdvancedLlmSettingsViewModel(),
 ) {
     val themeMode by settingsViewModel.themeMode.collectAsState()
     val themeType by settingsViewModel.themeType.collectAsState()
@@ -105,8 +102,9 @@ fun SettingsScreen(
         onLanguageChange = { },
         onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings,
         networkUiState = networkUiState,
-        onWebsiteUrlChange = advancedLlmViewModel::onWebsiteUrlChange,
-        checkWebsiteConnectivity = advancedLlmViewModel::checkWebsiteConnectivity,
+        onOnlineCheckUrlChange = advancedLlmViewModel::onOnlineCheckUrlChange,
+        checkOnlineConnection = advancedLlmViewModel::checkOnlineConnection,
+        checkLocalLlmConnection = advancedLlmViewModel::checkLocalLlmConnection,
         apiKey = apiKey,
         onApiKeyChange = settingsViewModel::setApiKey,
         localLlmAddress = localLlmAddress,
@@ -135,8 +133,9 @@ fun SettingsContent(
     onNavigateToAdvancedLlmSettings: () -> Unit,
     // Network Settings
     networkUiState: AdvancedLlmSettingsUiState,
-    onWebsiteUrlChange: (String) -> Unit,
-    checkWebsiteConnectivity: () -> Unit,
+    onOnlineCheckUrlChange: (String) -> Unit,
+    checkOnlineConnection: () -> Unit,
+    checkLocalLlmConnection: () -> Unit,
     // LLM Settings
     apiKey: String,
     onApiKeyChange: (String) -> Unit,
@@ -218,8 +217,9 @@ fun SettingsContent(
             item {
                 NetworkSettingsContent(
                     uiState = networkUiState,
-                    onWebsiteUrlChange = onWebsiteUrlChange,
-                    checkWebsiteConnectivity = checkWebsiteConnectivity
+                    onUrlChange = onOnlineCheckUrlChange,
+                    checkConnection = checkOnlineConnection,
+                    checkLocalConnection = checkLocalLlmConnection
                 )
             }
 

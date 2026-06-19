@@ -19,11 +19,18 @@ class LlmServiceImpl(
         val providerId = settingsRepository.selectedProviderId.first()
         val address = settingsRepository.localLlmAddress.first()
         val modelId = settingsRepository.selectedModel.first() ?: "local-model"
-        val apiKey = settingsRepository.apiKey.first()
+        
+        val apiKey = when (providerId) {
+            "gemini" -> settingsRepository.geminiApiKey.first()
+            "openai" -> settingsRepository.openaiApiKey.first()
+            "custom" -> settingsRepository.customProviderApiKey.first()
+            else -> ""
+        }
 
         if (providerId == "local") {
             val resolvedAddress = hostResolver.resolve(address)
-            emitAll(generateOpenAiStream(prompt, history, resolvedAddress, modelId))
+            val localKey = settingsRepository.localApiKey.first()
+            emitAll(generateOpenAiStream(prompt, history, resolvedAddress, modelId, localKey))
         } else {
             emitAll(generateGeminiStream(prompt, history, apiKey))
         }
@@ -32,11 +39,18 @@ class LlmServiceImpl(
     override suspend fun validate(): Boolean {
         val providerId = settingsRepository.selectedProviderId.first()
         val address = settingsRepository.localLlmAddress.first()
-        val apiKey = settingsRepository.apiKey.first()
+        
+        val apiKey = when (providerId) {
+            "gemini" -> settingsRepository.geminiApiKey.first()
+            "openai" -> settingsRepository.openaiApiKey.first()
+            "custom" -> settingsRepository.customProviderApiKey.first()
+            else -> ""
+        }
         
         return if (providerId == "local") {
             val resolvedAddress = hostResolver.resolve(address)
-            validateOpenAi(resolvedAddress)
+            val localKey = settingsRepository.localApiKey.first()
+            validateOpenAi(resolvedAddress, localKey)
         } else {
             validateGemini(apiKey)
         }
@@ -48,7 +62,8 @@ class LlmServiceImpl(
         
         return if (providerId == "local") {
             val resolvedAddress = hostResolver.resolve(address)
-            getOpenAiModels(resolvedAddress)
+            val localKey = settingsRepository.localApiKey.first()
+            getOpenAiModels(resolvedAddress, localKey)
         } else {
             getGeminiModels()
         }

@@ -36,7 +36,7 @@ val commonModule = module {
     factory { FileClearViewModel(get()) }
     factory { TodoViewModel() }
     factory { CharacterInteractionViewModel(get(), get(), get()) } // Pass ChatRepository
-    factory { AdvancedLlmSettingsViewModel(get()) }
+    factory { AdvancedLlmSettingsViewModel(get(), get(), get()) } // Pass LlmService
     single { SettingsViewModel(get()) }
 
     // 4. Provide LlmService
