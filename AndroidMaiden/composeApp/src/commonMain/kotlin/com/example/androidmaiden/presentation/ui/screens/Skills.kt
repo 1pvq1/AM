@@ -2,6 +2,9 @@ package com.example.androidmaiden.presentation.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -17,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.ui.components.*
 import com.example.androidmaiden.presentation.ui.features.others.DraftSkillTreeV2
+import com.example.androidmaiden.presentation.ui.adaptive.*
 import com.example.androidmaiden.platform.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -141,21 +145,46 @@ fun SkillsPage(onNavigate: (Screen) -> Unit = {}) {
                 .weight(1f)
         ) {
             if (!isTreeViewActive) {
-                // Classic card list view (Default View)
-                val scrollState = rememberScrollState()
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                        .verticalScroll(scrollState),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    features.forEach { feature ->
-                        FeatureCard(feature) {
-                            feature.screen?.let { onNavigate(it) }
+                // Classic card list/grid view (Default View)
+                val windowSize = LocalWindowSizeClass.current
+                val columns = when (windowSize.widthCategory) {
+                    WindowSizeCategory.Compact -> 1
+                    WindowSizeCategory.Medium -> 2
+                    WindowSizeCategory.Expanded -> 3
+                }
+
+                if (columns == 1) {
+                    val scrollState = rememberScrollState()
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp)
+                            .verticalScroll(scrollState),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        features.forEach { feature ->
+                            FeatureCard(feature) {
+                                feature.screen?.let { onNavigate(it) }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(columns),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(bottom = 16.dp)
+                    ) {
+                        items(features) { feature ->
+                            FeatureCard(feature) {
+                                feature.screen?.let { onNavigate(it) }
+                            }
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             } else {
                 // RPG Skill Tree Interactive View V2

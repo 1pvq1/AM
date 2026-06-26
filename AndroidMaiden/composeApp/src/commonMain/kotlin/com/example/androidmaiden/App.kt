@@ -17,6 +17,7 @@ import com.example.androidmaiden.presentation.ui.screens.interaction.CharacterIn
 import com.example.androidmaiden.presentation.ui.screens.settings.llm.*
 import com.example.androidmaiden.presentation.ui.components.*
 import com.example.androidmaiden.presentation.ui.theme.*
+import com.example.androidmaiden.presentation.ui.adaptive.*
 import com.example.androidmaiden.util.*
 import com.example.androidmaiden.presentation.viewmodel.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -42,80 +43,123 @@ fun App() {
         val useDynamicColor by settingsViewModel.useDynamicColor.collectAsState()
         val buttonDisplayStyle by settingsViewModel.buttonDisplayStyle.collectAsState()
 
+        val windowSizeClass = rememberWindowSizeClass()
+        var manualWidthCategory by remember { mutableStateOf<WindowSizeCategory?>(null) }
+        
+        val effectiveWindowSizeClass = remember(windowSizeClass, manualWidthCategory) {
+            if (manualWidthCategory != null && windowSizeClass.widthCategory != WindowSizeCategory.Compact) {
+                windowSizeClass.copy(widthCategory = manualWidthCategory!!)
+            } else {
+                windowSizeClass
+            }
+        }
+
         setSingletonImageLoaderFactory { context ->
             getAsyncImageLoader(context)
         }
 
-        AppTheme(
-            themeType = themeType,
-            themeMode = themeMode,
-            useDynamicColor = useDynamicColor,
-            buttonDisplayStyle = buttonDisplayStyle
-        ) {
-            Scaffold(
-                bottomBar = {
-                    if (isNavigationBarVisible) {
-                        AppNavigationBar(
-                            currentScreen = currentScreen, onScreenSelected = { screen ->
-                                navViewModel.navigateTo(screen)
-                            })
-                    }
-                }) { innerPadding ->
-                    Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-                        when (currentScreen) {
-                            is Screen.Home -> HomeScreen()
-                            is Screen.Settings -> SettingsScreen(
-                                onNavigateToAdvancedLlmSettings = {
-                                    navViewModel.navigateTo(Screen.AdvancedLlmSettings)
+        CompositionLocalProvider(LocalWindowSizeClass provides effectiveWindowSizeClass) {
+            AppTheme(
+                themeType = themeType,
+                themeMode = themeMode,
+                useDynamicColor = useDynamicColor,
+                buttonDisplayStyle = buttonDisplayStyle
+            ) {
+                val showNavigationRail = effectiveWindowSizeClass.widthCategory != WindowSizeCategory.Compact
+                
+                Row(modifier = Modifier.fillMaxSize()) {
+                    if (showNavigationRail && isNavigationBarVisible) {
+                        AppNavigationRail(
+                            currentScreen = currentScreen,
+                            onScreenSelected = { screen -> navViewModel.navigateTo(screen) },
+                            windowSizeClass = effectiveWindowSizeClass,
+                            onToggleLayout = {
+                                manualWidthCategory = if (effectiveWindowSizeClass.widthCategory == WindowSizeCategory.Expanded) {
+                                    WindowSizeCategory.Medium
+                                } else {
+                                    WindowSizeCategory.Expanded
                                 }
-                            )
-
-                            is Screen.Skills -> SkillsPage(onNavigate = { screen ->
-                                navViewModel.navigateTo(screen)
-
-                            })
-
-                            is Screen.Files -> FilesScreen(onNavigate = { screen ->
-                                navViewModel.navigateTo(screen)
-                            })
-
-                            is Screen.FileAnalysis -> FileAnalysisScreen(onNavigateUp = {
-                                navViewModel.navigateTo(Screen.Files)
-                            })
-
-                            is Screen.FileClassify -> FileClassifyPage(
-                                onBack = {
-                                    navViewModel.navigateTo(Screen.Files)
-                                })
-
-                            is Screen.FileOrganize -> FileOrganizePage(
-                                onBack = {
-                                    navViewModel.navigateTo(Screen.Files)
-                                })
-
-                            is Screen.FileClean -> FileCleanPage(
-                                onBack = {
-                                    navViewModel.navigateTo(Screen.Files)
-                                })
-
-                            is Screen.Todo -> {
-                                val todoViewModel: TodoViewModel = koinViewModel()
-                                TodoPage(viewModel = todoViewModel)
                             }
-
-                            is Screen.CharacterInteraction -> CharacterInteractionPage(
-                                onFullScreenChange = { isFullScreen: Boolean ->
-                                    navViewModel.setNavigationBarVisible(!isFullScreen)
-                                }
+                        )
+                    }
+                    
+                    Scaffold(
+                        bottomBar = {
+                            if (!showNavigationRail && isNavigationBarVisible) {
+                                AppNavigationBar(
+                                    currentScreen = currentScreen,
+                                    onScreenSelected = { screen -> navViewModel.navigateTo(screen) }
+                                )
+                            }
+                        }
+                    ) { innerPadding ->
+                        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+                            AppScreenContent(
+                                currentScreen = currentScreen,
+                                navViewModel = navViewModel
                             )
-
-                            is Screen.AdvancedLlmSettings -> AdvancedLlmSettingsPage(onNavigateBack = {
-                                navViewModel.navigateTo(Screen.Settings)
-                            })
-
                         }
                     }
                 }
+            }
         }
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+@Composable
+private fun AppScreenContent(
+    currentScreen: Screen,
+    navViewModel: NavigationViewModel
+) {
+    when (currentScreen) {
+        is Screen.Home -> HomeScreen()
+        is Screen.Settings -> SettingsScreen(
+            onNavigateToAdvancedLlmSettings = {
+                navViewModel.navigateTo(Screen.AdvancedLlmSettings)
+            }
+        )
+
+        is Screen.Skills -> SkillsPage(onNavigate = { screen ->
+            navViewModel.navigateTo(screen)
+        })
+
+        is Screen.Files -> FilesScreen(onNavigate = { screen ->
+            navViewModel.navigateTo(screen)
+        })
+
+        is Screen.FileAnalysis -> FileAnalysisScreen(onNavigateUp = {
+            navViewModel.navigateTo(Screen.Files)
+        })
+
+        is Screen.FileClassify -> FileClassifyPage(
+            onBack = {
+                navViewModel.navigateTo(Screen.Files)
+            })
+
+        is Screen.FileOrganize -> FileOrganizePage(
+            onBack = {
+                navViewModel.navigateTo(Screen.Files)
+            })
+
+        is Screen.FileClean -> FileCleanPage(
+            onBack = {
+                navViewModel.navigateTo(Screen.Files)
+            })
+
+        is Screen.Todo -> {
+            val todoViewModel: TodoViewModel = koinViewModel()
+            TodoPage(viewModel = todoViewModel)
+        }
+
+        is Screen.CharacterInteraction -> CharacterInteractionPage(
+            onFullScreenChange = { isFullScreen: Boolean ->
+                navViewModel.setNavigationBarVisible(!isFullScreen)
+            }
+        )
+
+        is Screen.AdvancedLlmSettings -> AdvancedLlmSettingsPage(onNavigateBack = {
+            navViewModel.navigateTo(Screen.Settings)
+        })
     }
 }
