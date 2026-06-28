@@ -6,14 +6,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import coil3.compose.setSingletonImageLoaderFactory
 import com.example.androidmaiden.domain.model.*
-import com.example.androidmaiden.presentation.ui.screens.*
-import com.example.androidmaiden.presentation.ui.screens.fileSystem.*
+import com.example.androidmaiden.presentation.ui.screens.home.*
+import com.example.androidmaiden.presentation.ui.screens.skills.*
+import com.example.androidmaiden.presentation.ui.screens.settings.*
+import com.example.androidmaiden.presentation.ui.screens.todo.TodoScreen
+import com.example.androidmaiden.presentation.ui.screens.fileSystem.dashboard.FilesScreen
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.analyze.*
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.classify.*
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.clean.*
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.organize.*
 import com.example.androidmaiden.presentation.ui.screens.pages.*
-import com.example.androidmaiden.presentation.ui.screens.interaction.CharacterInteractionPage
+import com.example.androidmaiden.presentation.ui.screens.interaction.*
 import com.example.androidmaiden.presentation.ui.screens.settings.llm.*
 import com.example.androidmaiden.presentation.ui.components.*
 import com.example.androidmaiden.presentation.ui.theme.*
@@ -120,7 +123,7 @@ private fun AppScreenContent(
             }
         )
 
-        is Screen.Skills -> SkillsPage(onNavigate = { screen ->
+        is Screen.Skills -> SkillsScreen(onNavigate = { screen ->
             navViewModel.navigateTo(screen)
         })
 
@@ -149,10 +152,10 @@ private fun AppScreenContent(
 
         is Screen.Todo -> {
             val todoViewModel: TodoViewModel = koinViewModel()
-            TodoPage(viewModel = todoViewModel)
+            TodoScreen(viewModel = todoViewModel)
         }
 
-        is Screen.CharacterInteraction -> CharacterInteractionPage(
+        is Screen.CharacterInteraction -> CharacterInteractionScreen(
             onFullScreenChange = { isFullScreen: Boolean ->
                 navViewModel.setNavigationBarVisible(!isFullScreen)
             }

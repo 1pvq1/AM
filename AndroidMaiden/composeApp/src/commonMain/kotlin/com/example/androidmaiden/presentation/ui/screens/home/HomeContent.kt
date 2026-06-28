@@ -1,40 +1,38 @@
-package com.example.androidmaiden.presentation.ui.screens
+package com.example.androidmaiden.presentation.ui.screens.home
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import androidmaiden.composeapp.generated.resources.Res
-import androidmaiden.composeapp.generated.resources.compose_multiplatform
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
-import com.example.androidmaiden.Greeting
 import com.example.androidmaiden.presentation.ui.components.DevButton
 import com.example.androidmaiden.presentation.ui.components.ShowDialogButton
 import com.example.androidmaiden.presentation.ui.components.SwitchLayoutButton
 import com.example.androidmaiden.presentation.ui.features.character.*
 import com.example.androidmaiden.presentation.ui.features.panel.PanelOfTask
 import com.example.androidmaiden.presentation.ui.theme.core.LocalAppExtraShapes
-import com.example.androidmaiden.presentation.ui.adaptive.*
-import org.jetbrains.compose.resources.stringResource
-import androidmaiden.composeapp.generated.resources.*
 import com.example.androidmaiden.platform.stringResource
 
-@Preview
+/**
+ * The Stateless UI for the Home screen.
+ */
 @Composable
-fun HomeScreen() {
-    val windowSize = LocalWindowSizeClass.current
-
-    if (windowSize.widthCategory == WindowSizeCategory.Expanded) {
+fun HomeContent(
+    isExpanded: Boolean,
+    isMedium: Boolean,
+    showCharacterDialog: Boolean,
+    onShowCharacterDialogChange: (Boolean) -> Unit,
+    characterLayout: CharacterLayout,
+    onCharacterLayoutChange: (CharacterLayout) -> Unit,
+    dialogText: String
+) {
+    if (isExpanded) {
         Row(
             modifier = Modifier.fillMaxSize().padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(24.dp)
@@ -44,7 +42,14 @@ fun HomeScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                CharacterSection()
+                CharacterSection(
+                    isExpanded = true,
+                    showDialog = showCharacterDialog,
+                    onShowDialogChange = onShowCharacterDialogChange,
+                    layout = characterLayout,
+                    onLayoutChange = onCharacterLayoutChange,
+                    dialogText = dialogText
+                )
             }
             Column(
                 modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
@@ -55,9 +60,9 @@ fun HomeScreen() {
             }
         }
     } else {
-        val maxWidth = if (windowSize.widthCategory == WindowSizeCategory.Medium) 600.dp else Dp.Unspecified
+        val maxWidth = if (isMedium) 600.dp else Dp.Unspecified
         val modifier = if (maxWidth != Dp.Unspecified) Modifier.widthIn(max = maxWidth) else Modifier.fillMaxWidth()
-        
+
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             LazyColumn(
                 modifier = modifier.fillMaxHeight(),
@@ -65,7 +70,16 @@ fun HomeScreen() {
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                item { CharacterSection() }
+                item {
+                    CharacterSection(
+                        isExpanded = false,
+                        showDialog = showCharacterDialog,
+                        onShowDialogChange = onShowCharacterDialogChange,
+                        layout = characterLayout,
+                        onLayoutChange = onCharacterLayoutChange,
+                        dialogText = dialogText
+                    )
+                }
                 item { TaskSection() }
                 item { OtherSection() }
             }
@@ -74,14 +88,14 @@ fun HomeScreen() {
 }
 
 @Composable
-fun CharacterSection() {
-    val windowSize = LocalWindowSizeClass.current
-    val isExpanded = windowSize.widthCategory == WindowSizeCategory.Expanded
-    
-    var showDialog by remember { mutableStateOf(true) }
-    var layout by remember { mutableStateOf(CharacterLayout.Vertical) }
-    val dialogText = stringResource(id = "home_greeting_default")
-
+fun CharacterSection(
+    isExpanded: Boolean,
+    showDialog: Boolean,
+    onShowDialogChange: (Boolean) -> Unit,
+    layout: CharacterLayout,
+    onLayoutChange: (CharacterLayout) -> Unit,
+    dialogText: String
+) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -89,9 +103,9 @@ fun CharacterSection() {
     ) {
         BarCharacterSection(
             showDialog = showDialog,
-            onShowDialogChange = { showDialog = it },
+            onShowDialogChange = onShowDialogChange ,
             layout = layout,
-            onLayoutChange = { layout = it }
+            onLayoutChange = onLayoutChange
         )
         Surface(
             modifier = Modifier.fillMaxWidth(),
@@ -106,7 +120,12 @@ fun CharacterSection() {
                     CharacterWithDialog(dialogText = dialogText, layout = layout)
                 } else {
                     val illustrationSize = if (isExpanded) 300.dp else 240.dp
-                    CharacterIllustrationBox(modifier = Modifier.size(width = illustrationSize * 0.8f, height = illustrationSize))
+                    CharacterIllustrationBox(
+                        modifier = Modifier.size(
+                            width = illustrationSize * 0.8f,
+                            height = illustrationSize
+                        )
+                    )
                 }
             }
         }
@@ -141,13 +160,13 @@ fun OtherSection() {
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = stringResource(id= "home_announcement"),
+                    text = stringResource(id = "home_announcement"),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onTertiaryContainer
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    stringResource(id = "home_announcement_placeholder"),
+                    text = stringResource(id = "home_announcement_placeholder"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onTertiaryContainer
                 )
@@ -155,8 +174,6 @@ fun OtherSection() {
         }
     }
 }
-
-
 
 @Composable
 private fun BarCharacterSection(
@@ -184,4 +201,3 @@ private fun BarCharacterSection(
         DevButton()
     }
 }
-

@@ -36,4 +36,7 @@ val platformModule = module {
 
     // 4. Provide the Android-specific Scanner implementation
     single<FileSystemScanner> { AndroidFileSystemScanner(get()) }
+
+    // 5. Provide the Android-specific FileProvider implementation
+    single<FileProvider> { AndroidFileProvider() }
 }

@@ -1,4 +1,4 @@
-package com.example.androidmaiden.presentation.ui.screens.pages
+package com.example.androidmaiden.presentation.ui.screens.todo
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -15,58 +15,76 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.domain.model.TodoItem
-import com.example.androidmaiden.presentation.viewmodel.TodoViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
- * Main page for the Todo list feature.
+ * The Stateless UI for the Todo screen.
  */
 @Composable
-fun TodoPage(viewModel: TodoViewModel) {
-    val todoItems = viewModel.items
-    val newTodoText = viewModel.newText
-    val itemToEdit = viewModel.itemToEdit
+fun TodoContent(
+    isWide: Boolean,
+    todoItems: List<TodoItem>,
+    newTodoText: String,
+    itemToEdit: TodoItem?,
+    onNewTextChanged: (String) -> Unit,
+    onAddItem: () -> Unit,
+    onToggleChecked: (TodoItem, Boolean) -> Unit,
+    onDeleteItem: (TodoItem) -> Unit,
+    onStartEdit: (TodoItem) -> Unit,
+    onCancelEdit: () -> Unit,
+    onUpdateItem: (TodoItem, String) -> Unit
+) {
+    val contentModifier = if (isWide) {
+        Modifier.fillMaxSize().padding(horizontal = 32.dp).widthIn(max = 800.dp)
+    } else {
+        Modifier.fillMaxSize()
+    }
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp)
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
     ) {
-        Text(
-            text = "Todo List",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = contentModifier.padding(16.dp)
         ) {
-            OutlinedTextField(
-                value = newTodoText,
-                onValueChange = { viewModel.onNewTextChanged(it) },
-                label = { Text("New Task") },
-                modifier = Modifier.weight(1f),
-                singleLine = true
+            Text(
+                text = "Todo List",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            Button(
-                onClick = viewModel::addItem,
-                enabled = newTodoText.isNotBlank()
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Task")
-            }
-        }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            itemsIndexed(todoItems, key = { _, item -> item.id }) { _, item ->
-                TodoListItem(
-                    item = item,
-                    onCheckedChange = { checked -> viewModel.toggleChecked(item, checked) },
-                    onDelete = { viewModel.deleteItem(item) },
-                    onEdit = { viewModel.startEdit(item) }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = newTodoText,
+                    onValueChange = onNewTextChanged,
+                    label = { Text("New Task") },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true
                 )
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = onAddItem,
+                    enabled = newTodoText.isNotBlank()
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add Task")
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                itemsIndexed(todoItems, key = { _, item -> item.id }) { _, item ->
+                    TodoListItem(
+                        item = item,
+                        onCheckedChange = { checked -> onToggleChecked(item, checked) },
+                        onDelete = { onDeleteItem(item) },
+                        onEdit = { onStartEdit(item) }
+                    )
+                }
             }
         }
     }
@@ -74,8 +92,8 @@ fun TodoPage(viewModel: TodoViewModel) {
     itemToEdit?.let { item ->
         EditTodoDialog(
             item = item,
-            onDismiss = viewModel::cancelEdit,
-            onSave = { newText -> viewModel.updateItem(item, newText) }
+            onDismiss = onCancelEdit,
+            onSave = { newText -> onUpdateItem(item, newText) }
         )
     }
 }
@@ -114,7 +132,6 @@ fun TodoListItem(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Scrollable text for the todo item name
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -142,7 +159,7 @@ fun TodoListItem(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp, start = 48.dp) // Align with text
+                        .padding(top = 8.dp, start = 48.dp)
                 ) {
                     Text(
                         text = "Details: ${item.text}",
@@ -245,13 +262,20 @@ fun TodoListItemPreviewDark() {
     }
 }
 
-/**
- * Preview for the entire Todo page.
- */
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun TodoPagePreview() {
-    MaterialTheme {
-        TodoPage(viewModel = TodoViewModel())
-    }
+    TodoContent(
+        isWide = false,
+        todoItems = listOf(TodoItem(1L, "Task 1", false), TodoItem(2L, "Task 2", true)),
+        newTodoText = "",
+        itemToEdit = null,
+        onNewTextChanged = {},
+        onAddItem = {},
+        onToggleChecked = { _, _ -> },
+        onDeleteItem = {},
+        onStartEdit = {},
+        onCancelEdit = {},
+        onUpdateItem = { _, _ -> }
+    )
 }

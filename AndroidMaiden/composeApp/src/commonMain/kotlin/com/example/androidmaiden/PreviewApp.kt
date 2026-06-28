@@ -7,19 +7,21 @@ import androidx.compose.ui.Modifier
 import com.example.androidmaiden.domain.model.Screen
 import com.example.androidmaiden.presentation.ui.components.AppNavigationBar
 import com.example.androidmaiden.presentation.ui.screens.*
-import com.example.androidmaiden.presentation.ui.screens.fileSystem.FilesScreen
-import com.example.androidmaiden.presentation.ui.screens.pages.TodoPage
+import com.example.androidmaiden.presentation.ui.screens.fileSystem.dashboard.FilesScreen
 import com.example.androidmaiden.presentation.ui.theme.AppTheme
 import com.example.androidmaiden.presentation.viewmodel.TodoViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.analyze.FileAnalysisScreen
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.classify.FileClassifyPage
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.clean.FileCleanPage
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.organize.FileOrganizePage
+import com.example.androidmaiden.presentation.ui.screens.home.HomeScreen
 import com.example.androidmaiden.presentation.ui.screens.interaction.components.RegularChatViewPreview
 import com.example.androidmaiden.presentation.ui.screens.interaction.components.VirtualChatViewPreview
+import com.example.androidmaiden.presentation.ui.screens.settings.SettingsScreenPreview
 import com.example.androidmaiden.presentation.ui.screens.settings.llm.AdvancedLlmSettingsPage
+import com.example.androidmaiden.presentation.ui.screens.skills.SkillsScreen
+import com.example.androidmaiden.presentation.ui.screens.todo.TodoScreen
 import org.koin.compose.KoinContext
 import kotlin.time.ExperimentalTime
 
@@ -60,7 +62,7 @@ fun FullAppHomePreview() {
 @Composable
 fun FullAppSkillsPreview() {
     AppPreviewWrapper(Screen.Skills) {
-        SkillsPage(onNavigate = {})
+        SkillsScreen(onNavigate = {})
     }
 }
 
@@ -84,7 +86,7 @@ fun FullAppSettingsPreview() {
 @Composable
 fun FullAppTodoPreview() {
     AppPreviewWrapper(Screen.Todo) {
-        TodoPage(viewModel = TodoViewModel())
+        TodoScreen(viewModel = TodoViewModel())
     }
 }
 

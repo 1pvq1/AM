@@ -21,7 +21,7 @@ val commonModule = module {
     single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
 
     // 2. Provide the Repository
-    single { FileRepository(get(), get(), get()) }
+    single { FileRepository(get(), get(), get(), get()) }
     single { SettingsRepository(get()) }
     single { ChatRepository(get()) }
     single<FileClearRepository> { 

@@ -55,7 +55,7 @@ class FileOrganizeViewModel(
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     // --- Navigation State ---
-    private val _currentPath = MutableStateFlow<String>("") // Empty string for root
+    private val _currentPath = MutableStateFlow<String>(repository.getScannedPath())
 
     /**
      * The current path within the file system being browsed.
@@ -66,15 +66,18 @@ class FileOrganizeViewModel(
      * A stack of path segments for breadcrumb navigation.
      */
     val pathStack: StateFlow<List<String>> = _currentPath.map { path ->
-        if (path.isEmpty()) emptyList() else path.split("/").filter { it.isNotEmpty() }
+        val root = repository.getScannedPath()
+        val relative = if (path.startsWith(root)) path.removePrefix(root) else path
+        if (relative.isEmpty() || relative == "/") emptyList() 
+        else relative.split("/").filter { it.isNotEmpty() }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     /**
-     * Flow of files in the current directory.
+     * Flow of files in the current directory with their tags.
      */
-    val currentDirectoryFiles: StateFlow<List<FileMetadata>> = _currentPath
+    val currentDirectoryFiles: StateFlow<List<FileWithTags>> = _currentPath
         .flatMapLatest { path ->
-            repository.getFilesByParent(path)
+            repository.getRealTimeFilesWithTags(path)
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -102,7 +105,9 @@ class FileOrganizeViewModel(
     fun navigateToIndex(index: Int) {
         val stack = pathStack.value
         if (index < stack.size) {
-            val newPath = stack.take(index + 1).joinToString("/", prefix = "/")
+            val root = repository.getScannedPath()
+            val segments = stack.take(index + 1)
+            val newPath = root + segments.joinToString("/", prefix = "/")
             _currentPath.value = newPath
         }
     }
@@ -111,7 +116,7 @@ class FileOrganizeViewModel(
      * Navigates to the root directory.
      */
     fun navigateToRoot() {
-        _currentPath.value = ""
+        _currentPath.value = repository.getScannedPath()
     }
 
     /**

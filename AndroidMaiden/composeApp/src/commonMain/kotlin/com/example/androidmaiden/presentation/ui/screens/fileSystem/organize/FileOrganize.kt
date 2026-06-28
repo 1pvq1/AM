@@ -51,8 +51,8 @@ fun FileOrganizePage(onBack: () -> Unit) {
         onIndexClick = { viewModel.navigateToIndex(it) },
         onRootClick = { viewModel.navigateToRoot() },
         onFileClick = { file ->
-            if (file.isDirectory) {
-                viewModel.navigateTo(file.path)
+            if (file.file.isDirectory) {
+                viewModel.navigateTo(file.file.path)
             }
         }
     )
@@ -70,7 +70,7 @@ fun FileOrganizeScreen(
     searchQuery: String,
     searchResults: List<FileMetadata>,
     pathStack: List<String>,
-    currentDirectoryFiles: List<FileMetadata>,
+    currentDirectoryFiles: List<FileWithTags>,
     onBack: () -> Unit,
     onSelectTag: (Tag?) -> Unit,
     onDeleteTag: (Tag) -> Unit,
@@ -81,7 +81,7 @@ fun FileOrganizeScreen(
     onCreateTag: (String, String) -> Unit,
     onIndexClick: (Int) -> Unit,
     onRootClick: () -> Unit,
-    onFileClick: (FileMetadata) -> Unit
+    onFileClick: (FileWithTags) -> Unit
 ) {
     var showCreateTagDialog by remember { mutableStateOf(false) }
     var editingTag by remember { mutableStateOf<Tag?>(null) }
@@ -149,12 +149,13 @@ fun FileOrganizeScreen(
                 )
 
                 LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-                    items(currentDirectoryFiles) { file ->
+                    items(currentDirectoryFiles) { fileWithTags ->
                         FileTagCard(
-                            file = file,
+                            file = fileWithTags.file,
+                            tags = fileWithTags.tags,
                             availableTags = allTags,
                             onAddTagToFile = onAddTagToFile,
-                            onClick = { onFileClick(file) }
+                            onClick = { onFileClick(fileWithTags) }
                         )
                     }
                 }
@@ -210,13 +211,16 @@ fun PreviewFileOrganize() {
         ),
         pathStack = listOf("Documents"),
         currentDirectoryFiles = listOf(
-            FileMetadata(
-                path = "/storage/emulated/0/Documents/report.pdf",
-                name = "report.pdf",
-                isDirectory = false,
-                lastModified = 0,
-                size = 1024 * 1024,
-                parentPath = "/storage/emulated/0/Documents"
+            FileWithTags(
+                file = FileMetadata(
+                    path = "/storage/emulated/0/Documents/report.pdf",
+                    name = "report.pdf",
+                    isDirectory = false,
+                    lastModified = 0,
+                    size = 1024 * 1024,
+                    parentPath = "/storage/emulated/0/Documents"
+                ),
+                tags = listOf(Tag(1, "Work", "#FF0000"))
             )
         ),
         onBack = {},

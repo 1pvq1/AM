@@ -1,5 +1,6 @@
 package com.example.androidmaiden.presentation.ui.screens.fileSystem.organize.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -14,6 +15,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.androidmaiden.data.local.*
+import com.example.androidmaiden.util.formatSize
+import com.example.androidmaiden.util.formatDateTime
 
 /**
  * View showing search results for files and allowing tags to be added.
@@ -35,7 +38,11 @@ fun TagSearchView(
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(searchResults, key = { it.path }) { file ->
-                    FileTagCard(file, availableTags, onAddTagToFile)
+                    FileTagCard(
+                        file = file,
+                        availableTags = availableTags,
+                        onAddTagToFile = onAddTagToFile
+                    )
                 }
             }
         }
@@ -48,6 +55,7 @@ fun TagSearchView(
 @Composable
 fun FileTagCard(
     file: FileMetadata,
+    tags: List<Tag> = emptyList(),
     availableTags: List<Tag>,
     onAddTagToFile: (FileMetadata, Tag) -> Unit,
     onClick: (() -> Unit)? = null
@@ -55,6 +63,7 @@ fun FileTagCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(vertical = 4.dp)
             .let { if (onClick != null) it.clickable { onClick() } else it },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
@@ -66,15 +75,53 @@ fun FileTagCard(
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Spacer(Modifier.width(12.dp))
-                Text(file.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        file.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    if (!file.isDirectory) {
+                        Text(
+                            "${formatSize(file.size)} | ${formatDateTime(file.lastModified)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                }
             }
-            Text(file.path, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             
+            if (tags.isNotEmpty()) {
+                Spacer(Modifier.height(8.dp))
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    items(tags) { tag ->
+                        AssistChip(
+                            onClick = {},
+                            label = { Text(tag.name, fontSize = 10.sp) },
+                            leadingIcon = {
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .background(
+                                            com.example.androidmaiden.presentation.ui.screens.fileSystem.organize.utils.ColorUtils.parseHexColor(tag.colorHex),
+                                            androidx.compose.foundation.shape.CircleShape
+                                        )
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+
             Spacer(Modifier.height(8.dp))
             
             Text("Add Tag:", style = MaterialTheme.typography.labelSmall)
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                items(availableTags) { tag ->
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                items(availableTags.filter { it !in tags }) { tag ->
                     SuggestionChip(
                         onClick = { onAddTagToFile(file, tag) },
                         label = { Text(tag.name, fontSize = 10.sp) }

@@ -8,8 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.platform.*
-import com.example.androidmaiden.presentation.ui.screens.*
-import com.example.androidmaiden.presentation.ui.components.*import org.jetbrains.compose.ui.tooling.preview.Preview
+import com.example.androidmaiden.presentation.ui.screens.settings.Language
+import com.example.androidmaiden.presentation.ui.components.*
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * Preview for the Language settings group.

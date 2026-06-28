@@ -2,6 +2,7 @@ package com.example.androidmaiden.data.repository
 
 import kotlinx.coroutines.flow.*
 import com.example.androidmaiden.util.FileSystemScanner
+import com.example.androidmaiden.util.FileProvider
 import com.example.androidmaiden.data.local.*
 import kotlinx.coroutines.*
 
@@ -12,6 +13,7 @@ import kotlinx.coroutines.*
 class FileRepository(
     private val fileDao: FileMetadataDao,
     private val scanner: FileSystemScanner,
+    private val fileProvider: FileProvider,
     private val repositoryScope: CoroutineScope
 ) {
     /**
@@ -99,7 +101,29 @@ class FileRepository(
      * Returns the base path currently being scanned.
      */
     fun getScannedPath(): String {
-        return scanner.getScannedPath()
+        return fileProvider.getRootPath()
+    }
+
+    /**
+     * Lists files from the OS in real-time and enriches them with tag data from the DB.
+     * @param path The directory path to list.
+     */
+    fun getRealTimeFilesWithTags(path: String): Flow<List<FileWithTags>> = flow {
+        // 1. Get real-time file list from the OS
+        val realFiles = fileProvider.listFiles(path)
+        
+        // 2. Map files to FileWithTags by looking up tags in the DB for each file
+        // Since we want this to be reactive to tag changes, we combine it with tag xref flows
+        // For simplicity and performance in a list, we'll fetch the current tags for these paths
+        val filesWithTags = realFiles.map { file ->
+            val tags = fileDao.getXRefsForFile(file.path).mapNotNull { xref ->
+                // This is a bit heavy, in a real app we might want a more efficient join
+                // but for now it satisfies the requirement of combining OS and DB.
+                fileDao.getAllTags().firstOrNull()?.find { it.id == xref.tagId }
+            }
+            FileWithTags(file, tags)
+        }
+        emit(filesWithTags)
     }
 
     // --- Tag Operations ---
