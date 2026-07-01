@@ -13,4 +13,5 @@ sealed class Screen(val title: String) {
     data object Todo : Screen("Todo Lists")
     data object CharacterInteraction : Screen("Chat with AI")    
     data object AdvancedLlmSettings : Screen("Advanced LLM Settings")
+    data object ThemeMatching : Screen("Theme Matching")
 }

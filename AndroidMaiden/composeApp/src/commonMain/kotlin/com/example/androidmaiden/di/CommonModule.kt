@@ -3,6 +3,8 @@ package com.example.androidmaiden.di
 import com.example.androidmaiden.data.network.LlmService
 import com.example.androidmaiden.data.network.LlmServiceImpl
 import com.example.androidmaiden.data.repository.*
+import com.example.androidmaiden.domain.themematching.repository.*
+import com.example.androidmaiden.data.themematching.repository.*
 import com.example.androidmaiden.presentation.viewmodel.*
 import com.example.androidmaiden.util.*
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +29,7 @@ val commonModule = module {
     single<FileClearRepository> { 
         FileClearRepositoryImpl(get(), get(), "/tmp/trash") // Trash dir should be platform-specific in a real app
     }
+    single<ThemeMatchingRepository> { ThemeMatchingRepositoryImpl() }
 
     // 3. Provide the ViewModels
     factory { PersistentFileViewModel(get()) }
@@ -37,6 +40,7 @@ val commonModule = module {
     factory { TodoViewModel() }
     factory { CharacterInteractionViewModel(get(), get(), get()) } // Pass ChatRepository
     factory { AdvancedLlmSettingsViewModel(get(), get(), get()) } // Pass LlmService
+    factory { ThemeMatchingViewModel(get()) }
     single { SettingsViewModel(get()) }
 
     // 4. Provide LlmService

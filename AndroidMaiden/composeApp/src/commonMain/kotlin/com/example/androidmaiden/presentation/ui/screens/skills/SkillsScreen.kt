@@ -49,7 +49,8 @@ fun SkillsScreen(onNavigate: (Screen) -> Unit = {}) {
             3,
             stringResource(id = "skills_theme_title"),
             stringResource(id = "skills_theme_desc"),
-            Icons.Default.Palette
+            Icons.Default.Palette,
+            Screen.ThemeMatching
         ),
         Feature(
             4,
