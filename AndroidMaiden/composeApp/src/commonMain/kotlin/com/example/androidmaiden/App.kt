@@ -16,6 +16,7 @@ import com.example.androidmaiden.presentation.ui.screens.fileSystem.classify.*
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.clean.*
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.organize.*
 import com.example.androidmaiden.presentation.ui.screens.interaction.*
+import com.example.androidmaiden.presentation.ui.screens.hardware.HardwareScreen
 import com.example.androidmaiden.presentation.ui.screens.settings.llm.*
 import com.example.androidmaiden.presentation.ui.components.*
 import com.example.androidmaiden.presentation.ui.theme.*
@@ -166,6 +167,10 @@ private fun AppScreenContent(
         })
 
         is Screen.ThemeMatching -> ThemeMatchingScreen(onBack = {
+            navViewModel.navigateTo(Screen.Skills)
+        })
+
+        is Screen.Hardware -> HardwareScreen(onBack = {
             navViewModel.navigateTo(Screen.Skills)
         })
     }

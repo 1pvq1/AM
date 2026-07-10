@@ -208,8 +208,8 @@ private fun rememberSkillTreeNodes(): List<SkillNodeV2> {
                 x = 0.20f,
                 y = 0.20f,
                 color = SkillTreeColors.System,
-                screen = null,
-                isUnlocked = false,
+                screen = Screen.Hardware,
+                isUnlocked = true,
                 branch = "System"
             ),
             SkillNodeV2(

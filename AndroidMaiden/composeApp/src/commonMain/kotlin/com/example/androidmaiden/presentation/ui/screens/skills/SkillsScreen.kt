@@ -69,7 +69,8 @@ fun SkillsScreen(onNavigate: (Screen) -> Unit = {}) {
             6,
             stringResource(id = "skills_hw_mgmt_title"),
             stringResource(id = "skills_hw_mgmt_desc"),
-            Icons.Default.Hardware
+            Icons.Default.Hardware,
+            Screen.Hardware
         )
     )
 

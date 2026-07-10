@@ -14,4 +14,5 @@ sealed class Screen(val title: String) {
     data object CharacterInteraction : Screen("Chat with AI")    
     data object AdvancedLlmSettings : Screen("Advanced LLM Settings")
     data object ThemeMatching : Screen("Theme Matching")
+    data object Hardware : Screen("Hardware Monitor")
 }

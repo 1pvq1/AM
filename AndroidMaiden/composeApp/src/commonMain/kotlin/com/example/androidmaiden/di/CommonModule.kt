@@ -5,6 +5,8 @@ import com.example.androidmaiden.data.network.LlmServiceImpl
 import com.example.androidmaiden.data.repository.*
 import com.example.androidmaiden.domain.themematching.repository.*
 import com.example.androidmaiden.data.themematching.repository.*
+import com.example.androidmaiden.domain.hardware.repository.HardwareRepository
+import com.example.androidmaiden.data.hardware.repository.HardwareRepositoryImpl
 import com.example.androidmaiden.presentation.viewmodel.*
 import com.example.androidmaiden.util.*
 import kotlinx.coroutines.CoroutineScope
@@ -30,6 +32,7 @@ val commonModule = module {
         FileClearRepositoryImpl(get(), get(), "/tmp/trash") // Trash dir should be platform-specific in a real app
     }
     single<ThemeMatchingRepository> { ThemeMatchingRepositoryImpl() }
+    single<HardwareRepository> { HardwareRepositoryImpl() }
 
     // 3. Provide the ViewModels
     factory { PersistentFileViewModel(get()) }
@@ -41,6 +44,7 @@ val commonModule = module {
     factory { CharacterInteractionViewModel(get(), get(), get()) } // Pass ChatRepository
     factory { AdvancedLlmSettingsViewModel(get(), get(), get()) } // Pass LlmService
     factory { ThemeMatchingViewModel(get()) }
+    factory { HardwareViewModel(get()) }
     single { SettingsViewModel(get()) }
 
     // 4. Provide LlmService

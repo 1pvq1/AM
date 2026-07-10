@@ -33,6 +33,17 @@
     <string name="skills_hw_mgmt_title">Hardware Management</string>
     <string name="skills_hw_mgmt_desc">Identify, maintain, configure, detect hardware</string>
 
+    <!-- Hardware Monitor Page -->
+    <string name="hardware_monitor_title">Hardware Monitor</string>
+    <string name="hardware_stress_test_title">STRESS TEST CONTROL</string>
+    <string name="hardware_stress_test_desc">Simulate heavy computational load to test thermal stability and power consumption.</string>
+    <string name="hardware_start_stress">START STRESS</string>
+    <string name="hardware_stop_stress">STOP STRESS</string>
+    <string name="hardware_stress_active">STRESS ACTIVE: %1$.1fs</string>
+    <string name="hardware_duration_10s">10S</string>
+    <string name="hardware_duration_30s">30S</string>
+    <string name="hardware_duration_60s">60S</string>
+
     <!-- Character Interaction Page -->
     <string name="character_interaction">Character Interaction</string>
     <string name="switch_view">Switch View</string>
