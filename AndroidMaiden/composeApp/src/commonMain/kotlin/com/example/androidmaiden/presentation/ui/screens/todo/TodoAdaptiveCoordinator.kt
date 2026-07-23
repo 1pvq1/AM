@@ -2,8 +2,9 @@ package com.example.androidmaiden.presentation.ui.screens.todo
 
 import androidx.compose.runtime.Composable
 import com.example.androidmaiden.domain.model.TodoItem
-import com.example.androidmaiden.presentation.ui.adaptive.WindowSizeCategory
-import com.example.androidmaiden.presentation.ui.adaptive.WindowSizeClass
+import com.example.androidmaiden.presentation.ui.adaptive.*
+import com.example.androidmaiden.presentation.ui.theme.AppTheme
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * The Adaptive Coordinator for the Todo screen.
@@ -36,5 +37,42 @@ fun TodoAdaptiveCoordinator(
         onStartEdit = onStartEdit,
         onCancelEdit = onCancelEdit,
         onUpdateItem = onUpdateItem
+    )
+}
+
+@Preview(name = "Compact", showBackground = true)
+@Composable
+fun TodoAdaptiveCoordinatorCompactPreview() {
+    AppTheme {
+        TodoAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Compact)
+    }
+}
+
+@Preview(name = "Wide", showBackground = true)
+@Composable
+fun TodoAdaptiveCoordinatorWidePreview() {
+    AppTheme {
+        TodoAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Expanded)
+    }
+}
+
+@Composable
+private fun TodoAdaptiveCoordinatorPreviewHelper(widthCategory: WindowSizeCategory) {
+    val sampleTodos = listOf(
+        TodoItem(1, "Buy milk", false),
+        TodoItem(2, "Learn Compose", true)
+    )
+    TodoAdaptiveCoordinator(
+        windowSizeClass = WindowSizeClass(widthCategory, WindowSizeCategory.Medium),
+        todoItems = sampleTodos,
+        newTodoText = "",
+        itemToEdit = null,
+        onNewTextChanged = { },
+        onAddItem = { },
+        onToggleChecked = { _, _ -> },
+        onDeleteItem = { },
+        onStartEdit = { },
+        onCancelEdit = { },
+        onUpdateItem = { _, _ -> }
     )
 }

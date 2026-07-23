@@ -6,6 +6,8 @@ import com.example.androidmaiden.data.network.LlmProvider
 import com.example.androidmaiden.domain.model.ChatMessage
 import com.example.androidmaiden.domain.model.ChatViewMode
 import com.example.androidmaiden.presentation.ui.adaptive.*
+import com.example.androidmaiden.presentation.ui.theme.AppTheme
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * The Adaptive Coordinator for the Character Interaction screen.
@@ -78,5 +80,65 @@ fun CharacterInteractionAdaptiveCoordinator(
         onModelClick = onModelClick,
         onDismissModelPicker = onDismissModelPicker,
         tokenUsage = tokenUsage
+    )
+}
+
+@Preview(name = "Compact", showBackground = true)
+@Composable
+fun CharacterInteractionAdaptiveCoordinatorCompactPreview() {
+    AppTheme {
+        CharacterInteractionAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Compact)
+    }
+}
+
+@Preview(name = "Medium", showBackground = true)
+@Composable
+fun CharacterInteractionAdaptiveCoordinatorMediumPreview() {
+    AppTheme {
+        CharacterInteractionAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Medium)
+    }
+}
+
+@Preview(name = "Expanded", showBackground = true)
+@Composable
+fun CharacterInteractionAdaptiveCoordinatorExpandedPreview() {
+    AppTheme {
+        CharacterInteractionAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Expanded)
+    }
+}
+
+@Composable
+private fun CharacterInteractionAdaptiveCoordinatorPreviewHelper(widthCategory: WindowSizeCategory) {
+    CharacterInteractionAdaptiveCoordinator(
+        windowSizeClass = WindowSizeClass(widthCategory, WindowSizeCategory.Medium),
+        isFullScreen = false,
+        onFullScreenToggle = { },
+        viewMode = ChatViewMode.REGULAR,
+        onViewModeChange = { },
+        chatHistory = emptyList(),
+        isSending = false,
+        allSessions = emptyList(),
+        selectedSessionId = null,
+        onSessionSelect = { },
+        onCreateNewSession = { },
+        onDeleteSession = { },
+        onRenameSession = { },
+        onPinSession = { },
+        text = "Preview text",
+        onTextChange = { },
+        onSendMessage = { },
+        selectedProvider = null,
+        onProviderClick = { },
+        showProviderPicker = false,
+        availableProviders = emptyList(),
+        onProviderSelect = { },
+        onDismissPicker = { },
+        selectedModel = null,
+        availableModels = emptyList(),
+        onModelSelect = { },
+        showModelPicker = false,
+        onModelClick = { },
+        onDismissModelPicker = { },
+        tokenUsage = 0.5f
     )
 }

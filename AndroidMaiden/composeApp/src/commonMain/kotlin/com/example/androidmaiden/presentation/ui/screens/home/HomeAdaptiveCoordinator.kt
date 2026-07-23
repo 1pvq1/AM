@@ -3,6 +3,8 @@ package com.example.androidmaiden.presentation.ui.screens.home
 import androidx.compose.runtime.Composable
 import com.example.androidmaiden.presentation.ui.adaptive.*
 import com.example.androidmaiden.presentation.ui.features.character.CharacterLayout
+import com.example.androidmaiden.presentation.ui.theme.AppTheme
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * The Adaptive Coordinator for the Home screen.
@@ -28,5 +30,41 @@ fun HomeAdaptiveCoordinator(
         characterLayout = characterLayout,
         onCharacterLayoutChange = onCharacterLayoutChange,
         dialogText = dialogText
+    )
+}
+
+@Preview(name = "Compact", showBackground = true)
+@Composable
+fun HomeAdaptiveCoordinatorCompactPreview() {
+    AppTheme {
+        HomeAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Compact)
+    }
+}
+
+@Preview(name = "Medium", showBackground = true)
+@Composable
+fun HomeAdaptiveCoordinatorMediumPreview() {
+    AppTheme {
+        HomeAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Medium)
+    }
+}
+
+@Preview(name = "Expanded", showBackground = true)
+@Composable
+fun HomeAdaptiveCoordinatorExpandedPreview() {
+    AppTheme {
+        HomeAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Expanded)
+    }
+}
+
+@Composable
+private fun HomeAdaptiveCoordinatorPreviewHelper(widthCategory: WindowSizeCategory) {
+    HomeAdaptiveCoordinator(
+        windowSizeClass = WindowSizeClass(widthCategory, WindowSizeCategory.Medium),
+        showCharacterDialog = true,
+        onShowCharacterDialogChange = { },
+        characterLayout = CharacterLayout.Horizontal,
+        onCharacterLayoutChange = { },
+        dialogText = "Hello from Preview!"
     )
 }

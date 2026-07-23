@@ -1,14 +1,33 @@
 package com.example.androidmaiden.presentation.ui.screens.settings
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.androidmaiden.platform.stringResource
 import com.example.androidmaiden.presentation.ui.adaptive.LocalWindowSizeClass
 import com.example.androidmaiden.presentation.ui.theme.core.AppThemeType
+import com.example.androidmaiden.presentation.ui.theme.core.ButtonDisplayStyle
 import com.example.androidmaiden.presentation.ui.theme.core.ThemeMode
+import com.example.androidmaiden.presentation.viewmodel.AdvancedLlmSettingsUiState
 import com.example.androidmaiden.presentation.viewmodel.AdvancedLlmSettingsViewModel
 import com.example.androidmaiden.presentation.viewmodel.SettingsViewModel
 import com.example.androidmaiden.presentation.viewmodel.rememberAdvancedLlmSettingsViewModel
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+
+/**
+ * Enum representing different sections of the settings.
+ */
+enum class SettingsSection(val titleResId: String, val icon: ImageVector) {
+    APPEARANCE("settings_appearance_title", Icons.Default.Palette),
+    LANGUAGE("settings_language_title", Icons.Default.Language),
+    CHAT("settings_chat_personalization_title", Icons.Default.Forum),
+    NETWORK("settings_network_title", Icons.Default.NetworkCheck),
+    LLM("settings_llm_title", Icons.Default.SmartToy),
+    NOTIFICATIONS("settings_notifications_title", Icons.Default.Notifications),
+    ABOUT("settings_about_title", Icons.Default.Info)
+}
 
 /**
  * Enum representing supported application languages.
@@ -49,10 +68,14 @@ fun SettingsScreen(
 
     val networkUiState by advancedLlmViewModel.uiState.collectAsState()
     
+    var selectedSection by remember { mutableStateOf(SettingsSection.APPEARANCE) }
+    
     val windowSizeClass = LocalWindowSizeClass.current
 
     SettingsAdaptiveCoordinator(
         windowSizeClass = windowSizeClass,
+        selectedSection = selectedSection,
+        onSectionSelect = { selectedSection = it },
         themeMode = themeMode,
         onThemeModeChange = settingsViewModel::setThemeMode,
         themeType = themeType,
@@ -72,5 +95,34 @@ fun SettingsScreen(
         checkOnlineConnection = advancedLlmViewModel::checkOnlineConnection,
         checkLocalLlmConnection = advancedLlmViewModel::checkLocalLlmConnection,
         onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SettingsScreenPreview() {
+    SettingsContent(
+        isWide = true,
+        selectedSection = SettingsSection.APPEARANCE,
+        onSectionSelect = { },
+        themeMode = ThemeMode.SYSTEM,
+        onThemeModeChange = { },
+        themeType = AppThemeType.DEFAULT,
+        onThemeTypeChange = { },
+        useDynamicColor = true,
+        onDynamicColorChange = { },
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_ONLY,
+        onButtonDisplayStyleChange = { },
+        apiKey = "preview-api-key",
+        onApiKeyChange = { },
+        localLlmAddress = "http://localhost:1234/v1",
+        onLocalLlmAddressChange = { },
+        useMatureMarkdown = true,
+        onMatureMarkdownToggle = { },
+        networkUiState = AdvancedLlmSettingsUiState(),
+        onOnlineCheckUrlChange = { },
+        checkOnlineConnection = { },
+        checkLocalLlmConnection = { },
+        onNavigateToAdvancedLlmSettings = { }
     )
 }
