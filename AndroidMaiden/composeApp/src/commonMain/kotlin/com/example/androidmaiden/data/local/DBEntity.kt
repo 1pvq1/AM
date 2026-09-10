@@ -1,12 +1,14 @@
 package com.example.androidmaiden.data.local
 
 import androidx.room.*
+import com.example.androidmaiden.domain.model.*
 
 /**
  * The "Shadow" Database Entity representing a file or folder on the system.
  * Updated to support rich media metadata and deep-scan status.
  */
 @Entity(tableName = "file_metadata")
+@OptIn(kotlin.time.ExperimentalTime::class)
 data class FileMetadata(
     @PrimaryKey val path: String,     // Absolute path is the unique ID
     val name: String,            // Physical file name
@@ -34,6 +36,49 @@ data class FileMetadata(
 ) {
     val extension: String get() = name.substringAfterLast('.', "").lowercase()
     val isFile: Boolean get() = !isDirectory
+
+    fun toDomain(): FileItem = FileItem(
+        path = path,
+        name = name,
+        isDirectory = isDirectory,
+        lastModified = lastModified,
+        size = size,
+        parentPath = parentPath,
+        mimeType = mimeType,
+        duration = duration,
+        artist = artist,
+        album = album,
+        bitrate = bitrate,
+        width = width,
+        height = height,
+        excerptPath = excerptPath,
+        metadataStatus = metadataStatus,
+        isFavorite = isFavorite,
+        isTrash = isTrash,
+        createdAt = kotlin.time.Instant.fromEpochMilliseconds(lastModified)
+    )
+
+    companion object {
+        fun fromDomain(item: FileItem): FileMetadata = FileMetadata(
+            path = item.path,
+            name = item.name,
+            isDirectory = item.isDirectory,
+            lastModified = item.lastModified,
+            size = item.size,
+            parentPath = item.parentPath,
+            mimeType = item.mimeType,
+            duration = item.duration,
+            artist = item.artist,
+            album = item.album,
+            bitrate = item.bitrate,
+            width = item.width,
+            height = item.height,
+            excerptPath = item.excerptPath,
+            metadataStatus = item.metadataStatus,
+            isFavorite = item.isFavorite,
+            isTrash = item.isTrash
+        )
+    }
 }
 
 @Entity(tableName = "tags")
@@ -41,7 +86,21 @@ data class Tag(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
     val colorHex: String // e.g., "#FF0000"
-)
+) {
+    fun toDomain(): com.example.androidmaiden.domain.model.Tag = com.example.androidmaiden.domain.model.Tag(
+        id = id,
+        name = name,
+        colorHex = colorHex
+    )
+
+    companion object {
+        fun fromDomain(item: com.example.androidmaiden.domain.model.Tag): Tag = Tag(
+            id = item.id,
+            name = item.name,
+            colorHex = item.colorHex
+        )
+    }
+}
 
 @Entity(
     tableName = "file_tag_xref",
@@ -77,7 +136,9 @@ data class ChatSession(
     val lastMessageAt: Long,
     val providerId: String? = null,
     val isPinned: Boolean = false
-)
+) {
+    // Session mapping is handled manually in ViewModel or UseCase for now
+}
 
 /**
  * Entity representing a single message in a chat session.
@@ -99,7 +160,12 @@ data class ChatMessageEntity(
     val message: String,
     val sender: String, // USER or CHARACTER
     val timestamp: Long
-)
+) {
+    fun toDomain(): ChatMessage = ChatMessage(
+        message = message,
+        sender = if (sender == "USER") Sender.USER else Sender.CHARACTER
+    )
+}
 
 data class FileWithTags(
     @Embedded val file: FileMetadata,
@@ -109,7 +175,12 @@ data class FileWithTags(
         associateBy = Junction(FileTagXRef::class, parentColumn = "path", entityColumn = "tagId")
     )
     val tags: List<Tag>
-)
+) {
+    fun toDomain(): com.example.androidmaiden.domain.model.FileWithTags = com.example.androidmaiden.domain.model.FileWithTags(
+        file = file.toDomain(),
+        tags = tags.map { it.toDomain() }
+    )
+}
 
 data class TagWithFiles(
     @Embedded val tag: Tag,
@@ -129,4 +200,24 @@ data class TrashEntry(
     val fileName: String,
     val size: Long,
     val isDirectory: Boolean
-)
+) {
+    fun toDomain(): TrashRecord = TrashRecord(
+        originalPath = originalPath,
+        trashPath = trashPath,
+        deletedAt = deletedAt,
+        fileName = fileName,
+        size = size,
+        isDirectory = isDirectory
+    )
+
+    companion object {
+        fun fromDomain(item: TrashRecord): TrashEntry = TrashEntry(
+            originalPath = item.originalPath,
+            trashPath = item.trashPath,
+            deletedAt = item.deletedAt,
+            fileName = item.fileName,
+            size = item.size,
+            isDirectory = item.isDirectory
+        )
+    }
+}

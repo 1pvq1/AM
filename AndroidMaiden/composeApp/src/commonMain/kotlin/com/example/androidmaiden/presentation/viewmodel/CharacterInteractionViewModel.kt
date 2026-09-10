@@ -2,19 +2,18 @@ package com.example.androidmaiden.presentation.viewmodel
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewModelScope
-import com.example.androidmaiden.domain.model.ChatMessage as DomainChatMessage
+import com.example.androidmaiden.core.experimental.time.TimeProvider
 import com.example.androidmaiden.domain.model.ChatViewMode
 import com.example.androidmaiden.domain.model.Sender
 import com.example.androidmaiden.data.network.*
 import com.example.androidmaiden.data.repository.*
 import com.example.androidmaiden.data.local.ChatSession
+import com.example.androidmaiden.domain.model.ChatMessage
+import com.example.androidmaiden.domain.service.LlmService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlin.time.ExperimentalTime
-import kotlin.time.Clock
-
 
 /**
  * ViewModel for managing the character interaction screen state and logic.
@@ -23,6 +22,7 @@ import kotlin.time.Clock
 class CharacterInteractionViewModel(
     private val settingsRepository: SettingsRepository,
     private val chatRepository: ChatRepository,
+    private val timeProvider: TimeProvider,
     private val llmService: LlmService? = null
 ) : BaseViewModel() {
     
@@ -47,8 +47,8 @@ class CharacterInteractionViewModel(
     var showProviderPicker by mutableStateOf(false)
         private set
 
-    private val _chatHistory = mutableStateListOf<DomainChatMessage>()
-    val chatHistory: List<DomainChatMessage> get() = _chatHistory
+    private val _chatHistory = mutableStateListOf<ChatMessage>()
+    val chatHistory: List<ChatMessage> get() = _chatHistory
 
     val availableProviders = mutableStateListOf<LlmProvider>()
 
@@ -172,9 +172,8 @@ class CharacterInteractionViewModel(
     /**
      * Starts a new chat session.
      */
-    @OptIn(ExperimentalTime::class)
     fun createNewSession() {
-        val newId = "session_${Clock.System.now().toEpochMilliseconds()}"
+        val newId = "session_${timeProvider.nowMillis()}"
         currentSessionId = newId
     }
 
@@ -220,7 +219,7 @@ class CharacterInteractionViewModel(
     /**
      * Initializes the chat history with starting messages.
      */
-    fun initChat(initialMessages: List<DomainChatMessage>) {
+    fun initChat(initialMessages: List<ChatMessage>) {
         if (_chatHistory.isEmpty()) {
             _chatHistory.addAll(initialMessages)
         }
@@ -262,12 +261,7 @@ class CharacterInteractionViewModel(
                 chatRepository.saveMessage(currentSessionId, userText, Sender.USER)
 
                 // Prepare history for LLM
-                val historyForLlm = _chatHistory.map {
-                    ChatMessage(
-                        it.message,
-                        if (it.sender == Sender.USER) ChatSender.USER else ChatSender.CHARACTER
-                    )
-                }
+                val historyForLlm = _chatHistory.toList()
 
                 var fullResponse = ""
                 llmService?.generateContentStream(userText, historyForLlm)
@@ -286,7 +280,7 @@ class CharacterInteractionViewModel(
                              val index = _chatHistory.size - 1
                              _chatHistory[index] = lastMsg.copy(message = lastMsg.message + chunk)
                         } else {
-                             _chatHistory.add(DomainChatMessage(chunk, Sender.CHARACTER))
+                             _chatHistory.add(ChatMessage(chunk, Sender.CHARACTER))
                         }
                     } ?: run {
                     isSending = false

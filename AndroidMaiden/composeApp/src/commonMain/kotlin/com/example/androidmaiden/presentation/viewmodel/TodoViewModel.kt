@@ -1,14 +1,36 @@
 package com.example.androidmaiden.presentation.viewmodel
 
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewModelScope
+import com.example.androidmaiden.core.experimental.time.TimeProvider
+import com.example.androidmaiden.data.repository.TodoRepository
 import com.example.androidmaiden.domain.model.TodoItem
+import com.example.androidmaiden.domain.model.TodoPriority
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 // commonMain/viewmodel/TodoViewModel.kt
-class TodoViewModel : BaseViewModel() {
-    private val _items = mutableStateListOf<TodoItem>()
-    val items: List<TodoItem> get() = _items
+@OptIn(kotlin.time.ExperimentalTime::class)
+class TodoViewModel(
+    private val repository: TodoRepository,
+    private val timeProvider: TimeProvider,
+) : BaseViewModel() {
+    val items: StateFlow<List<TodoItem>> = repository.getAllTodos()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList(),
+        )
 
     var newText by mutableStateOf("")
+        private set
+
+    var selectedPriority by mutableStateOf(TodoPriority.MEDIUM)
+        private set
+
+    var selectedCategory by mutableStateOf<String?>(null)
         private set
 
     var itemToEdit by mutableStateOf<TodoItem?>(null)
@@ -18,31 +40,47 @@ class TodoViewModel : BaseViewModel() {
         newText = text
     }
 
+    fun onPriorityChanged(priority: TodoPriority) {
+        selectedPriority = priority
+    }
+
+    fun onCategoryChanged(category: String?) {
+        selectedCategory = category
+    }
+
     fun addItem() {
         if (newText.isNotBlank()) {
-            val nextId = (_items.maxOfOrNull { it.id } ?: 0L) + 1
-            _items.add(TodoItem(id = nextId, text = newText, isChecked = false))
-            newText = ""
+            viewModelScope.launch {
+                val newItem = TodoItem(
+                    text = newText,
+                    isChecked = false,
+                    category = selectedCategory,
+                    priority = selectedPriority,
+                    createdAt = timeProvider.now()
+                )
+                repository.insertTodo(newItem)
+                newText = ""
+            }
         }
     }
 
-    fun updateItem(item: TodoItem, newText: String) {
-        val index = _items.indexOfFirst { it.id == item.id }
-        if (index != -1) {
-            _items[index] = item.copy(text = newText)
+    fun updateItem(item: TodoItem, newText: String, category: String?, priority: TodoPriority) {
+        viewModelScope.launch {
+            repository.updateTodo(item.copy(text = newText, category = category, priority = priority))
+            itemToEdit = null
         }
-        itemToEdit = null
     }
 
     fun toggleChecked(item: TodoItem, checked: Boolean) {
-        val index = _items.indexOf(item)
-        if (index != -1) {
-            _items[index] = item.copy(isChecked = checked)
+        viewModelScope.launch {
+            repository.updateTodo(item.copy(isChecked = checked))
         }
     }
 
     fun deleteItem(item: TodoItem) {
-        _items.remove(item)
+        viewModelScope.launch {
+            repository.deleteTodo(item)
+        }
     }
 
     fun startEdit(item: TodoItem) {

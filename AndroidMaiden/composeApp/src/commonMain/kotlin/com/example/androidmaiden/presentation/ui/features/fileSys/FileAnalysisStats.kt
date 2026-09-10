@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.androidmaiden.presentation.ui.theme.core.*
 import com.example.androidmaiden.presentation.ui.theme.AppTheme
-import com.example.androidmaiden.util.*
+import com.example.androidmaiden.core.util.*
 import com.example.androidmaiden.presentation.viewmodel.FolderAnalysisStats
 import org.jetbrains.compose.ui.tooling.preview.Preview
 

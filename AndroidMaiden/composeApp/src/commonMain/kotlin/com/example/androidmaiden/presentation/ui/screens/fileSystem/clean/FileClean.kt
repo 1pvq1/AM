@@ -12,9 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.androidmaiden.data.local.*
 import com.example.androidmaiden.domain.model.*
-import com.example.androidmaiden.util.*
+import com.example.androidmaiden.core.util.*
 import com.example.androidmaiden.presentation.viewmodel.FileClearViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -103,7 +102,7 @@ fun FileCleanPage(onBack: () -> Unit) {
                 }
             } else {
                 items(stats.trashEntries) { entry ->
-                    TrashItem(
+                    TrashItemRow(
                         entry = entry,
                         onRestore = { vm.restoreFromTrash(entry.trashPath) },
                         onDelete = { vm.deletePermanently(entry.trashPath) }
@@ -156,7 +155,7 @@ fun CleanupActionCard(title: String, subtitle: String, icon: ImageVector, onClic
  * Item representing a file in the recycle bin.
  */
 @Composable
-fun TrashItem(entry: TrashEntry, onRestore: () -> Unit, onDelete: () -> Unit) {
+fun TrashItemRow(entry: TrashRecord, onRestore: () -> Unit, onDelete: () -> Unit) {
     ListItem(
         headlineContent = { Text(entry.fileName) },
         supportingContent = { Text("Deleted from: ${entry.originalPath}") },

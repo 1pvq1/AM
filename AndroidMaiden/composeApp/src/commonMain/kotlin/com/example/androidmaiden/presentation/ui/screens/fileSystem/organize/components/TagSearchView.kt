@@ -14,9 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.androidmaiden.data.local.*
-import com.example.androidmaiden.util.formatSize
-import com.example.androidmaiden.util.formatDateTime
+import com.example.androidmaiden.domain.model.*
+import com.example.androidmaiden.core.util.formatSize
+import com.example.androidmaiden.core.util.formatDateTime
 
 /**
  * View showing search results for files and allowing tags to be added.
@@ -25,8 +25,8 @@ import com.example.androidmaiden.util.formatDateTime
 fun TagSearchView(
     query: String,
     onQueryChange: (String) -> Unit,
-    searchResults: List<FileMetadata>,
-    onAddTagToFile: (FileMetadata, Tag) -> Unit,
+    searchResults: List<FileItem>,
+    onAddTagToFile: (FileItem, Tag) -> Unit,
     availableTags: List<Tag>
 ) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
@@ -54,10 +54,10 @@ fun TagSearchView(
  */
 @Composable
 fun FileTagCard(
-    file: FileMetadata,
+    file: FileItem,
     tags: List<Tag> = emptyList(),
     availableTags: List<Tag>,
-    onAddTagToFile: (FileMetadata, Tag) -> Unit,
+    onAddTagToFile: (FileItem, Tag) -> Unit,
     onClick: (() -> Unit)? = null
 ) {
     Card(

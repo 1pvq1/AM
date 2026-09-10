@@ -17,12 +17,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.androidmaiden.data.local.FileMetadata
 import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.ui.features.fileSys.ViewMode
-import com.example.androidmaiden.util.*
+import com.example.androidmaiden.core.util.*
 import com.example.androidmaiden.presentation.viewmodel.*
 import com.example.androidmaiden.presentation.ui.components.*
+import io.ktor.http.content.PartData
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.ExperimentalTime
@@ -46,7 +46,7 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
     val searchResults by vm.searchResults.collectAsState()
 
     var isSearchActive by remember { mutableStateOf(false) }
-    var previewFile by remember { mutableStateOf<FileMetadata?>(null) }
+    var previewFile by remember { mutableStateOf<FileItem?>(null) }
 
     // 2. Trigger incremental sync once on startup
     LaunchedEffect(Unit) {
@@ -224,7 +224,7 @@ private fun SearchTopBar(
  * View showing the list of search results.
  */
 @Composable
-private fun SearchResultsView(results: List<FileMetadata>, onFileClick: (FileMetadata) -> Unit) {
+private fun SearchResultsView(results: List<FileItem>, onFileClick: (FileItem) -> Unit) {
     if (results.isEmpty()) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("No results found", color = MaterialTheme.colorScheme.outline)
@@ -382,7 +382,7 @@ private fun FileCategoryStrip(category: FileCategory, onClick: () -> Unit) {
 @Composable
 private fun FileCategoryCard(category: FileCategory, onClick: () -> Unit) {
     val description = if (category.count != null && category.totalSizeMb != null) {
-        "${category.count} files • ${category.totalSizeMb} MB"
+        "${category.count} files �?${category.totalSizeMb} MB"
     } else {
         "Calculating..."
     }

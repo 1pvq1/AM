@@ -18,6 +18,8 @@ import com.example.androidmaiden.presentation.ui.features.character.*
 import com.example.androidmaiden.presentation.ui.features.panel.PanelOfTask
 import com.example.androidmaiden.presentation.ui.theme.core.LocalAppExtraShapes
 import com.example.androidmaiden.platform.stringResource
+import com.example.androidmaiden.presentation.viewmodel.TodoViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * The Stateless UI for the Home screen.
@@ -134,6 +136,7 @@ fun CharacterSection(
 
 @Composable
 fun TaskSection() {
+    val viewModel: TodoViewModel = koinViewModel()
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(id = "home_daily_tasks"),
@@ -141,7 +144,7 @@ fun TaskSection() {
             modifier = Modifier.padding(bottom = 8.dp)
         )
         Card(modifier = Modifier.fillMaxWidth()) {
-            PanelOfTask()
+            PanelOfTask(viewModel = viewModel)
         }
     }
 }

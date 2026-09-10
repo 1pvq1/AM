@@ -1,5 +1,6 @@
-package com.example.androidmaiden.data.network
+package com.example.androidmaiden.domain.service
 
+import com.example.androidmaiden.domain.model.ChatMessage
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -21,15 +22,4 @@ interface LlmService {
      * Validates if the current configuration (API key, URL, etc.) is working.
      */
     suspend fun validate(): Boolean
-}
-
-data class ChatMessage(
-    val message: String,
-    val sender: ChatSender,
-    val timestamp: Long = 0L // Placeholder for now
-)
-
-enum class ChatSender {
-    USER,
-    CHARACTER
 }

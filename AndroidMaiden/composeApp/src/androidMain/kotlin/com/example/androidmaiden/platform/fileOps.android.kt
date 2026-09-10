@@ -2,7 +2,7 @@ package com.example.androidmaiden.platform
 
 import android.media.MediaMetadataRetriever
 import com.example.androidmaiden.domain.model.*
-import com.example.androidmaiden.util.formatDuration
+import com.example.androidmaiden.core.util.formatDuration
 import java.io.File
 import kotlin.io.path.extension
 import kotlin.time.Clock
@@ -35,10 +35,10 @@ private fun extractQuickMetadata(file: File): String {
         if (isVideo) {
             val w = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)
             val h = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)
-            if (w != null && h != null) "${w}x${h} â€¢ $durationText" else durationText
+            if (w != null && h != null) "${w}x${h} â€?$durationText" else durationText
         } else {
             val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
-            if (artist != null) "$artist â€¢ $durationText" else durationText
+            if (artist != null) "$artist â€?$durationText" else durationText
         }
     } catch (e: Exception) {
         "Media File"

@@ -4,6 +4,11 @@ import androidx.compose.runtime.Composable
 import com.example.androidmaiden.data.repository.SettingsRepository
 import kotlinx.coroutines.flow.StateFlow
 
+import androidx.lifecycle.ViewModel
+import com.example.androidmaiden.core.network.NetworkManager
+import com.example.androidmaiden.domain.service.HostResolver
+import com.example.androidmaiden.domain.service.LlmService
+
 data class AdvancedLlmSettingsUiState(
     val localLlmAddress: String = "http://127.0.0.1:1234",
     val localLlmStatus: String = "",
@@ -33,9 +38,10 @@ expect fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel
 
 expect class AdvancedLlmSettingsViewModel(
     settingsRepository: SettingsRepository,
-    hostResolver: com.example.androidmaiden.util.HostResolver,
-    llmService: com.example.androidmaiden.data.network.LlmService
-) {
+    hostResolver: HostResolver,
+    llmService: LlmService,
+    networkManager: NetworkManager
+) : ViewModel {
     val uiState: StateFlow<AdvancedLlmSettingsUiState>
 
     fun onLocalLlmAddressChange(address: String)

@@ -1,7 +1,40 @@
+//@file:OptIn(kotlin.time.ExperimentalTime::class)
 package com.example.androidmaiden.domain.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.androidmaiden.data.local.FileMetadata
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+
+/**
+ * Domain-level representation of a file or folder.
+ * Free from any database or network annotations.
+ */
+@OptIn(ExperimentalTime::class)
+data class FileItem (
+//    data class FileItem @OptIn(ExperimentalTime::class) constructor(
+    val path: String,
+    val name: String,
+    val isDirectory: Boolean,
+    val lastModified: Long,
+    val size: Long,
+    val parentPath: String,
+    val mimeType: String? = null,
+    val duration: Long? = null,
+    val artist: String? = null,
+    val album: String? = null,
+    val bitrate: Long? = null,
+    val width: Int? = null,
+    val height: Int? = null,
+    val excerptPath: String? = null,
+    val metadataStatus: Int = 0,
+    val isFavorite: Boolean = false,
+    val isTrash: Boolean = false,
+//    val createdAt: kotlin.time.Instant? = null
+    val createdAt: Instant? = null
+) {
+    val extension: String get() = name.substringAfterLast('.', "").lowercase()
+    val isFile: Boolean get() = !isDirectory
+}
 
 // Folder categories that display specific folder icons to distinguish them from the default folder icons
 enum class FolderType {
@@ -50,5 +83,5 @@ data class FileCategory(
     val type: String,
     val count: Int? = null,
     val totalSizeMb: Long? = null,
-    val files: List<FileMetadata> = emptyList() // Changed to use formal model
+    val files: List<FileItem> = emptyList()
 )

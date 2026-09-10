@@ -1,6 +1,7 @@
 package com.example.androidmaiden.data.network
 
-import com.example.androidmaiden.util.DefaultHostResolver
+import com.example.androidmaiden.data.util.DefaultHostResolver
+import com.example.androidmaiden.domain.model.Sender
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

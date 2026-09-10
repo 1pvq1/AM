@@ -1,20 +1,29 @@
 package com.example.androidmaiden.domain.model
 
-import com.example.androidmaiden.data.local.FileMetadata
-import com.example.androidmaiden.data.local.TrashEntry
-
 sealed class CleanupResult {
     object Success : CleanupResult()
     data class Error(val message: String) : CleanupResult()
     data class Loading(val progress: Float? = null) : CleanupResult()
 }
 
+/**
+ * Domain-level representation of a trash entry.
+ */
+data class TrashRecord(
+    val originalPath: String,
+    val trashPath: String,
+    val deletedAt: Long,
+    val fileName: String,
+    val size: Long,
+    val isDirectory: Boolean
+)
+
 data class CleanupStats(
-    val duplicateFiles: List<FileMetadata> = emptyList(),
-    val emptyFolders: List<FileMetadata> = emptyList(),
-    val uninstalledRemnants: List<FileMetadata> = emptyList(),
-    val appCacheFiles: List<FileMetadata> = emptyList(),
-    val trashEntries: List<TrashEntry> = emptyList()
+    val duplicateFiles: List<FileItem> = emptyList(),
+    val emptyFolders: List<FileItem> = emptyList(),
+    val uninstalledRemnants: List<FileItem> = emptyList(),
+    val appCacheFiles: List<FileItem> = emptyList(),
+    val trashEntries: List<TrashRecord> = emptyList()
 ) {
     val totalRedundantSize: Long get() = (duplicateFiles.sumOf { it.size } + 
                                        uninstalledRemnants.sumOf { it.size } + 

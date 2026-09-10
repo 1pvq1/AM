@@ -6,8 +6,9 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import com.example.androidmaiden.platform.*
-import com.example.androidmaiden.util.*
 import com.example.androidmaiden.presentation.ui.features.fileSys.ViewMode
+import com.example.androidmaiden.core.util.deprecated.SortMode
+import com.example.androidmaiden.core.util.deprecated.SortOrder
 
 /**
  * Composable providing file-related actions like changing view mode and sorting.

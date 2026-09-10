@@ -3,11 +3,10 @@ package com.example.androidmaiden.presentation.viewmodel
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.ktor.client.*
-import io.ktor.client.engine.okhttp.*
+import com.example.androidmaiden.core.network.NetworkManager
 import com.example.androidmaiden.data.repository.SettingsRepository
-import com.example.androidmaiden.util.HostResolver
-import com.example.androidmaiden.data.network.LlmService
+import com.example.androidmaiden.domain.service.HostResolver
+import com.example.androidmaiden.domain.service.LlmService
 import com.example.androidmaiden.data.network.ModelConfig
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -25,13 +24,13 @@ actual fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel 
 actual class AdvancedLlmSettingsViewModel actual constructor(
     private val settingsRepository: SettingsRepository,
     private val hostResolver: HostResolver,
-    private val llmService: LlmService
+    private val llmService: LlmService,
+    private val networkManager: NetworkManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AdvancedLlmSettingsUiState())
     actual val uiState = _uiState.asStateFlow()
 
-    private val client = HttpClient(OkHttp)
     private val json = Json { ignoreUnknownKeys = true }
 
     init {
@@ -61,7 +60,7 @@ actual class AdvancedLlmSettingsViewModel actual constructor(
             _uiState.update { it.copy(isCheckingLocalLlm = true, localLlmStatus = "", localHelpText = "") }
             try {
                 val resolvedAddress = hostResolver.resolve(_uiState.value.localLlmAddress)
-                val response = client.get(resolvedAddress.trimEnd('/') + "/models") {
+                val response = networkManager.getClient().get(resolvedAddress.trimEnd('/') + "/models") {
                     if (_uiState.value.localApiKey.isNotBlank()) {
                         header("Authorization", "Bearer ${_uiState.value.localApiKey}")
                     }
@@ -165,7 +164,7 @@ actual class AdvancedLlmSettingsViewModel actual constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isCheckingOnline = true, onlineCheckStatus = "") }
             try {
-                val response = client.get(_uiState.value.onlineCheckUrl)
+                val response = networkManager.checkConnection(_uiState.value.onlineCheckUrl)
                 _uiState.update {
                     it.copy(
                         isCheckingOnline = false,

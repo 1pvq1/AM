@@ -1,5 +1,7 @@
 package com.example.androidmaiden.data.network
 
+import com.example.androidmaiden.domain.model.*
+import com.example.androidmaiden.domain.service.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -32,7 +34,7 @@ internal fun LlmServiceImpl.generateOpenAiStream(
                     model = modelId,
                     messages = history.map {
                         OpenAiMessage(
-                            role = if (it.sender == ChatSender.USER) "user" else "assistant",
+                            role = if (it.sender == Sender.USER) "user" else "assistant",
                             content = it.message
                         )
                     } + OpenAiMessage(role = "user", content = prompt),

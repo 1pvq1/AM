@@ -1,99 +1,81 @@
 package com.example.androidmaiden.presentation.viewmodel
 
+import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import io.ktor.client.*
-import io.ktor.client.engine.java.*
+import com.example.androidmaiden.core.network.NetworkManager
 import com.example.androidmaiden.data.repository.SettingsRepository
-import io.ktor.client.statement.*
-import io.ktor.client.request.get
+import com.example.androidmaiden.domain.service.HostResolver
+import com.example.androidmaiden.domain.service.LlmService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-actual fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel {
-    val repository = koinInject<SettingsRepository>()
-    return remember { AdvancedLlmSettingsViewModel(repository) }
-}
+actual fun rememberAdvancedLlmSettingsViewModel(): AdvancedLlmSettingsViewModel = koinViewModel()
 
 actual class AdvancedLlmSettingsViewModel actual constructor(
-    private val settingsRepository: SettingsRepository
-) {
-
+    private val settingsRepository: SettingsRepository,
+    private val hostResolver: HostResolver,
+    private val llmService: LlmService,
+    private val networkManager: NetworkManager
+) : ViewModel() {
     private val viewModelScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val _uiState = MutableStateFlow(AdvancedLlmSettingsUiState())
     actual val uiState = _uiState.asStateFlow()
 
-    private val client = HttpClient(Java)
-
     init {
-        settingsRepository.localLlmAddress
-            .onEach { address ->
-                _uiState.update { it.copy(localLlmAddress = address) }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    actual fun onWebsiteUrlChange(url: String) {
-        _uiState.update { it.copy(websiteUrl = url) }
-    }
-
-    actual fun checkWebsiteConnectivity() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isCheckingWebsite = true, websiteStatus = "") }
-            try {
-                val response = client.get(_uiState.value.websiteUrl)
-                _uiState.update {
-                    it.copy(
-                        isCheckingWebsite = false,
-                        websiteStatus = "Successfully connected. Status: ${response.status}"
-                    )
-                }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isCheckingWebsite = false,
-                        websiteStatus = "Failed to connect: ${e.message}"
-                    )
-                }
-            }
-        }
+        // Basic sync for desktop
+        settingsRepository.localLlmAddress.onEach { v -> _uiState.update { it.copy(localLlmAddress = v) } }.launchIn(viewModelScope)
     }
 
     actual fun onLocalLlmAddressChange(address: String) {
-        _uiState.update { it.copy(localLlmAddress = address) }
-        viewModelScope.launch {
-            settingsRepository.saveLocalLlmAddress(address)
-        }
+        viewModelScope.launch { settingsRepository.saveLocalLlmAddress(address) }
     }
 
-    actual fun connectToLocalLlm() {
+    actual fun onLocalApiKeyChange(key: String) {
+        viewModelScope.launch { settingsRepository.saveLocalApiKey(key) }
+    }
+
+    actual fun checkLocalLlmConnection() {
+        // Logic similar to Android but simplified for desktop for now
+    }
+
+    actual fun onGeminiApiKeyChange(key: String) {
+        viewModelScope.launch { settingsRepository.saveGeminiApiKey(key) }
+    }
+
+    actual fun onOpenAiApiKeyChange(key: String) {
+        viewModelScope.launch { settingsRepository.saveOpenAiApiKey(key) }
+    }
+
+    actual fun onCustomProviderUrlChange(url: String) {
+        viewModelScope.launch { settingsRepository.saveCustomProviderUrl(url) }
+    }
+
+    actual fun onCustomProviderApiKeyChange(key: String) {
+        viewModelScope.launch { settingsRepository.saveCustomProviderApiKey(key) }
+    }
+
+    actual fun onOnlineCheckUrlChange(url: String) {
+        _uiState.update { it.copy(onlineCheckUrl = url) }
+    }
+
+    actual fun checkOnlineConnection() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isConnectingToLocalLlm = true, localLlmStatus = "") }
+            _uiState.update { it.copy(isCheckingOnline = true) }
             try {
-                val response = client.get(_uiState.value.localLlmAddress)
-                _uiState.update {
-                    it.copy(
-                        isConnectingToLocalLlm = false,
-                        localLlmStatus = "Successfully connected. Status: ${response.status}"
-                    )
-                }
+                networkManager.checkConnection(_uiState.value.onlineCheckUrl)
+                _uiState.update { it.copy(isCheckingOnline = false, onlineCheckStatus = "Connected") }
             } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isConnectingToLocalLlm = false,
-                        localLlmStatus = "Failed to connect: ${e.message}"
-                    )
-                }
+                _uiState.update { it.copy(isCheckingOnline = false, onlineCheckStatus = "Failed") }
             }
         }
     }
+
+    actual fun fetchAvailableModels() {}
+    actual fun toggleModelEnabled(modelId: String) {}
+    actual fun updateModelOrder(fromIndex: Int, toIndex: Int) {}
 }

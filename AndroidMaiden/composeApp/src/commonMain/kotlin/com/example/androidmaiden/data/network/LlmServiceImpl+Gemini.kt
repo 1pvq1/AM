@@ -1,5 +1,6 @@
 package com.example.androidmaiden.data.network
 
+import com.example.androidmaiden.domain.model.ChatMessage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

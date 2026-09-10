@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.androidmaiden.util.*
+import com.example.androidmaiden.core.util.*
 import com.example.androidmaiden.presentation.viewmodel.StorageStats
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -62,7 +62,7 @@ fun StorageSummaryHeader(stats: StorageStats) {
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    text = "${stats.fileCount} Files â€¢ ${stats.folderCount} Folders",
+                    text = "${stats.fileCount} Files â€?${stats.folderCount} Folders",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                 )

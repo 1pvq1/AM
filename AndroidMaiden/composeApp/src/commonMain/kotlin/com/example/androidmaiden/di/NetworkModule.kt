@@ -1,5 +1,6 @@
 package com.example.androidmaiden.di
 
+import com.example.androidmaiden.core.network.NetworkManager
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
@@ -21,4 +22,6 @@ val networkModule = module {
             }
         }
     }
+    
+    single { NetworkManager(get()) }
 }

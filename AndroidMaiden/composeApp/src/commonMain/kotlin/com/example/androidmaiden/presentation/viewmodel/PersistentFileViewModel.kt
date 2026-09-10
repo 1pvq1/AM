@@ -1,17 +1,16 @@
 package com.example.androidmaiden.presentation.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.example.androidmaiden.data.local.FileMetadata
+import com.example.androidmaiden.core.experimental.time.TimeProvider
 import com.example.androidmaiden.data.repository.FileRepository
 import com.example.androidmaiden.domain.model.FileCategory
-import com.example.androidmaiden.util.FileTypeUtils
-import com.example.androidmaiden.util.FileTypeUtils.getExtensionType
+import com.example.androidmaiden.domain.model.FileItem
+import com.example.androidmaiden.core.util.FileTypeUtils
+import com.example.androidmaiden.core.util.FileTypeUtils.getExtensionType
 import com.example.androidmaiden.presentation.ui.features.fileSys.ViewMode
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
-import kotlin.time.ExperimentalTime
 
 /**
  * Data class for basic storage usage statistics.
@@ -34,8 +33,10 @@ val initialCategories =
 /**
  * ViewModel for persistent file classification and management.
  */
-@OptIn(ExperimentalTime::class)
-class PersistentFileViewModel(private val repository: FileRepository) : BaseViewModel() {
+class PersistentFileViewModel(
+    private val repository: FileRepository,
+    private val timeProvider: TimeProvider
+) : BaseViewModel() {
 
     /**
      * Flow of the repository's sync status.
@@ -87,7 +88,7 @@ class PersistentFileViewModel(private val repository: FileRepository) : BaseView
      * Flow of search results from the repository.
      */
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val searchResults: StateFlow<List<FileMetadata>> = _searchQuery
+    val searchResults: StateFlow<List<FileItem>> = _searchQuery
         .debounce(300)
         .flatMapLatest { query ->
             if (query.length < 2) flowOf(emptyList())
@@ -169,7 +170,7 @@ class PersistentFileViewModel(private val repository: FileRepository) : BaseView
     /**
      * Processes raw metadata into categorized lists.
      */
-    private fun processMetadata(list: List<FileMetadata>): List<FileCategory> {
+    private fun processMetadata(list: List<FileItem>): List<FileCategory> {
         val allFilesOnly = list.filter { !it.isDirectory }
         val groups = allFilesOnly.groupBy { getExtensionType(it.name) }
 
@@ -185,7 +186,7 @@ class PersistentFileViewModel(private val repository: FileRepository) : BaseView
             )
         }
 
-        val nowMillis = Clock.System.now().toEpochMilliseconds()
+        val nowMillis = timeProvider.nowMillis()
         val sevenDaysAgo = nowMillis - 7.days.inWholeMilliseconds
         val largeFileThreshold = 50 * 1024 * 1024L
 

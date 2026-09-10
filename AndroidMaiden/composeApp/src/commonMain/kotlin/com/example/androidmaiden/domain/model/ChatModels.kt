@@ -3,7 +3,11 @@ package com.example.androidmaiden.domain.model
 /**
  * Data model for a single chat message.
  */
-data class ChatMessage(val message: String, val sender: Sender)
+data class ChatMessage(
+    val message: String,
+    val sender: Sender,
+    val timestamp: Long = 0L
+)
 
 /**
  * Enum representing the sender of a chat message.

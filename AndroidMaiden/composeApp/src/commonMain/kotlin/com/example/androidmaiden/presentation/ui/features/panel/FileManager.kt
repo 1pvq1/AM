@@ -7,8 +7,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.platform.*
-import com.example.androidmaiden.util.*
 import com.example.androidmaiden.presentation.ui.features.fileSys.ViewMode
+import com.example.androidmaiden.core.util.deprecated.SortMode
+import com.example.androidmaiden.core.util.deprecated.SortOrder
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**

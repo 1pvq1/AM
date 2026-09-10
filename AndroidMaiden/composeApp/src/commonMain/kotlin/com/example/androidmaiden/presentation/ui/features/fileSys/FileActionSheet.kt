@@ -11,7 +11,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.ui.icons.*
-import com.example.androidmaiden.util.*
+import com.example.androidmaiden.core.util.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**

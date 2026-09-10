@@ -1,3 +1,4 @@
+@file:OptIn(kotlin.time.ExperimentalTime::class)
 package com.example.androidmaiden.presentation.ui.screens.todo
 
 import androidx.compose.animation.AnimatedVisibility
@@ -15,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.domain.model.TodoItem
+import com.example.androidmaiden.domain.model.TodoPriority
+import com.example.androidmaiden.core.util.formatInstant
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -25,14 +28,18 @@ fun TodoContent(
     isWide: Boolean,
     todoItems: List<TodoItem>,
     newTodoText: String,
+    selectedPriority: TodoPriority,
+    selectedCategory: String?,
     itemToEdit: TodoItem?,
     onNewTextChanged: (String) -> Unit,
+    onPriorityChanged: (TodoPriority) -> Unit,
+    onCategoryChanged: (String?) -> Unit,
     onAddItem: () -> Unit,
     onToggleChecked: (TodoItem, Boolean) -> Unit,
     onDeleteItem: (TodoItem) -> Unit,
     onStartEdit: (TodoItem) -> Unit,
     onCancelEdit: () -> Unit,
-    onUpdateItem: (TodoItem, String) -> Unit
+    onUpdateItem: (TodoItem, String, String?, TodoPriority) -> Unit
 ) {
     val contentModifier = if (isWide) {
         Modifier.fillMaxSize().padding(horizontal = 32.dp).widthIn(max = 800.dp)
@@ -53,23 +60,65 @@ fun TodoContent(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            Row(
+            // Input Area
+            Card(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                OutlinedTextField(
-                    value = newTodoText,
-                    onValueChange = onNewTextChanged,
-                    label = { Text("New Task") },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(
-                    onClick = onAddItem,
-                    enabled = newTodoText.isNotBlank()
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Task")
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedTextField(
+                            value = newTodoText,
+                            onValueChange = onNewTextChanged,
+                            label = { Text("New Task") },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(
+                            onClick = onAddItem,
+                            enabled = newTodoText.isNotBlank()
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = "Add Task")
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Category (Simple text field for now)
+                        OutlinedTextField(
+                            value = selectedCategory ?: "",
+                            onValueChange = { onCategoryChanged(it.ifBlank { null }) },
+                            label = { Text("Category") },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true
+                        )
+
+                        // Priority Dropdown (Simplified)
+                        var expanded by remember { mutableStateOf(false) }
+                        Box {
+                            TextButton(onClick = { expanded = true }) {
+                                Text("Priority: ${selectedPriority.name}")
+                            }
+                            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                                TodoPriority.entries.forEach { priority ->
+                                    DropdownMenuItem(
+                                        text = { Text(priority.name) },
+                                        onClick = {
+                                            onPriorityChanged(priority)
+                                            expanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -77,6 +126,7 @@ fun TodoContent(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                // Grouping could be added here later if needed
                 itemsIndexed(todoItems, key = { _, item -> item.id }) { _, item ->
                     TodoListItem(
                         item = item,
@@ -93,7 +143,7 @@ fun TodoContent(
         EditTodoDialog(
             item = item,
             onDismiss = onCancelEdit,
-            onSave = { newText -> onUpdateItem(item, newText) }
+            onSave = onUpdateItem
         )
     }
 }
@@ -132,17 +182,43 @@ fun TodoListItem(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .horizontalScroll(rememberScrollState())
-                        .clickable(onClick = onEdit)
-                ) {
-                    Text(
-                        text = item.text,
-                        style = MaterialTheme.typography.bodyLarge,
-                        maxLines = 1
-                    )
+                Column(modifier = Modifier.weight(1f)) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .clickable(onClick = onEdit)
+                    ) {
+                        Text(
+                            text = item.text,
+                            style = MaterialTheme.typography.bodyLarge,
+                            maxLines = 1
+                        )
+                    }
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        item.category?.let {
+                            SuggestionChip(
+                                onClick = {},
+                                label = { Text(it, style = MaterialTheme.typography.labelSmall) }
+                            )
+                        }
+                        
+                        val priorityColor = when (item.priority) {
+                            TodoPriority.HIGH -> MaterialTheme.colorScheme.error
+                            TodoPriority.MEDIUM -> MaterialTheme.colorScheme.primary
+                            TodoPriority.LOW -> MaterialTheme.colorScheme.secondary
+                        }
+                        
+                        Text(
+                            text = item.priority.name,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = priorityColor
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -162,7 +238,7 @@ fun TodoListItem(
                         .padding(top = 8.dp, start = 48.dp)
                 ) {
                     Text(
-                        text = "Details: ${item.text}",
+                        text = "Details: ${item.text}\nCreated: ${formatInstant(item.createdAt)}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -193,25 +269,48 @@ fun TodoListItem(
 fun EditTodoDialog(
     item: TodoItem,
     onDismiss: () -> Unit,
-    onSave: (String) -> Unit
+    onSave: (TodoItem, String, String?, TodoPriority) -> Unit
 ) {
     var text by remember(item) { mutableStateOf(item.text) }
+    var category by remember(item) { mutableStateOf(item.category ?: "") }
+    var priority by remember(item) { mutableStateOf(item.priority) }
+    
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Edit Task") },
         text = {
-            OutlinedTextField(
-                value = text,
-                onValueChange = { text = it },
-                label = { Text("Task Description") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    label = { Text("Task Description") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                OutlinedTextField(
+                    value = category,
+                    onValueChange = { category = it },
+                    label = { Text("Category") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                Text("Priority")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TodoPriority.entries.forEach { p ->
+                        FilterChip(
+                            selected = priority == p,
+                            onClick = { priority = p },
+                            label = { Text(p.name) }
+                        )
+                    }
+                }
+            }
         },
         confirmButton = {
             Button(
                 onClick = {
                     if (text.isNotBlank()) {
-                        onSave(text)
+                        onSave(item, text, category.ifBlank { null }, priority)
                     }
                 }
             ) {
@@ -235,7 +334,12 @@ fun TodoListItemPreviewLight() {
     MaterialTheme(colorScheme = lightColorScheme()) {
         Surface {
             TodoListItem(
-                item = TodoItem(id = 1L, text = "This is a very long todo item that should be scrollable horizontally to see the full content", isChecked = false),
+                item = TodoItem(
+                    id = 1L,
+                    text = "This is a very long todo item that should be scrollable horizontally to see the full content",
+                    isChecked = false,
+                    createdAt = kotlin.time.Instant.fromEpochMilliseconds(0)
+                ),
                 onCheckedChange = {},
                 onDelete = {},
                 onEdit = {}
@@ -253,7 +357,12 @@ fun TodoListItemPreviewDark() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface {
             TodoListItem(
-                item = TodoItem(id = 1L, text = "This is a very long todo item that should be scrollable horizontally to see the full content", isChecked = true),
+                item = TodoItem(
+                    id = 1L,
+                    text = "This is a very long todo item that should be scrollable horizontally to see the full content",
+                    isChecked = true,
+                    createdAt = kotlin.time.Instant.fromEpochMilliseconds(0)
+                ),
                 onCheckedChange = {},
                 onDelete = {},
                 onEdit = {}
@@ -267,15 +376,22 @@ fun TodoListItemPreviewDark() {
 fun TodoPagePreview() {
     TodoContent(
         isWide = false,
-        todoItems = listOf(TodoItem(1L, "Task 1", false), TodoItem(2L, "Task 2", true)),
+        todoItems = listOf(
+            TodoItem(1L, "Task 1", false, createdAt = kotlin.time.Instant.fromEpochMilliseconds(0)),
+            TodoItem(2L, "Task 2", true, category = "Work", priority = TodoPriority.HIGH, createdAt = kotlin.time.Instant.fromEpochMilliseconds(0))
+        ),
         newTodoText = "",
+        selectedPriority = TodoPriority.MEDIUM,
+        selectedCategory = null,
         itemToEdit = null,
         onNewTextChanged = {},
+        onPriorityChanged = {},
+        onCategoryChanged = {},
         onAddItem = {},
         onToggleChecked = { _, _ -> },
         onDeleteItem = {},
         onStartEdit = {},
         onCancelEdit = {},
-        onUpdateItem = { _, _ -> }
+        onUpdateItem = { _, _, _, _ -> }
     )
 }

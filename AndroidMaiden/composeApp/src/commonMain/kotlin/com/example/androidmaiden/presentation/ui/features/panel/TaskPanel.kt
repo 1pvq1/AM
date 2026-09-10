@@ -9,15 +9,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.viewmodel.*
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * A panel displaying a summary of current tasks.
  */
-@Preview
 @Composable
-fun PanelOfTask(viewModel: TodoViewModel = remember { TodoViewModel() }) {
-    val tasks = viewModel.items
+fun PanelOfTask(viewModel: TodoViewModel) {
+    val tasks by viewModel.items.collectAsState()
     val previewTasks = tasks.take(3) // Only show the first few tasks as a preview
 
     Column(

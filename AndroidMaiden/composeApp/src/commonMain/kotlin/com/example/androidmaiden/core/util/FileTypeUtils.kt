@@ -1,4 +1,4 @@
-package com.example.androidmaiden.util
+package com.example.androidmaiden.core.util
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
@@ -8,6 +8,7 @@ import com.example.androidmaiden.data.local.FileMetadata
 import com.example.androidmaiden.domain.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.example.androidmaiden.core.util.*
 
 /**
  * Centrally managed file categories to be shared across the app.

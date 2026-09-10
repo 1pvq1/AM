@@ -1,11 +1,14 @@
-package com.example.androidmaiden.util
+package com.example.androidmaiden.platform
 
 import android.media.MediaMetadataRetriever
 import android.os.Build
 import android.os.Environment
+import com.example.androidmaiden.core.experimental.time.TimeProvider
 import com.example.androidmaiden.data.local.*
+import com.example.androidmaiden.domain.service.FileSystemScanner
 import java.io.File
 import kotlinx.coroutines.*
+import kotlin.time.Duration.Companion.days
 
 /**
  * Android implementation of the scanner using java.io.File.
@@ -13,7 +16,8 @@ import kotlinx.coroutines.*
  * Enhanced to extract media metadata for Videos, Audio, and Images.
  */
 class AndroidFileSystemScanner(
-    private val fileDao: FileMetadataDao
+    private val fileDao: FileMetadataDao,
+    private val timeProvider: TimeProvider
 ) : FileSystemScanner {
     val rootPath: String = Environment.getExternalStorageDirectory().absolutePath
 

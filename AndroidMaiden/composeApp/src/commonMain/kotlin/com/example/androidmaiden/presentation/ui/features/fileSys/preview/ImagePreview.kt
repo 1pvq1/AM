@@ -11,14 +11,14 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
-import com.example.androidmaiden.data.local.FileMetadata
+import com.example.androidmaiden.domain.model.FileItem
 import kotlin.math.*
 
 /**
  * Composable for previewing images with zoom, pan, and rotation support.
  */
 @Composable
-fun ImagePreview(file: FileMetadata, manualRotation: Float, onToggleUi: () -> Unit) {
+fun ImagePreview(file: FileItem, manualRotation: Float, onToggleUi: () -> Unit) {
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     var gestureRotation by remember { mutableFloatStateOf(0f) }

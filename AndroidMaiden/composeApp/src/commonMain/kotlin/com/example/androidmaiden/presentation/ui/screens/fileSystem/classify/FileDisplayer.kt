@@ -19,9 +19,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.androidmaiden.data.local.FileMetadata
+import com.example.androidmaiden.domain.model.FileItem
 import com.example.androidmaiden.presentation.ui.features.fileSys.preview.*
-import com.example.androidmaiden.util.*
+import com.example.androidmaiden.core.util.*
 
 /**
  * Enhanced file previewer.
@@ -33,7 +33,7 @@ import com.example.androidmaiden.util.*
  */
 @Composable
 fun FilePreviewOverlay(
-    file: FileMetadata,
+    file: FileItem,
     onDismiss: () -> Unit
 ) {
     val category = remember(file.name) { FileTypeUtils.getExtensionType(file.name) }
@@ -159,7 +159,7 @@ fun FilePreviewOverlay(
  * Fallback preview for file types that don't have a specialized preview.
  */
 @Composable
-private fun GenericPreview(file: FileMetadata) {
+private fun GenericPreview(file: FileItem) {
     Card(
         modifier = Modifier.padding(32.dp),
         shape = RoundedCornerShape(24.dp)

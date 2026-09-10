@@ -1,4 +1,4 @@
-package com.example.androidmaiden.util
+package com.example.androidmaiden.core.util.deprecated
 
 import com.example.androidmaiden.domain.model.FileSysNode
 import com.example.androidmaiden.domain.model.NodeType

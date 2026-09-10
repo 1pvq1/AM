@@ -18,8 +18,9 @@ import androidx.sqlite.execSQL
         TrashEntry::class,
         ChatSession::class,
         ChatMessageEntity::class,
+        TodoEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -32,6 +33,11 @@ abstract class AppDatabase : RoomDatabase() {
      * Provides access to the chat DAO.
      */
     abstract fun chatDao(): ChatDao
+
+    /**
+     * Provides access to the todo DAO.
+     */
+    abstract fun todoDao(): TodoDao
 
     companion object {
         val MIGRATION_2_3 = object : Migration(2, 3) {

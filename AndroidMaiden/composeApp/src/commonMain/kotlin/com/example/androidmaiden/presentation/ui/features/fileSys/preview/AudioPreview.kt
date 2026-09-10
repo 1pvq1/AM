@@ -12,13 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.androidmaiden.data.local.FileMetadata
+import com.example.androidmaiden.domain.model.FileItem
 
 /**
  * Composable for previewing audio files with playback controls.
  */
 @Composable
-fun AudioPreview(file: FileMetadata) {
+fun AudioPreview(file: FileItem) {
     var isPlaying by remember { mutableStateOf(false) }
     var progress by remember { mutableFloatStateOf(0f) }
 

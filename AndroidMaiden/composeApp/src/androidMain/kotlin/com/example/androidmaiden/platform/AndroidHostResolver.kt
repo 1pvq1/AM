@@ -1,7 +1,7 @@
 package com.example.androidmaiden.platform
 
 import android.os.Build
-import com.example.androidmaiden.util.HostResolver
+import com.example.androidmaiden.domain.service.HostResolver
 
 /**
  * Android implementation of HostResolver.
@@ -28,10 +28,10 @@ class AndroidHostResolver : HostResolver {
                 || Build.PRODUCT.contains("simulator")
     }
 
-    override fun resolve(url: String): String {
-        if (!isEmulator) return url
+    override fun resolve(address: String): String {
+        if (!isEmulator) return address
 
-        return url.replace("localhost", "10.0.2.2")
-                  .replace("127.0.0.1", "10.0.2.2")
+        return address.replace("localhost", "10.0.2.2")
+                      .replace("127.0.0.1", "10.0.2.2")
     }
 }

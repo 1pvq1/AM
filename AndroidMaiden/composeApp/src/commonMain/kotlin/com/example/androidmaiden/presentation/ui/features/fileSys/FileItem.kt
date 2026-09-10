@@ -14,8 +14,8 @@ import com.example.androidmaiden.domain.model.NodeType
 import com.example.androidmaiden.presentation.ui.theme.AppTheme
 import com.example.androidmaiden.presentation.ui.icons.fileIcon
 import com.example.androidmaiden.presentation.ui.icons.folderIcon
-import com.example.androidmaiden.util.formatSize
-import com.example.androidmaiden.util.formatDateTime
+import com.example.androidmaiden.core.util.formatSize
+import com.example.androidmaiden.core.util.formatDateTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**

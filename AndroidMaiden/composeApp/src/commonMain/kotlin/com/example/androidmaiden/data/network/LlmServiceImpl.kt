@@ -3,7 +3,8 @@ package com.example.androidmaiden.data.network
 import io.ktor.client.*
 import kotlinx.coroutines.flow.*
 import com.example.androidmaiden.data.repository.SettingsRepository
-import com.example.androidmaiden.util.HostResolver
+import com.example.androidmaiden.domain.model.ChatMessage
+import com.example.androidmaiden.domain.service.*
 
 /**
  * Core implementation of LlmService.

@@ -2,10 +2,8 @@ package com.example.androidmaiden.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.androidmaiden.data.local.FileMetadata
 import com.example.androidmaiden.data.repository.FileRepository
-import com.example.androidmaiden.data.local.Tag
-import com.example.androidmaiden.data.local.FileWithTags
+import com.example.androidmaiden.domain.model.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -36,12 +34,12 @@ class FileOrganizeViewModel(
     /**
      * Flow of files that have the currently selected tag.
      */
-    val taggedFiles: StateFlow<List<FileMetadata>> = _selectedTag
+    val taggedFiles: StateFlow<List<FileItem>> = _selectedTag
         .flatMapLatest { tag ->
             if (tag == null) {
                 flowOf(emptyList())
             } else {
-                repository.getTagWithFiles(tag.id).map { it?.files ?: emptyList() }
+                repository.getTagWithFiles(tag.id)
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -122,7 +120,7 @@ class FileOrganizeViewModel(
     /**
      * Flow of file search results based on the current query.
      */
-    val searchResults: StateFlow<List<FileMetadata>> = _searchQuery
+    val searchResults: StateFlow<List<FileItem>> = _searchQuery
         .debounce(300)
         .flatMapLatest { query ->
             if (query.length < 2) flowOf(emptyList())

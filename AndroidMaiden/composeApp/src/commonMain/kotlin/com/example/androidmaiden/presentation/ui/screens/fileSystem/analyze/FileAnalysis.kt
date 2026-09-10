@@ -13,12 +13,13 @@ import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.platform.*
 import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.ui.screens.pages.BasePage
-import com.example.androidmaiden.util.*
 import com.example.androidmaiden.presentation.viewmodel.FileScannerViewModel
 import com.example.androidmaiden.presentation.ui.features.fileSys.*
 import com.example.androidmaiden.presentation.ui.features.panel.*
+import com.example.androidmaiden.core.util.deprecated.SortMode
+import com.example.androidmaiden.core.util.deprecated.SortOrder
+import com.example.androidmaiden.core.util.deprecated.sortedChildren
 import org.koin.compose.viewmodel.koinViewModel
-import org.koin.dsl.module
 import kotlin.time.ExperimentalTime
 
 /**

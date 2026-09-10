@@ -2,6 +2,7 @@ package com.example.androidmaiden.presentation.ui.screens.hardware
 
 import androidx.compose.runtime.*
 import com.example.androidmaiden.presentation.viewmodel.HardwareViewModel
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
 /**

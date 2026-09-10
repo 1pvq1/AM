@@ -1,16 +1,18 @@
 package com.example.androidmaiden.data.repository
 
+import com.example.androidmaiden.core.experimental.time.TimeProvider
 import com.example.androidmaiden.data.local.*
 import com.example.androidmaiden.domain.model.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 /**
  * Repository for managing chat history and sessions.
  */
-class ChatRepository(private val chatDao: ChatDao) {
+class ChatRepository(
+    private val chatDao: ChatDao,
+    private val timeProvider: TimeProvider
+) {
 
     /**
      * Returns a stream of all chat sessions.
@@ -22,25 +24,19 @@ class ChatRepository(private val chatDao: ChatDao) {
      */
     fun getMessagesForSession(sessionId: String): Flow<List<ChatMessage>> {
         return chatDao.getMessagesForSession(sessionId).map { entities ->
-            entities.map { entity ->
-                ChatMessage(
-                    message = entity.message,
-                    sender = if (entity.sender == "USER") Sender.USER else Sender.CHARACTER
-                )
-            }
+            entities.map { it.toDomain() }
         }
     }
 
     /**
      * Saves a new message to the local database.
      */
-    @OptIn(ExperimentalTime::class)
     suspend fun saveMessage(sessionId: String, message: String, sender: Sender) {
         val entity = ChatMessageEntity(
             sessionId = sessionId,
             message = message,
             sender = if (sender == Sender.USER) "USER" else "CHARACTER",
-            timestamp = Clock.System.now().toEpochMilliseconds()
+            timestamp = timeProvider.nowMillis()
         )
         chatDao.saveMessageAndRefreshSession(entity)
     }

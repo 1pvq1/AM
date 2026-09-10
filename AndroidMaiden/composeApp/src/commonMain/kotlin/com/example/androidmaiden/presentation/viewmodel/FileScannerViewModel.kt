@@ -2,15 +2,13 @@ package com.example.androidmaiden.presentation.viewmodel
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewModelScope
-import com.example.androidmaiden.data.local.FileMetadata
+import com.example.androidmaiden.core.experimental.time.TimeProvider
 import com.example.androidmaiden.data.repository.FileRepository
 import com.example.androidmaiden.domain.model.*
-import com.example.androidmaiden.util.FileTypeUtils
+import com.example.androidmaiden.core.util.FileTypeUtils
 import com.example.androidmaiden.presentation.ui.features.eg.simFileNode
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 /**
  * Data class representing statistics for a folder's content.
@@ -26,7 +24,10 @@ data class FolderAnalysisStats(
  * ViewModel for the File System Analysis screen.
  * Handles navigation, file operations, and content analysis.
  */
-class FileScannerViewModel(val repository: FileRepository) : BaseViewModel() {
+class FileScannerViewModel(
+    val repository: FileRepository,
+    private val timeProvider: TimeProvider
+) : BaseViewModel() {
 
     private val defaultRoot: String get() = repository.getScannedPath()
     private val mockRootPath = "mock_root"
@@ -176,7 +177,6 @@ class FileScannerViewModel(val repository: FileRepository) : BaseViewModel() {
     /**
      * Loads real directory data from the database.
      */
-    @OptIn(ExperimentalTime::class)
     private fun loadRealDirectory(path: String) {
         realDataJob = repository.getFilesByParent(path)
             .onEach { metadataList ->
@@ -247,10 +247,9 @@ class FileScannerViewModel(val repository: FileRepository) : BaseViewModel() {
     }
 
     /**
-     * Maps a list of [FileMetadata] from Room to the unified [FileSysNode] structure.
+     * Maps a list of [FileItem] from Room to the unified [FileSysNode] structure.
      */
-    @OptIn(ExperimentalTime::class)
-    private fun mapMetadataToNode(path: String, metadataList: List<FileMetadata>): FileSysNode {
+    private fun mapMetadataToNode(path: String, metadataList: List<FileItem>): FileSysNode {
         val children = metadataList.map { metadata ->
             FileSysNode(
                 name = metadata.name,
@@ -270,7 +269,7 @@ class FileScannerViewModel(val repository: FileRepository) : BaseViewModel() {
             folderType = FolderType.FOLDER,
             dataSource = DataSource.REAL,
             children = children,
-            lastModified = Clock.System.now().toEpochMilliseconds(),
+            lastModified = timeProvider.nowMillis(),
             description = "Path: $path",
             path = path
         )

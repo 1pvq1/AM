@@ -1,5 +1,4 @@
-package com.example.androidmaiden.util
-
+package com.example.androidmaiden.domain.service
 
 /**
  * Platform-independent interface for scanning the physical file system.

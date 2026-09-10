@@ -1,7 +1,7 @@
-package com.example.androidmaiden.util
+package com.example.androidmaiden.core.util
 
 import com.example.androidmaiden.domain.model.FileSysNode
-import com.example.androidmaiden.util.FileTypeUtils.getExtensionType
+import com.example.androidmaiden.core.util.FileTypeUtils.getExtensionType
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 

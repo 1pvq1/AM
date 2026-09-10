@@ -6,13 +6,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.androidmaiden.data.local.FileMetadata
+import com.example.androidmaiden.domain.model.FileItem
 
 /**
  * Composable for previewing video files.
  */
 @Composable
-fun VideoPreview(file: FileMetadata) {
+fun VideoPreview(file: FileItem) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center

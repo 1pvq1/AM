@@ -1,15 +1,15 @@
 package com.example.androidmaiden.data.repository
 
+import com.example.androidmaiden.core.experimental.time.TimeProvider
 import com.example.androidmaiden.domain.model.CleanupStats
-import com.example.androidmaiden.util.FileSystemScanner
+import com.example.androidmaiden.domain.model.TrashRecord
+import com.example.androidmaiden.domain.service.FileSystemScanner
 import com.example.androidmaiden.data.local.*
 import kotlinx.coroutines.flow.*
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 interface FileClearRepository {
     val cleanupStats: Flow<CleanupStats>
-    val trashEntries: Flow<List<TrashEntry>>
+    val trashEntries: Flow<List<TrashRecord>>
     
     suspend fun moveToTrash(path: String): Boolean
     suspend fun restoreFromTrash(trashPath: String): Boolean
@@ -22,6 +22,7 @@ interface FileClearRepository {
 class FileClearRepositoryImpl(
     private val fileDao: FileMetadataDao,
     private val scanner: FileSystemScanner,
+    private val timeProvider: TimeProvider,
     private val trashDir: String // Should be provided via platform module
 ) : FileClearRepository {
 
@@ -31,18 +32,19 @@ class FileClearRepositoryImpl(
         fileDao.getAllTrashEntries()
     ) { duplicates, emptyFolders, trash ->
         CleanupStats(
-            duplicateFiles = duplicates,
-            emptyFolders = emptyFolders,
-            trashEntries = trash
+            duplicateFiles = duplicates.map { it.toDomain() },
+            emptyFolders = emptyFolders.map { it.toDomain() },
+            trashEntries = trash.map { it.toDomain() }
         )
     }
 
-    override val trashEntries: Flow<List<TrashEntry>> = fileDao.getAllTrashEntries()
+    override val trashEntries: Flow<List<TrashRecord>> = fileDao.getAllTrashEntries().map { entities ->
+        entities.map { it.toDomain() }
+    }
 
-    @OptIn(ExperimentalTime::class)
     override suspend fun moveToTrash(path: String): Boolean {
         val fileName = path.substringAfterLast('/')
-        val now = Clock.System.now().toEpochMilliseconds()
+        val now = timeProvider.nowMillis()
         val destination = "$trashDir/${now}_$fileName"
         
         val success = scanner.moveFile(path, destination)

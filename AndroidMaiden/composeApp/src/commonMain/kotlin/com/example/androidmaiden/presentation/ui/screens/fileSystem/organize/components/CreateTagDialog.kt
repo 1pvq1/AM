@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.androidmaiden.data.local.Tag
+import com.example.androidmaiden.domain.model.Tag
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.organize.utils.ColorUtils
 import org.jetbrains.compose.ui.tooling.preview.Preview
 

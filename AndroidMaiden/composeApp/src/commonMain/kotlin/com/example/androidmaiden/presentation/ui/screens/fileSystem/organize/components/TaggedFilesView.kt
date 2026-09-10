@@ -10,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.androidmaiden.data.local.FileMetadata
-import com.example.androidmaiden.util.*
+import com.example.androidmaiden.domain.model.FileItem
+import com.example.androidmaiden.core.util.*
 
 /**
  * View showing files associated with a specific tag.
@@ -19,8 +19,8 @@ import com.example.androidmaiden.util.*
 @Composable
 fun TaggedFilesView(
     tagName: String,
-    files: List<FileMetadata>,
-    onRemoveTag: (FileMetadata) -> Unit
+    files: List<FileItem>,
+    onRemoveTag: (FileItem) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("Files tagged with \"$tagName\"", style = MaterialTheme.typography.titleLarge)

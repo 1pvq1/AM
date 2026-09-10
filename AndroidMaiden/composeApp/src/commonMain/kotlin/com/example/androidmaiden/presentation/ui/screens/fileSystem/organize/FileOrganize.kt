@@ -1,3 +1,4 @@
+@file:OptIn(kotlin.time.ExperimentalTime::class)
 package com.example.androidmaiden.presentation.ui.screens.fileSystem.organize
 
 import androidx.compose.foundation.layout.*
@@ -10,7 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.androidmaiden.data.local.*
+import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.organize.components.*
 import com.example.androidmaiden.presentation.viewmodel.FileOrganizeViewModel
 import com.example.androidmaiden.presentation.ui.features.fileSys.PathBreadcrumbs
@@ -66,9 +67,9 @@ fun FileOrganizePage(onBack: () -> Unit) {
 fun FileOrganizeScreen(
     allTags: List<Tag>,
     selectedTag: Tag?,
-    taggedFiles: List<FileMetadata>,
+    taggedFiles: List<FileItem>,
     searchQuery: String,
-    searchResults: List<FileMetadata>,
+    searchResults: List<FileItem>,
     pathStack: List<String>,
     currentDirectoryFiles: List<FileWithTags>,
     onBack: () -> Unit,
@@ -76,8 +77,8 @@ fun FileOrganizeScreen(
     onDeleteTag: (Tag) -> Unit,
     onUpdateTag: (Tag) -> Unit,
     onUpdateSearchQuery: (String) -> Unit,
-    onAddTagToFile: (FileMetadata, Tag) -> Unit,
-    onRemoveTagFromFile: (FileMetadata, Tag) -> Unit,
+    onAddTagToFile: (FileItem, Tag) -> Unit,
+    onRemoveTagFromFile: (FileItem, Tag) -> Unit,
     onCreateTag: (String, String) -> Unit,
     onIndexClick: (Int) -> Unit,
     onRootClick: () -> Unit,
@@ -200,25 +201,27 @@ fun PreviewFileOrganize() {
         taggedFiles = emptyList(),
         searchQuery = "test",
         searchResults = listOf(
-            FileMetadata(
+            FileItem(
                 path = "/storage/emulated/0/Documents/report.pdf",
                 name = "report.pdf",
                 isDirectory = false,
                 lastModified = 0,
                 size = 1024 * 1024,
-                parentPath = "/storage/emulated/0/Documents"
+                parentPath = "/storage/emulated/0/Documents",
+                createdAt = kotlin.time.Instant.fromEpochMilliseconds(0)
             )
         ),
         pathStack = listOf("Documents"),
         currentDirectoryFiles = listOf(
             FileWithTags(
-                file = FileMetadata(
+                file = FileItem(
                     path = "/storage/emulated/0/Documents/report.pdf",
                     name = "report.pdf",
                     isDirectory = false,
                     lastModified = 0,
                     size = 1024 * 1024,
-                    parentPath = "/storage/emulated/0/Documents"
+                    parentPath = "/storage/emulated/0/Documents",
+                    createdAt = kotlin.time.Instant.fromEpochMilliseconds(0)
                 ),
                 tags = listOf(Tag(1, "Work", "#FF0000"))
             )

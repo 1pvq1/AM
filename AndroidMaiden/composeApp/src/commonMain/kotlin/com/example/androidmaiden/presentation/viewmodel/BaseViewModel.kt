@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * Base ViewModel to provide unified state management and survival across configuration changes.
+ * 
+ * [IMPORTANT] This class is deprecated in favor of [com.example.androidmaiden.core.arch.MaidenViewModel].
+ * New features should use the core base class.
  */
 abstract class BaseViewModel : ViewModel() {
 

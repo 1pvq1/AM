@@ -1,9 +1,12 @@
 package com.example.androidmaiden.data.repository
 
 import kotlinx.coroutines.flow.*
-import com.example.androidmaiden.util.FileSystemScanner
-import com.example.androidmaiden.util.FileProvider
+import com.example.androidmaiden.domain.service.FileSystemScanner
+import com.example.androidmaiden.domain.service.FileProvider
 import com.example.androidmaiden.data.local.*
+import com.example.androidmaiden.domain.model.FileItem
+import com.example.androidmaiden.domain.model.FileWithTags
+import com.example.androidmaiden.domain.model.Tag
 import kotlinx.coroutines.*
 
 /**
@@ -19,7 +22,8 @@ class FileRepository(
     /**
      * Flow of all file metadata stored in the database.
      */
-    val allFiles: Flow<List<FileMetadata>> = fileDao.getAllFiles()
+    val allFiles: Flow<List<FileItem>> = fileDao.getAllFiles()
+        .map { entities -> entities.map { it.toDomain() } }
         .stateIn(
             scope = repositoryScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -61,15 +65,19 @@ class FileRepository(
     /**
      * Targeted query for specific categories used in ViewModels.
      */
-    fun getFilesByParent(path: String): Flow<List<FileMetadata>> {
-        return fileDao.getFilesByParent(path)
+    fun getFilesByParent(path: String): Flow<List<FileItem>> {
+        return fileDao.getFilesByParent(path).map { entities ->
+            entities.map { it.toDomain() }
+        }
     }
 
     /**
      * Global search across all indexed files.
      */
-    fun searchFiles(query: String): Flow<List<FileMetadata>> {
-        return fileDao.searchFiles(query)
+    fun searchFiles(query: String): Flow<List<FileItem>> {
+        return fileDao.searchFiles(query).map { entities ->
+            entities.map { it.toDomain() }
+        }
     }
 
     /**
@@ -113,13 +121,9 @@ class FileRepository(
         val realFiles = fileProvider.listFiles(path)
         
         // 2. Map files to FileWithTags by looking up tags in the DB for each file
-        // Since we want this to be reactive to tag changes, we combine it with tag xref flows
-        // For simplicity and performance in a list, we'll fetch the current tags for these paths
         val filesWithTags = realFiles.map { file ->
             val tags = fileDao.getXRefsForFile(file.path).mapNotNull { xref ->
-                // This is a bit heavy, in a real app we might want a more efficient join
-                // but for now it satisfies the requirement of combining OS and DB.
-                fileDao.getAllTags().firstOrNull()?.find { it.id == xref.tagId }
+                fileDao.getAllTags().firstOrNull()?.find { it.id == xref.tagId }?.toDomain()
             }
             FileWithTags(file, tags)
         }
@@ -131,38 +135,44 @@ class FileRepository(
     /**
      * Returns a flow of all available tags.
      */
-    fun getAllTags(): Flow<List<Tag>> = fileDao.getAllTags()
+    fun getAllTags(): Flow<List<Tag>> = fileDao.getAllTags().map { entities ->
+        entities.map { it.toDomain() }
+    }
 
     /**
      * Adds a new tag with the given name and color.
      */
     suspend fun addTag(name: String, colorHex: String) {
-        fileDao.insertTag(Tag(name = name, colorHex = colorHex))
+        fileDao.insertTag(com.example.androidmaiden.data.local.Tag(name = name, colorHex = colorHex))
     }
 
     /**
      * Updates an existing tag.
      */
     suspend fun updateTag(tag: Tag) {
-        fileDao.insertTag(tag)
+        fileDao.insertTag(com.example.androidmaiden.data.local.Tag.fromDomain(tag))
     }
 
     /**
      * Removes a tag.
      */
     suspend fun removeTag(tag: Tag) {
-        fileDao.deleteTag(tag)
+        fileDao.deleteTag(com.example.androidmaiden.data.local.Tag.fromDomain(tag))
     }
 
     /**
      * Returns a flow of a file and its associated tags.
      */
-    fun getFileWithTags(path: String): Flow<FileWithTags?> = fileDao.getFileWithTags(path)
+    fun getFileWithTags(path: String): Flow<FileWithTags?> = fileDao.getFileWithTags(path).map { 
+        it?.toDomain()
+    }
 
     /**
      * Returns a flow of a tag and all files associated with it.
      */
-    fun getTagWithFiles(tagId: Long): Flow<TagWithFiles?> = fileDao.getTagWithFiles(tagId)
+    fun getTagWithFiles(tagId: Long): Flow<List<FileItem>> = fileDao.getTagWithFiles(tagId).map { 
+        it?.files?.map { entity -> entity.toDomain() } ?: emptyList()
+    }
 
     /**
      * Associates a tag with a file.

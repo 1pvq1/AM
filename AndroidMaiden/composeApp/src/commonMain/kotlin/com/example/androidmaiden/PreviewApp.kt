@@ -82,6 +82,7 @@ fun FullAppSettingsPreview() {
     }
 }
 
+/*
 @Preview
 @Composable
 fun FullAppTodoPreview() {
@@ -89,6 +90,7 @@ fun FullAppTodoPreview() {
         TodoScreen(viewModel = TodoViewModel())
     }
 }
+*/
 
 @Preview
 @Composable

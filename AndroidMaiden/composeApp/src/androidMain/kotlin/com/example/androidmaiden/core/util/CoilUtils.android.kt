@@ -1,4 +1,4 @@
-package com.example.androidmaiden.util
+package com.example.androidmaiden.core.util
 
 import coil3.ImageLoader
 import coil3.PlatformContext
