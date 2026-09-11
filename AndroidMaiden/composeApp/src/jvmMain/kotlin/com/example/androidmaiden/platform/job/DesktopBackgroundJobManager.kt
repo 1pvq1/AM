@@ -12,6 +12,11 @@ class DesktopBackgroundJobManager : BackgroundJobManager {
         println("Scheduled JVM notification [$id]: $text after $delayMillis ms")
     }
 
+    override fun schedulePeriodicNotification(id: String, text: String, intervalMillis: Long, initialDelayMillis: Long) {
+        // TODO: Implement JVM-specific periodic task
+        println("Scheduled periodic JVM notification [$id]: $text every $intervalMillis ms")
+    }
+
     override fun cancelJob(id: String) {
         println("Cancelled JVM job: $id")
     }

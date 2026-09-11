@@ -28,6 +28,25 @@ class AndroidBackgroundJobManager(private val context: Context) : BackgroundJobM
         )
     }
 
+    override fun schedulePeriodicNotification(id: String, text: String, intervalMillis: Long, initialDelayMillis: Long) {
+        val workRequest = PeriodicWorkRequestBuilder<TodoNotificationWorker>(
+            intervalMillis, TimeUnit.MILLISECONDS
+        )
+            .setInitialDelay(initialDelayMillis, TimeUnit.MILLISECONDS)
+            .setInputData(workDataOf(
+                "todo_text" to text,
+                "todo_id" to id.hashCode().toLong()
+            ))
+            .addTag(id)
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            id,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            workRequest
+        )
+    }
+
     override fun cancelJob(id: String) {
         WorkManager.getInstance(context).cancelUniqueWork(id)
     }

@@ -34,7 +34,7 @@ val commonModule = module {
     single { FileRepository(get(), get(), get(), get()) }
     single { SettingsRepository(get()) }
     single { ChatRepository(get(), get()) }
-    single { TodoRepository(get()) }
+    single { TodoRepository(get(), get(), get()) }
     single<FileClearRepository> {
         FileClearRepositoryImpl(get(), get(), get(), "/tmp/trash") // Trash dir should be platform-specific in a real app
     }

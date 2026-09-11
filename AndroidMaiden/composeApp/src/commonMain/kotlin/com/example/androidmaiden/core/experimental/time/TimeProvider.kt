@@ -18,4 +18,9 @@ interface TimeProvider {
      * Returns the current time in milliseconds since epoch.
      */
     fun nowMillis(): Long
+
+    /**
+     * Returns a new [Instant] by adding [offsetMillis] to the current time.
+     */
+    fun nowPlus(offsetMillis: Long): Instant
 }

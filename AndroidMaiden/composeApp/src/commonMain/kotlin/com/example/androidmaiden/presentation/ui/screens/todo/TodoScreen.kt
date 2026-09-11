@@ -17,9 +17,11 @@ fun TodoScreen(viewModel: TodoViewModel) {
     val newTodoText = viewModel.newText
     val selectedPriority = viewModel.selectedPriority
     val selectedCategory = viewModel.selectedCategory
+    val reminderSettings = viewModel.reminderSettings
     val itemToEdit = viewModel.itemToEdit
     
     val windowSizeClass = LocalWindowSizeClass.current
+    val currentTimeMillis = viewModel.currentTimeMillis
 
     TodoAdaptiveCoordinator(
         windowSizeClass = windowSizeClass,
@@ -27,10 +29,14 @@ fun TodoScreen(viewModel: TodoViewModel) {
         newTodoText = newTodoText,
         selectedPriority = selectedPriority,
         selectedCategory = selectedCategory,
+        reminderSettings = reminderSettings,
         itemToEdit = itemToEdit,
+        currentTimeMillis = currentTimeMillis,
         onNewTextChanged = viewModel::onNewTextChanged,
         onPriorityChanged = viewModel::onPriorityChanged,
         onCategoryChanged = viewModel::onCategoryChanged,
+        onReminderSettingsChanged = viewModel::onReminderSettingsChanged,
+        onSetDefaultReminder = viewModel::onSetDefaultReminder,
         onAddItem = viewModel::addItem,
         onToggleChecked = viewModel::toggleChecked,
         onDeleteItem = viewModel::deleteItem,

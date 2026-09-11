@@ -2,8 +2,7 @@ package com.example.androidmaiden.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.androidmaiden.domain.model.TodoItem
-import com.example.androidmaiden.domain.model.TodoPriority
+import com.example.androidmaiden.domain.model.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -15,6 +14,8 @@ data class TodoEntity(
     val category: String?,
     val priority: String, // Store enum as String
     val dueDate: Long?,   // Store Instant as Long (epoch millis)
+    val reminderTime: Long?,
+    val reminderFrequency: String?,
     val createdAt: Long,   // Store Instant as Long (epoch millis)
 ) {
     @OptIn(ExperimentalTime::class)
@@ -25,6 +26,12 @@ data class TodoEntity(
         category = category,
         priority = TodoPriority.valueOf(priority),
         dueDate = dueDate?.let { Instant.fromEpochMilliseconds(it) },
+        reminderSettings = if (reminderTime != null && reminderFrequency != null) {
+            ReminderSettings(
+                time = Instant.fromEpochMilliseconds(reminderTime),
+                frequency = ReminderFrequency.valueOf(reminderFrequency)
+            )
+        } else null,
         createdAt = Instant.fromEpochMilliseconds(createdAt)
     )
 
@@ -37,6 +44,8 @@ data class TodoEntity(
             category = item.category,
             priority = item.priority.name,
             dueDate = item.dueDate?.toEpochMilliseconds(),
+            reminderTime = item.reminderSettings?.time?.toEpochMilliseconds(),
+            reminderFrequency = item.reminderSettings?.frequency?.name,
             createdAt = item.createdAt.toEpochMilliseconds()
         )
     }

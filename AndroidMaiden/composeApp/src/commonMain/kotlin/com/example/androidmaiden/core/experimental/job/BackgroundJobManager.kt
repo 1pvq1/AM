@@ -11,6 +11,15 @@ interface BackgroundJobManager {
      * @param delayMillis Delay in milliseconds before showing the notification.
      */
     fun scheduleNotification(id: String, text: String, delayMillis: Long)
+
+    /**
+     * Schedules a periodic notification.
+     * @param id Unique identifier for the notification/job.
+     * @param text The message to display.
+     * @param intervalMillis Interval between notifications.
+     * @param initialDelayMillis Delay before the first notification.
+     */
+    fun schedulePeriodicNotification(id: String, text: String, intervalMillis: Long, initialDelayMillis: Long)
     
     /**
      * Cancels a scheduled job.

@@ -4,18 +4,24 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
+
 /**
  * Implementation of [TimeProvider] using the system clock from kotlinx-datetime.
- * val now = kotlinx.datetime.Clock.System.now() //Unresolved reference 'System'.
+ * kotlinx.datetime.Clock.System.now() //Unresolved reference 'System'.
  */
 @OptIn(ExperimentalTime::class)
 class SystemTimeProvider : TimeProvider {
     override fun now(): Instant {
-        val now = Clock.System.now()
-        return Instant.fromEpochMilliseconds(now.toEpochMilliseconds())
+        val nowMillis = Clock.System.now().toEpochMilliseconds()
+        return Instant.fromEpochMilliseconds(nowMillis)
     }
 
     override fun nowMillis(): Long {
         return Clock.System.now().toEpochMilliseconds()
+    }
+
+    override fun nowPlus(offsetMillis: Long): Instant {
+        val futureMillis = nowMillis() + offsetMillis
+        return Instant.fromEpochMilliseconds(futureMillis)
     }
 }
