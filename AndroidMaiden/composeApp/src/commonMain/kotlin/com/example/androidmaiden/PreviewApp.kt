@@ -7,11 +7,11 @@ import androidx.compose.ui.Modifier
 import com.example.androidmaiden.domain.model.Screen
 import com.example.androidmaiden.presentation.ui.components.AppNavigationBar
 import com.example.androidmaiden.presentation.ui.screens.*
-import com.example.androidmaiden.presentation.ui.screens.fileSystem.dashboard.FilesScreen
+import com.example.androidmaiden.presentation.ui.screens.fileSystem.dashboard.FilesPage
 import com.example.androidmaiden.presentation.ui.theme.AppTheme
 import com.example.androidmaiden.presentation.viewmodel.TodoViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import com.example.androidmaiden.presentation.ui.screens.fileSystem.analyze.FileAnalysisScreen
+import com.example.androidmaiden.presentation.ui.screens.fileSystem.analyze.FileAnalysisPage
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.classify.FileClassifyPage
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.clean.FileCleanPage
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.organize.FileOrganizePage
@@ -70,7 +70,7 @@ fun FullAppSkillsPreview() {
 @Composable
 fun FullAppFilesPreview() {
     AppPreviewWrapper(Screen.Files) {
-        FilesScreen(onNavigate = {})
+        FilesPage(onNavigate = {})
     }
 }
 
@@ -108,12 +108,13 @@ fun FullAppVirtualChatViewPreview() {
     }
 }
 
+@OptIn(ExperimentalTime::class)
 @Preview
 @Composable
 fun FullAppFileAnalysisPreview() {
     AppPreviewWrapper(Screen.FileAnalysis) {
         KoinContext {
-            FileAnalysisScreen(onNavigateUp = {})
+            FileAnalysisPage(onNavigateUp = {})
         }
     }
 }

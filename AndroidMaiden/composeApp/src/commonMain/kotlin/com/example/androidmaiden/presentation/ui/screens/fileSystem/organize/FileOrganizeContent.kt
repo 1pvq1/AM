@@ -13,58 +13,38 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.organize.components.*
-import com.example.androidmaiden.presentation.viewmodel.FileOrganizeViewModel
 import com.example.androidmaiden.presentation.ui.features.fileSys.PathBreadcrumbs
+import com.example.androidmaiden.presentation.ui.theme.AppTheme
+import com.example.androidmaiden.presentation.ui.theme.core.AppThemeType
+import com.example.androidmaiden.presentation.ui.theme.core.ThemeMode
+import com.example.androidmaiden.presentation.ui.theme.core.ButtonDisplayStyle
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.viewmodel.koinViewModel
-
-/**
- * Entry point for the File Organize feature.
- * Connects the UI to the ViewModel.
- */
-@Composable
-fun FileOrganizePage(onBack: () -> Unit) {
-    val viewModel: FileOrganizeViewModel = koinViewModel()
-    val allTags by viewModel.allTags.collectAsState()
-    val selectedTag by viewModel.selectedTag.collectAsState()
-    val taggedFiles by viewModel.taggedFiles.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val searchResults by viewModel.searchResults.collectAsState()
-    val pathStack by viewModel.pathStack.collectAsState()
-    val currentDirectoryFiles by viewModel.currentDirectoryFiles.collectAsState()
-
-    FileOrganizeScreen(
-        allTags = allTags,
-        selectedTag = selectedTag,
-        taggedFiles = taggedFiles,
-        searchQuery = searchQuery,
-        searchResults = searchResults,
-        pathStack = pathStack,
-        currentDirectoryFiles = currentDirectoryFiles,
-        onBack = onBack,
-        onSelectTag = { viewModel.selectTag(it) },
-        onDeleteTag = { viewModel.deleteTag(it) },
-        onUpdateTag = { viewModel.updateTag(it) },
-        onUpdateSearchQuery = { viewModel.updateSearchQuery(it) },
-        onAddTagToFile = { file, tag -> viewModel.addTagToFile(file.path, tag) },
-        onRemoveTagFromFile = { file, tag -> viewModel.removeTagFromFile(file.path, tag) },
-        onCreateTag = { name, color -> viewModel.createTag(name, color) },
-        onIndexClick = { viewModel.navigateToIndex(it) },
-        onRootClick = { viewModel.navigateToRoot() },
-        onFileClick = { file ->
-            if (file.file.isDirectory) {
-                viewModel.navigateTo(file.file.path)
-            }
-        }
-    )
-}
 
 /**
  * Stateless screen layout for the File Organize feature.
+ *
+ * @param allTags List of all available tags.
+ * @param selectedTag The currently selected tag for filtering.
+ * @param taggedFiles List of files associated with the selected tag.
+ * @param searchQuery The current search query string.
+ * @param searchResults List of files matching the search query.
+ * @param pathStack The current navigation path stack.
+ * @param currentDirectoryFiles List of files in the current directory with their tags.
+ * @param onBack Callback for navigating back.
+ * @param onSelectTag Callback when a tag is selected or deselected.
+ * @param onDeleteTag Callback to delete a tag.
+ * @param onUpdateTag Callback to update a tag's properties.
+ * @param onUpdateSearchQuery Callback when the search query is updated.
+ * @param onAddTagToFile Callback to add a tag to a file.
+ * @param onRemoveTagFromFile Callback to remove a tag from a file.
+ * @param onCreateTag Callback to create a new tag.
+ * @param onIndexClick Callback to navigate to a specific index in the path stack.
+ * @param onRootClick Callback to navigate to the root directory.
+ * @param onFileClick Callback when a file or directory is clicked.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FileOrganizeScreen(
+fun FileOrganizeContent(
     allTags: List<Tag>,
     selectedTag: Tag?,
     taggedFiles: List<FileItem>,
@@ -185,63 +165,16 @@ fun FileOrganizeScreen(
 }
 
 /**
- * Preview for the File Organize screen.
- */
-@Preview
-@Composable
-fun PreviewFileOrganize() {
-    // Using FileOrganizeScreen directly in Preview to avoid Koin initialization issues with koinViewModel()
-    FileOrganizeScreen(
-        allTags = listOf(
-            Tag(1, "Work", "#FF0000"),
-            Tag(2, "Personal", "#00FF00"),
-            Tag(3, "Important", "#0000FF")
-        ),
-        selectedTag = null,
-        taggedFiles = emptyList(),
-        searchQuery = "test",
-        searchResults = listOf(
-            FileItem(
-                path = "/storage/emulated/0/Documents/report.pdf",
-                name = "report.pdf",
-                isDirectory = false,
-                lastModified = 0,
-                size = 1024 * 1024,
-                parentPath = "/storage/emulated/0/Documents",
-                createdAt = kotlin.time.Instant.fromEpochMilliseconds(0)
-            )
-        ),
-        pathStack = listOf("Documents"),
-        currentDirectoryFiles = listOf(
-            FileWithTags(
-                file = FileItem(
-                    path = "/storage/emulated/0/Documents/report.pdf",
-                    name = "report.pdf",
-                    isDirectory = false,
-                    lastModified = 0,
-                    size = 1024 * 1024,
-                    parentPath = "/storage/emulated/0/Documents",
-                    createdAt = kotlin.time.Instant.fromEpochMilliseconds(0)
-                ),
-                tags = listOf(Tag(1, "Work", "#FF0000"))
-            )
-        ),
-        onBack = {},
-        onSelectTag = {},
-        onDeleteTag = {},
-        onUpdateTag = {},
-        onUpdateSearchQuery = {},
-        onAddTagToFile = { _, _ -> },
-        onRemoveTagFromFile = { _, _ -> },
-        onCreateTag = { _, _ -> },
-        onIndexClick = {},
-        onRootClick = {},
-        onFileClick = {}
-    )
-}
-
-/**
  * Top bar for the file organizer with search and tag management actions.
+ *
+ * @param isSearching Whether the search mode is active.
+ * @param searchQuery The current search query string.
+ * @param onSearchQueryChange Callback when the search query is updated.
+ * @param onToggleSearch Callback to toggle search mode.
+ * @param onBack Callback for the back button.
+ * @param isEditMode Whether the tag edit mode is active.
+ * @param onToggleEditMode Callback to toggle tag edit mode.
+ * @param onCreateTag Callback to open the tag creation dialog.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -300,5 +233,45 @@ fun FileOrganizeTopBar(
                 }
             }
         )
+    }
+}
+
+/**
+ * Preview for the File Organize content in Light Theme.
+ */
+@Preview
+@Composable
+fun FileOrganizeContentLightPreview() {
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.LIGHT,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            FileOrganizeContent(
+                allTags = listOf(
+                    Tag(1, "Work", "#FF0000"),
+                    Tag(2, "Personal", "#00FF00")
+                ),
+                selectedTag = null,
+                taggedFiles = emptyList(),
+                searchQuery = "",
+                searchResults = emptyList(),
+                pathStack = listOf("Documents"),
+                currentDirectoryFiles = emptyList(),
+                onBack = {},
+                onSelectTag = {},
+                onDeleteTag = {},
+                onUpdateTag = {},
+                onUpdateSearchQuery = {},
+                onAddTagToFile = { _, _ -> },
+                onRemoveTagFromFile = { _, _ -> },
+                onCreateTag = { _, _ -> },
+                onIndexClick = {},
+                onRootClick = {},
+                onFileClick = {}
+            )
+        }
     }
 }

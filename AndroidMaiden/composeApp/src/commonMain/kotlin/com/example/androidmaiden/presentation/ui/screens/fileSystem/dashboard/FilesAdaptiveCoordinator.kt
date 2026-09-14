@@ -7,15 +7,22 @@ import androidx.compose.runtime.Composable
 import com.example.androidmaiden.domain.model.Screen
 import com.example.androidmaiden.presentation.ui.adaptive.*
 import com.example.androidmaiden.presentation.ui.theme.AppTheme
+import com.example.androidmaiden.presentation.viewmodel.StorageStats
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * The Adaptive Coordinator for the Files screen.
+ *
+ * @param windowSizeClass The current window size class.
+ * @param features List of available file features.
+ * @param storageStats Current storage usage statistics.
+ * @param onNavigate Callback for navigation.
  */
 @Composable
 fun FilesAdaptiveCoordinator(
     windowSizeClass: WindowSizeClass,
     features: List<FileFeature>,
+    storageStats: StorageStats,
     onNavigate: (Screen) -> Unit
 ) {
     val columns = when (windowSizeClass.widthCategory) {
@@ -27,6 +34,7 @@ fun FilesAdaptiveCoordinator(
     FilesContent(
         columns = columns,
         features = features,
+        storageStats = storageStats,
         onNavigate = onNavigate
     )
 }
@@ -64,6 +72,7 @@ private fun FilesAdaptiveCoordinatorPreviewHelper(widthCategory: WindowSizeCateg
     FilesAdaptiveCoordinator(
         windowSizeClass = WindowSizeClass(widthCategory, WindowSizeCategory.Medium),
         features = sampleFeatures,
+        storageStats = StorageStats(),
         onNavigate = { }
     )
 }

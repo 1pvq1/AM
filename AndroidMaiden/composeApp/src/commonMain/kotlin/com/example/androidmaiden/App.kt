@@ -10,7 +10,7 @@ import com.example.androidmaiden.presentation.ui.screens.home.*
 import com.example.androidmaiden.presentation.ui.screens.skills.*
 import com.example.androidmaiden.presentation.ui.screens.settings.*
 import com.example.androidmaiden.presentation.ui.screens.todo.TodoScreen
-import com.example.androidmaiden.presentation.ui.screens.fileSystem.dashboard.FilesScreen
+import com.example.androidmaiden.presentation.ui.screens.fileSystem.dashboard.FilesPage
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.analyze.*
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.classify.*
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.clean.*
@@ -128,11 +128,11 @@ private fun AppScreenContent(
             navViewModel.navigateTo(screen)
         })
 
-        is Screen.Files -> FilesScreen(onNavigate = { screen ->
+        is Screen.Files -> FilesPage(onNavigate = { screen ->
             navViewModel.navigateTo(screen)
         })
 
-        is Screen.FileAnalysis -> FileAnalysisScreen(onNavigateUp = {
+        is Screen.FileAnalysis -> FileAnalysisPage(onNavigateUp = {
             navViewModel.navigateTo(Screen.Files)
         })
 

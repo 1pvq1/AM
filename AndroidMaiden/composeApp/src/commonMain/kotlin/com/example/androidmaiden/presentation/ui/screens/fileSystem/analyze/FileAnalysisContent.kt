@@ -10,44 +10,67 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.androidmaiden.platform.*
 import com.example.androidmaiden.domain.model.*
+import com.example.androidmaiden.presentation.viewmodel.FolderAnalysisStats
 import com.example.androidmaiden.presentation.ui.screens.pages.BasePage
-import com.example.androidmaiden.presentation.viewmodel.FileScannerViewModel
 import com.example.androidmaiden.presentation.ui.features.fileSys.*
 import com.example.androidmaiden.presentation.ui.features.panel.*
 import com.example.androidmaiden.core.util.deprecated.SortMode
 import com.example.androidmaiden.core.util.deprecated.SortOrder
 import com.example.androidmaiden.core.util.deprecated.sortedChildren
-import org.koin.compose.viewmodel.koinViewModel
+import com.example.androidmaiden.presentation.ui.screens.fileSystem.analyze.components.*
+import com.example.androidmaiden.presentation.ui.theme.AppTheme
+import com.example.androidmaiden.presentation.ui.theme.core.AppThemeType
+import com.example.androidmaiden.presentation.ui.theme.core.ThemeMode
+import com.example.androidmaiden.presentation.ui.theme.core.ButtonDisplayStyle
+import com.example.androidmaiden.platform.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.ExperimentalTime
 
 /**
- * Main screen for the File System Analysis feature.
- * This screen provides a hierarchical view of the file system (Mock or Real)
- * and allows users to perform basic file operations and view storage statistics.
+ * Stateless content for the File System Analysis feature.
+ *
+ * @param root The current root directory node being analyzed.
+ * @param stats Statistics for the current folder.
+ * @param isLoading Whether the data is currently loading.
+ * @param loadError Any error message if loading failed.
+ * @param pathStack The current navigation path stack.
+ * @param useMock Whether mock data is currently being used.
+ * @param viewMode The current view mode (List, Grid, or Tree).
+ * @param sortMode The current sort mode (Name, Size, or Date).
+ * @param sortOrder The current sort order (Ascending or Descending).
+ * @param onBack Callback for navigating back.
+ * @param onNavigateTo Callback to navigate to a specific node.
+ * @param onToggleSource Callback to switch between mock and real data.
+ * @param onViewModeChange Callback when the view mode is changed.
+ * @param onSortModeChange Callback when the sort mode is changed.
+ * @param onSortOrderChange Callback when the sort order is changed.
+ * @param onNavigateToStackIndex Callback to navigate to a specific index in the path stack.
+ * @param onDeleteNode Callback to delete a file system node.
+ * @param onRenameNode Callback to rename a file system node.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class, ExperimentalFoundationApi::class)
 @Composable
-fun FileAnalysisScreen(
-    onNavigateUp: () -> Unit = {},
-    vm: FileScannerViewModel = koinViewModel()
+fun FileAnalysisContent(
+    root: FileSysNode?,
+    stats: FolderAnalysisStats,
+    isLoading: Boolean,
+    loadError: String?,
+    pathStack: List<String>,
+    useMock: Boolean,
+    viewMode: ViewMode,
+    sortMode: SortMode,
+    sortOrder: SortOrder,
+    onBack: () -> Unit,
+    onNavigateTo: (FileSysNode) -> Unit,
+    onToggleSource: () -> Unit,
+    onViewModeChange: (ViewMode) -> Unit,
+    onSortModeChange: (SortMode) -> Unit,
+    onSortOrderChange: (SortOrder) -> Unit,
+    onNavigateToStackIndex: (Int) -> Unit,
+    onDeleteNode: (FileSysNode) -> Unit,
+    onRenameNode: (FileSysNode, String) -> Unit
 ) {
-
-    // --- UI State ---
-    var viewMode by remember { mutableStateOf(ViewMode.LIST) }
-    var sortMode by remember { mutableStateOf(SortMode.NAME) }
-    var sortOrder by remember { mutableStateOf(SortOrder.ASC) }
-
-    // --- ViewModel & Data ---
-    val useMock = vm.useMock
-    
-    val root = vm.currentDirectory
-    val stats = vm.folderStats
-    val isLoading by vm.isLoading.collectAsState()
-    val loadError by vm.error.collectAsState()
-    val pathStack = vm.pathStack
-
     // --- Interaction State ---
     var selectedNode by remember { mutableStateOf<FileSysNode?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -59,11 +82,7 @@ fun FileAnalysisScreen(
     BasePage(
         title = stringResource(id = "file_analysis"),
         navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
-        onNavigationIconClick = {
-            if (!vm.navigateBack()) {
-                onNavigateUp()
-            }
-        },
+        onNavigationIconClick = onBack,
         scrollBehavior = scrollBehavior,
         actions = {
             // Stats Trigger
@@ -73,24 +92,17 @@ fun FileAnalysisScreen(
             // Sorting & View Mode Toolbar
             FileAnalysisToolbar(
                 viewMode = viewMode,
-                onViewModeChange = { viewMode = it },
+                onViewModeChange = onViewModeChange,
                 useMock = useMock,
-                onUseMockChange = { vm.toggleSource() },
-                isAndroid = true, 
+                onUseMockChange = { onToggleSource() },
+                isAndroid = true,
                 sortMode = sortMode,
-                onSortModeChange = { sortMode = it },
+                onSortModeChange = onSortModeChange,
                 sortOrder = sortOrder,
-                onSortOrderChange = { sortOrder = it }
+                onSortOrderChange = onSortOrderChange
             )
         }
     ) { innerPadding ->
-        // Start incremental sync when entering the screen to ensure real data is available
-        LaunchedEffect(useMock) {
-            if (!useMock) {
-                vm.startSync()
-            }
-        }
-
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -100,8 +112,8 @@ fun FileAnalysisScreen(
             // Navigation Breadcrumbs
             PathBreadcrumbs(
                 pathStack = pathStack,
-                onIndexClick = { vm.navigateToStackIndex(it) },
-                onRootClick = { vm.navigateToStackIndex(-1) }
+                onIndexClick = onNavigateToStackIndex,
+                onRootClick = { onNavigateToStackIndex(-1) }
             )
 
             HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
@@ -116,7 +128,7 @@ fun FileAnalysisScreen(
                     loadError != null -> {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text(
-                                text = loadError!!,
+                                text = loadError,
                                 color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.bodyLarge
                             )
@@ -135,7 +147,7 @@ fun FileAnalysisScreen(
                         
                         val onNodeDoubleClick: (FileSysNode) -> Unit = { node ->
                             if (node.isFolder) {
-                                vm.navigateTo(node)
+                                onNavigateTo(node)
                             } else {
                                 selectedNode = node
                             }
@@ -168,7 +180,7 @@ fun FileAnalysisScreen(
             FileActionSheetContent(
                 node = node,
                 onEnterClick = { 
-                    if (node.isFolder) vm.navigateTo(node)
+                    if (node.isFolder) onNavigateTo(node)
                     selectedNode = null
                 },
                 onRenameClick = { showRenameDialog = true },
@@ -182,7 +194,7 @@ fun FileAnalysisScreen(
         DeleteConfirmDialog(
             node = selectedNode!!,
             onConfirm = {
-                selectedNode?.let { vm.deleteNode(it) }
+                onDeleteNode(selectedNode!!)
                 showDeleteDialog = false
                 selectedNode = null
             },
@@ -195,11 +207,49 @@ fun FileAnalysisScreen(
         RenameDialog(
             node = selectedNode!!,
             onConfirm = { newName ->
-                selectedNode?.let { vm.renameNode(it, newName) }
+                onRenameNode(selectedNode!!, newName)
                 showRenameDialog = false
                 selectedNode = null
             },
             onDismiss = { showRenameDialog = false }
         )
+    }
+}
+
+/**
+ * Light theme preview for the file analysis content.
+ */
+@ExperimentalTime
+@Preview
+@Composable
+fun FileAnalysisContentLightPreview() {
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.LIGHT,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            FileAnalysisContent(
+                root = FileSysNode(name = "Root", nodeType = NodeType.FOLDER),
+                stats = FolderAnalysisStats(),
+                isLoading = false,
+                loadError = null,
+                pathStack = listOf("Storage", "Documents"),
+                useMock = true,
+                viewMode = ViewMode.LIST,
+                sortMode = SortMode.NAME,
+                sortOrder = SortOrder.ASC,
+                onBack = {},
+                onNavigateTo = {},
+                onToggleSource = {},
+                onViewModeChange = {},
+                onSortModeChange = {},
+                onSortOrderChange = {},
+                onNavigateToStackIndex = {},
+                onDeleteNode = {},
+                onRenameNode = { _, _ -> }
+            )
+        }
     }
 }

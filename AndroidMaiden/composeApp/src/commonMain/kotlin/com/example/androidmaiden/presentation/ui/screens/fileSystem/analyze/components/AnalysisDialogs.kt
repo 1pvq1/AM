@@ -1,4 +1,4 @@
-package com.example.androidmaiden.presentation.ui.screens.fileSystem.analyze
+package com.example.androidmaiden.presentation.ui.screens.fileSystem.analyze.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.*
