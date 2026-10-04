@@ -8,7 +8,6 @@ import com.example.androidmaiden.presentation.ui.theme.core.ThemeMode
 import com.example.androidmaiden.presentation.viewmodel.AdvancedLlmSettingsUiState
 import com.example.androidmaiden.presentation.ui.theme.AppTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
 
 /**
  * The Adaptive Coordinator for the Settings screen.
@@ -36,11 +35,9 @@ fun SettingsAdaptiveCoordinator(
     onOnlineCheckUrlChange: (String) -> Unit,
     checkOnlineConnection: () -> Unit,
     checkLocalLlmConnection: () -> Unit,
-    onNavigateToAdvancedLlmSettings: () -> Unit
+    onNavigateToAdvancedLlmSettings: () -> Unit,
+    onNavigateToControlAppearance: () -> Unit = {}
 ) {
-    // In Settings, we might use a different layout for wide screens, 
-    // e.g., a list-detail view,
-    // with width constraints on wide screens.
     val isWide = windowSizeClass.widthCategory != WindowSizeCategory.Compact
     
     SettingsContent(
@@ -65,9 +62,11 @@ fun SettingsAdaptiveCoordinator(
         onOnlineCheckUrlChange = onOnlineCheckUrlChange,
         checkOnlineConnection = checkOnlineConnection,
         checkLocalLlmConnection = checkLocalLlmConnection,
-        onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings
+        onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings,
+        onNavigateToControlAppearance = onNavigateToControlAppearance
     )
 }
+
 @Preview(name = "Compact", showBackground = true)
 @Composable
 fun SettingsScreenCompactPreview() {
@@ -116,6 +115,7 @@ private fun SettingsAdaptiveCoordinatorPreviewHelper(widthCategory: WindowSizeCa
         onOnlineCheckUrlChange = { },
         checkOnlineConnection = { },
         checkLocalLlmConnection = { },
-        onNavigateToAdvancedLlmSettings = { }
+        onNavigateToAdvancedLlmSettings = { },
+        onNavigateToControlAppearance = { }
     )
 }

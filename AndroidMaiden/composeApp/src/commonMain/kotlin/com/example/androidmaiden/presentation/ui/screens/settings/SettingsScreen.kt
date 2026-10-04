@@ -55,8 +55,9 @@ enum class Language(val stringResId: String, val tag: String) {
 @Composable
 fun SettingsScreen(
     onNavigateToAdvancedLlmSettings: () -> Unit,
+    onNavigateToControlAppearance: () -> Unit = {},
     settingsViewModel: SettingsViewModel = koinViewModel(),
-    advancedLlmViewModel: AdvancedLlmSettingsViewModel = rememberAdvancedLlmSettingsViewModel(),
+    advancedLlmViewModel: AdvancedLlmSettingsViewModel = rememberAdvancedLlmSettingsViewModel()
 ) {
     val themeMode by settingsViewModel.themeMode.collectAsState()
     val themeType by settingsViewModel.themeType.collectAsState()
@@ -94,7 +95,8 @@ fun SettingsScreen(
         onOnlineCheckUrlChange = advancedLlmViewModel::onOnlineCheckUrlChange,
         checkOnlineConnection = advancedLlmViewModel::checkOnlineConnection,
         checkLocalLlmConnection = advancedLlmViewModel::checkLocalLlmConnection,
-        onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings
+        onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings,
+        onNavigateToControlAppearance = onNavigateToControlAppearance
     )
 }
 
@@ -123,6 +125,7 @@ fun SettingsScreenPreview() {
         onOnlineCheckUrlChange = { },
         checkOnlineConnection = { },
         checkLocalLlmConnection = { },
-        onNavigateToAdvancedLlmSettings = { }
+        onNavigateToAdvancedLlmSettings = { },
+        onNavigateToControlAppearance = { }
     )
 }

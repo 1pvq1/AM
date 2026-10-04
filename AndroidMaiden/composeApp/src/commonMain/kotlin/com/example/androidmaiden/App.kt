@@ -9,6 +9,7 @@ import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.ui.screens.home.*
 import com.example.androidmaiden.presentation.ui.screens.skills.*
 import com.example.androidmaiden.presentation.ui.screens.settings.*
+import com.example.androidmaiden.presentation.ui.screens.settings.appearance.ControlAppearanceSettingsScreen
 import com.example.androidmaiden.presentation.ui.screens.todo.TodoScreen
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.dashboard.FilesPage
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.analyze.*
@@ -121,6 +122,15 @@ private fun AppScreenContent(
         is Screen.Settings -> SettingsScreen(
             onNavigateToAdvancedLlmSettings = {
                 navViewModel.navigateTo(Screen.AdvancedLlmSettings)
+            },
+            onNavigateToControlAppearance = {
+                navViewModel.navigateTo(Screen.ControlAppearance)
+            }
+        )
+
+        is Screen.ControlAppearance -> ControlAppearanceSettingsScreen(
+            onBack = {
+                navViewModel.navigateTo(Screen.Settings)
             }
         )
 

@@ -2,6 +2,7 @@ package com.example.androidmaiden.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
+import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.ui.theme.core.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -30,6 +31,14 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         val BUTTON_DISPLAY_STYLE = stringPreferencesKey("button_display_style")
         val USE_MATURE_MARKDOWN = booleanPreferencesKey("use_mature_markdown")
         val MODEL_CONFIGS_JSON = stringPreferencesKey("model_configs_json")
+
+        // UI Control Appearance Customization
+        val BREADCRUMB_SEPARATOR = stringPreferencesKey("breadcrumb_separator")
+        val BREADCRUMB_MAX_SEGMENTS = stringPreferencesKey("breadcrumb_max_segments")
+        val BREADCRUMB_ROOT_LABEL = stringPreferencesKey("breadcrumb_root_label")
+        val FILE_ITEM_DESCRIPTION_MODE = stringPreferencesKey("file_item_description_mode")
+        val FILE_ITEM_ICON_STYLE = stringPreferencesKey("file_item_icon_style")
+        val FILE_ITEM_SHOW_DETAILS = booleanPreferencesKey("file_item_show_details")
     }
 
     // LLM Settings
@@ -57,6 +66,18 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     val useMatureMarkdown: Flow<Boolean> = dataStore.data.map { it[Keys.USE_MATURE_MARKDOWN] ?: false }
     val modelConfigsJson: Flow<String?> = dataStore.data.map { it[Keys.MODEL_CONFIGS_JSON] }
 
+    // UI Control Appearance Settings
+    val controlAppearanceConfig: Flow<ControlAppearanceConfig> = dataStore.data.map { pref ->
+        ControlAppearanceConfig(
+            breadcrumbSeparator = BreadcrumbSeparator.entries.find { it.name == pref[Keys.BREADCRUMB_SEPARATOR] } ?: BreadcrumbSeparator.CHEVRON,
+            breadcrumbMaxSegments = BreadcrumbMaxSegments.entries.find { it.name == pref[Keys.BREADCRUMB_MAX_SEGMENTS] } ?: BreadcrumbMaxSegments.UNLIMITED,
+            breadcrumbRootLabel = BreadcrumbRootLabel.entries.find { it.name == pref[Keys.BREADCRUMB_ROOT_LABEL] } ?: BreadcrumbRootLabel.ROOT,
+            fileItemDescriptionMode = FileItemDescriptionMode.entries.find { it.name == pref[Keys.FILE_ITEM_DESCRIPTION_MODE] } ?: FileItemDescriptionMode.CONCISE,
+            fileItemIconStyle = FileItemIconStyle.entries.find { it.name == pref[Keys.FILE_ITEM_ICON_STYLE] } ?: FileItemIconStyle.DEFAULT,
+            fileItemShowDetails = pref[Keys.FILE_ITEM_SHOW_DETAILS] ?: true
+        )
+    }
+
     // Save Methods
     suspend fun saveGeminiApiKey(key: String) = dataStore.edit { it[Keys.GEMINI_API_KEY] = key }
     suspend fun saveOpenAiApiKey(key: String) = dataStore.edit { it[Keys.OPENAI_API_KEY] = key }
@@ -74,4 +95,11 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     suspend fun saveButtonDisplayStyle(style: ButtonDisplayStyle) = dataStore.edit { it[Keys.BUTTON_DISPLAY_STYLE] = style.name }
     suspend fun saveUseMatureMarkdown(use: Boolean) = dataStore.edit { it[Keys.USE_MATURE_MARKDOWN] = use }
     suspend fun saveModelConfigsJson(json: String) = dataStore.edit { it[Keys.MODEL_CONFIGS_JSON] = json }
+
+    suspend fun saveBreadcrumbSeparator(separator: BreadcrumbSeparator) = dataStore.edit { it[Keys.BREADCRUMB_SEPARATOR] = separator.name }
+    suspend fun saveBreadcrumbMaxSegments(maxSegments: BreadcrumbMaxSegments) = dataStore.edit { it[Keys.BREADCRUMB_MAX_SEGMENTS] = maxSegments.name }
+    suspend fun saveBreadcrumbRootLabel(label: BreadcrumbRootLabel) = dataStore.edit { it[Keys.BREADCRUMB_ROOT_LABEL] = label.name }
+    suspend fun saveFileItemDescriptionMode(mode: FileItemDescriptionMode) = dataStore.edit { it[Keys.FILE_ITEM_DESCRIPTION_MODE] = mode.name }
+    suspend fun saveFileItemIconStyle(style: FileItemIconStyle) = dataStore.edit { it[Keys.FILE_ITEM_ICON_STYLE] = style.name }
+    suspend fun saveFileItemShowDetails(show: Boolean) = dataStore.edit { it[Keys.FILE_ITEM_SHOW_DETAILS] = show }
 }

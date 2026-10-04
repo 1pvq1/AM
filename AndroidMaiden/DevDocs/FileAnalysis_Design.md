@@ -1,64 +1,60 @@
 # File System Analysis Module Design
 
 ## 1. Overview
-The File Analysis module is designed to provide users with a deep look into their device's storage. It goes beyond simple file browsing by offering visualization of storage distribution, identification of large/old files, and structural visualization via tree views.
+The File Analysis module provides users and developers with architectural insights into Android's storage layout (Android 13+ specification). Beyond standard file browsing, it offers storage distribution visualization, folder hierarchy traversal, and educational explanations of Android's system partitions, Scoped Storage rules, and application sandboxing.
 
 ## 2. Architecture (MVVM + Clean Architecture)
 
-### UI Layer (`com.example.androidmaiden.screens.fileSystem.analyze`)
-- **FileAnalysisScreen**: The main entry point. Orchestrates the toolbar, status display, and the active view mode (List/Grid/Tree).
-- **ViewComponents**: `FileListView`, `FileGridView`, `FileTreeView` - dedicated components for different visualization styles.
-- **FileItem**: Reusable component for displaying individual file metadata.
-- **PathBreadcrumbs**: Interactive navigation component for jumping between parent folders.
+### UI Layer (`com.example.androidmaiden.presentation.ui.screens.fileSystem.analyze`)
+- **FileAnalysisPage**: Stateful entry point connecting `FileScannerViewModel` to UI components.
+- **FileAnalysisCoordinator**: Adaptive UI layout coordinator.
+- **FileAnalysisContent**: Main stateless layout displaying breadcrumbs, view modes, and actions.
+- **ViewComponents**: `FileListView`, `FileGridView`, `FileTreeView` - dedicated views for different visualization styles.
+- **FileItem**: Reusable list item component displaying metadata, Android OS folder explanations, customizable description modes (Concise/Full/Hidden), and icon styles.
+- **PathBreadcrumbs**: Interactive path navigation bar supporting customizable separators (`>`, `/`, `|`, `•`, `→`), visible length limits, and root labels.
+- **FileActionSheet**: Bottom sheet displaying file actions and Android OS architecture insights.
+- **ControlAppearanceSettingsScreen**: Dedicated customization page with options and real-time interactive preview for UI controls.
 
-### Presentation Layer (`com.example.androidmaiden.viewModels`)
+### Presentation Layer (`com.example.androidmaiden.presentation.viewmodel`)
 - **FileScannerViewModel**: 
-    - Manages the current path and traversal state.
-    - Handles the toggle between Mock and Real data (connected to Room DB).
-    - Exposes UI state via `StateFlow` and `MutableState` (loading, error, current nodes).
-    - Manages a `pathStack` for hierarchical navigation and breadcrumb support.
-    - Integrated with Koin DI for proper lifecycle management.
+    - Manages directory traversal state, view modes, and sorting.
+    - Supports seamless switching between Simulated Data Mode (Android 13 OS hierarchy) and Real Device Data Mode (Room DB).
+    - Performs path lookup (`findMockNode`) for mock directory navigation.
+    - Enriches real device folder nodes using `AndroidFolderExplainer`.
+    - Exposes state flows for loading, errors, stats, and path stack.
+- **SettingsViewModel**:
+    - Exposes `controlAppearanceConfig` state flows and setters for DataStore preferences.
 
 ### Domain/Data Layer
-- **FileSysNode**: The unified data model for both mock and real file entries.
-- **FileRepository**: Single source of truth for "Real" data, ensuring consistency with the File Classification module.
-- **Analysis Engine**: Logic to calculate directory sizes and categorize space usage (In Progress).
+- **FileSysNode**: Unified hierarchical node model for file system entries.
+- **UiControlSettings**: Domain models (`BreadcrumbSeparator`, `BreadcrumbMaxSegments`, `BreadcrumbRootLabel`, `FileItemDescriptionMode`, `FileItemIconStyle`, `ControlAppearanceConfig`).
+- **AndroidFolderExplainer**: Domain service holding Android 13 architecture explanations (Scoped Storage, APEX, Treble, Direct Boot, etc.).
+- **FileRepository**: Single source of truth for real device data connected to Room DB (`FileMetadataDao`).
+- **SettingsRepository**: DataStore repository persisting theme, LLM, and UI control appearance configurations.
 
 ## 3. Implementation Progress
 
 | Feature | Status | Note |
 | :--- | :--- | :--- |
-| Mock Data Support | ✅ Done | Used for rapid UI prototyping. |
+| Mock Data Support | ✅ Done | Simulated Android 13 OS directory hierarchy with full path navigation. |
 | Real Data (DB) | ✅ Done | Reactive connection to Room database via `FileRepository`. |
-| View Modes (L/G/T) | ✅ Done | List, Grid, and Tree views fully integrated with navigation. |
+| Architecture Explanations | ✅ Done | `AndroidFolderExplainer` provides explanations for both Mock and Real folders. |
+| View Modes (L/G/T) | ✅ Done | List, Grid, and Tree views integrated with single/double-click handlers. |
 | Sorting | ✅ Done | Supports Name, Size, Date (Asc/Desc). |
-| Navigation | ✅ Done | Folder drill-down and hierarchical back-stack implemented. |
-| Breadcrumbs UI | ✅ Done | Clickable segments for quick navigation. |
-| Storage Analysis | 🏗️ In Progress | Missing pie charts / breakdown by type in the current view. |
-| File Operations | 🏗️ Partial | Folder navigation works; file preview/details pending integration. |
+| Navigation & Breadcrumbs | ✅ Done | Accurate path stack navigation with customizable separators & length truncation. |
+| UI Control Customization | ✅ Done | Dedicated `ControlAppearanceSettingsScreen` with options & live preview. |
+| Storage Analysis | ✅ Done | `FolderAnalysisStats` with distribution bar pop-ups. |
+| File Operations | ✅ Done | Folder opening, renaming, and deletion integrated. |
 
-## 4. Shortcomings & Improvement Plan
+## 4. Shortcomings & Addressed Issues
 
 ### Shortcomings (Addressed)
-1. ~~**ViewModel Lifecycle**~~: Now managed via Koin DI.
-2. ~~**Navigation**~~: Full folder drill-down supported in all view modes.
-3. ~~**Real Data Sync**~~: Connected to the persistent Room "shadow" database.
-4. ~~**Breadcrumbs**~~: Implemented interactive path segments.
+1. ~~**ViewModel Lifecycle**~~: Managed via Koin DI.
+2. ~~**Mock Data Navigation**~~: Implemented recursive `findMockNode` search so clicking folders in mock mode drills down correctly.
+3. ~~**Folder Architectural Explanations**~~: Integrated `AndroidFolderExplainer` to explain Android 13 directory rules (Scoped Storage, APEX, Treble, etc.).
+4. ~~**Breadcrumb Path Accuracy**~~: Synchronized path stack representation across mock and real device modes.
+5. ~~**UI Control Customization**~~: Integrated `ControlAppearanceSettingsScreen` and DataStore preferences for `PathBreadcrumbs` and `FileItem`.
 
-### Remaining Shortcomings
-1. **Tree View Optimization**: Large directories may cause UI stuttering if many nodes are expanded.
-2. **Analysis Depth**: Currently a file browser. Needs an "Analysis Dashboard" (pie charts, largest folders).
-3. **MIME Type Handling**: Using generic icons; should use specific icons based on file metadata.
-
-### Improvement Plan (Next Steps)
-1. **Analysis Dashboard**: Create a new component in the `FileAnalysisScreen` that shows a visual breakdown of the current folder's content (e.g., % of Images, Videos, etc.).
-2. **File Actions**: Integrate "Delete", "Rename", and "Preview" (using existing components from `FilesListPage`).
-3. **MIME Type Icons**: Improve `FileItem` to show more accurate icons based on file extensions.
-4. **Performance**: Implement lazy-loading or pagination for extremely large directories.
-
-# Issues:
-
-## Display aspects:
-1. Launch the application and go to the file analysis page. Under simulated data, no 'skeleton' is displayed; instead, you need to switch the data source for it to appear.
-~~2. When clicking a certain folder continuously under the tree view, the PathBreadcrumbs will stack repeatedly and cannot display the path correctly.~~
-3. The number of folders and the display are incorrect, both are 0, and no actual entries are shown.~~
+### Remaining Shortcomings & Future Plan
+1. **Tree View Optimization**: Implement lazy expansion or node virtualisation for ultra-large directories.
+2. **Batch File Actions**: Support multi-select deletion or moving.

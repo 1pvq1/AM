@@ -3,246 +3,343 @@ package com.example.androidmaiden.presentation.ui.features.eg
 import com.example.androidmaiden.domain.model.FileSysNode
 import com.example.androidmaiden.domain.model.FolderType
 import com.example.androidmaiden.domain.model.NodeType
+import com.example.androidmaiden.domain.service.AndroidFolderExplainer
 
-// Simulated file structure
-// Removed @Composable because this is called from the ViewModel/Background thread
+/**
+ * Returns a simulated Android 13 file system tree hierarchy.
+ * Used for educational analysis and UI demonstration of Android OS directory architecture.
+ */
 fun simFileNode(): FileSysNode {
     return FileSysNode(
         name = "/",
+        path = "/",
         nodeType = NodeType.FOLDER,
         folderType = FolderType.FOLDER,
-        description = "System Root",
+        description = AndroidFolderExplainer.explainFolder("/", "/"),
         children = listOf(
-            // User storage
+            // Storage subtree
             FileSysNode(
-                "storage", nodeType = NodeType.FOLDER, folderType = FolderType.FOLDER,
-                description = "Internal Shared Storage",
+                name = "storage",
+                path = "/storage",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.FOLDER,
+                description = AndroidFolderExplainer.explainFolder("/storage", "storage"),
                 children = listOf(
                     FileSysNode(
-                        "emulated", nodeType = NodeType.FOLDER, folderType = FolderType.FOLDER,
-                        description = "Device Storage Emulation",
+                        name = "emulated",
+                        path = "/storage/emulated",
+                        nodeType = NodeType.FOLDER,
+                        folderType = FolderType.FOLDER,
+                        description = AndroidFolderExplainer.explainFolder("/storage/emulated", "emulated"),
                         children = listOf(
                             FileSysNode(
-                                "0", nodeType = NodeType.FOLDER, folderType = FolderType.FOLDER,
-                                description = "Primary User Home",
+                                name = "0",
+                                path = "/storage/emulated/0",
+                                nodeType = NodeType.FOLDER,
+                                folderType = FolderType.FOLDER,
+                                description = AndroidFolderExplainer.explainFolder("/storage/emulated/0", "0"),
                                 children = listOf(
                                     FileSysNode(
-                                        "Android",
+                                        name = "Android",
+                                        path = "/storage/emulated/0/Android",
                                         nodeType = NodeType.FOLDER,
                                         folderType = FolderType.OTHER,
-                                        description = "App Data & Cache",
+                                        description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Android", "Android"),
                                         children = listOf(
                                             FileSysNode(
-                                                "data",
+                                                name = "data",
+                                                path = "/storage/emulated/0/Android/data",
                                                 nodeType = NodeType.FOLDER,
                                                 folderType = FolderType.OTHER,
-                                                description = "Private App Data"
+                                                description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Android/data", "data")
                                             ),
                                             FileSysNode(
-                                                "media",
+                                                name = "media",
+                                                path = "/storage/emulated/0/Android/media",
                                                 nodeType = NodeType.FOLDER,
                                                 folderType = FolderType.OTHER,
-                                                description = "App Media Files"
+                                                description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Android/media", "media")
                                             ),
                                             FileSysNode(
-                                                "obb",
+                                                name = "obb",
+                                                path = "/storage/emulated/0/Android/obb",
                                                 nodeType = NodeType.FOLDER,
                                                 folderType = FolderType.OTHER,
-                                                description = "Expansion Files"
+                                                description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Android/obb", "obb")
                                             )
                                         )
                                     ),
                                     FileSysNode(
-                                        "Download",
+                                        name = "Download",
+                                        path = "/storage/emulated/0/Download",
                                         nodeType = NodeType.FOLDER,
                                         folderType = FolderType.DOCUMENT,
-                                        description = "Downloaded Files"
+                                        description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Download", "Download")
                                     ),
                                     FileSysNode(
-                                        "Documents",
+                                        name = "Documents",
+                                        path = "/storage/emulated/0/Documents",
                                         nodeType = NodeType.FOLDER,
                                         folderType = FolderType.DOCUMENT,
-                                        description = "User Documents"
+                                        description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Documents", "Documents")
                                     ),
                                     FileSysNode(
-                                        "DCIM",
+                                        name = "DCIM",
+                                        path = "/storage/emulated/0/DCIM",
                                         nodeType = NodeType.FOLDER,
                                         folderType = FolderType.IMAGE,
-                                        description = "Camera Photos & Videos"
+                                        description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/DCIM", "DCIM")
                                     ),
                                     FileSysNode(
-                                        "Pictures",
+                                        name = "Pictures",
+                                        path = "/storage/emulated/0/Pictures",
                                         nodeType = NodeType.FOLDER,
                                         folderType = FolderType.IMAGE,
-                                        description = "User Images"
+                                        description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Pictures", "Pictures")
                                     ),
                                     FileSysNode(
-                                        "Screenshots",
+                                        name = "Screenshots",
+                                        path = "/storage/emulated/0/Pictures/Screenshots",
                                         nodeType = NodeType.FOLDER,
                                         folderType = FolderType.IMAGE,
-                                        description = "Captured Screens"
+                                        description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Pictures/Screenshots", "Screenshots")
                                     ),
                                     FileSysNode(
-                                        "Movies",
+                                        name = "Movies",
+                                        path = "/storage/emulated/0/Movies",
                                         nodeType = NodeType.FOLDER,
                                         folderType = FolderType.VIDEO,
-                                        description = "User Videos"
+                                        description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Movies", "Movies")
                                     ),
                                     FileSysNode(
-                                        "Music",
+                                        name = "Music",
+                                        path = "/storage/emulated/0/Music",
                                         nodeType = NodeType.FOLDER,
                                         folderType = FolderType.MUSIC,
-                                        description = "Audio Library"
+                                        description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Music", "Music")
                                     ),
                                     FileSysNode(
-                                        "Podcasts",
+                                        name = "Podcasts",
+                                        path = "/storage/emulated/0/Podcasts",
                                         nodeType = NodeType.FOLDER,
                                         folderType = FolderType.MUSIC,
-                                        description = "Subscription Audio"
+                                        description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Podcasts", "Podcasts")
                                     ),
                                     FileSysNode(
-                                        "Ringtones",
+                                        name = "Ringtones",
+                                        path = "/storage/emulated/0/Ringtones",
                                         nodeType = NodeType.FOLDER,
                                         folderType = FolderType.MUSIC,
-                                        description = "Alert Tones"
+                                        description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Ringtones", "Ringtones")
                                     ),
                                     FileSysNode(
-                                        "Alarms",
+                                        name = "Alarms",
+                                        path = "/storage/emulated/0/Alarms",
                                         nodeType = NodeType.FOLDER,
                                         folderType = FolderType.MUSIC,
-                                        description = "Alarm Sounds"
+                                        description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Alarms", "Alarms")
                                     ),
                                     FileSysNode(
-                                        "Notifications",
+                                        name = "Notifications",
+                                        path = "/storage/emulated/0/Notifications",
                                         nodeType = NodeType.FOLDER,
                                         folderType = FolderType.MUSIC,
-                                        description = "Notification Sounds"
+                                        description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Notifications", "Notifications")
                                     ),
                                     FileSysNode(
-                                        "Recordings",
+                                        name = "Recordings",
+                                        path = "/storage/emulated/0/Recordings",
                                         nodeType = NodeType.FOLDER,
                                         folderType = FolderType.MUSIC,
-                                        description = "Voice Memos"
+                                        description = AndroidFolderExplainer.explainFolder("/storage/emulated/0/Recordings", "Recordings")
                                     )
                                 )
                             )
                         )
                     ),
                     FileSysNode(
-                        "{XXXX-XXXX}", nodeType = NodeType.FOLDER, folderType = FolderType.FOLDER,
-                        description = "External SD Card"
+                        name = "{XXXX-XXXX}",
+                        path = "/storage/{XXXX-XXXX}",
+                        nodeType = NodeType.FOLDER,
+                        folderType = FolderType.FOLDER,
+                        description = "External SD Card storage mount point."
                     )
                 )
             ),
             FileSysNode(
-                "sdcard", nodeType = NodeType.FOLDER, folderType = FolderType.FOLDER,
-                description = "Legacy Symlink to Storage"
+                name = "sdcard",
+                path = "/sdcard",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.FOLDER,
+                description = "Legacy symlink pointing to /storage/emulated/0."
             ),
 
-            // App/data
+            // Data partition subtree
             FileSysNode(
-                "data", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "System Data Partition",
+                name = "data",
+                path = "/data",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/data", "data"),
                 children = listOf(
                     FileSysNode(
-                        "app", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                        description = "Installed Applications"
+                        name = "app",
+                        path = "/data/app",
+                        nodeType = NodeType.FOLDER,
+                        folderType = FolderType.OTHER,
+                        description = AndroidFolderExplainer.explainFolder("/data/app", "app")
                     ),
                     FileSysNode(
-                        "user", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                        description = "Multi-user Data"
+                        name = "user",
+                        path = "/data/user",
+                        nodeType = NodeType.FOLDER,
+                        folderType = FolderType.OTHER,
+                        description = AndroidFolderExplainer.explainFolder("/data/user", "user")
                     ),
                     FileSysNode(
-                        "user_de", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                        description = "Direct Boot Data"
+                        name = "user_de",
+                        path = "/data/user_de",
+                        nodeType = NodeType.FOLDER,
+                        folderType = FolderType.OTHER,
+                        description = AndroidFolderExplainer.explainFolder("/data/user_de", "user_de")
                     ),
                     FileSysNode(
-                        "media", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                        description = "Shared Media Data"
+                        name = "media",
+                        path = "/data/media",
+                        nodeType = NodeType.FOLDER,
+                        folderType = FolderType.OTHER,
+                        description = "Shared Media Data storage backing FUSE layer."
                     ),
                     FileSysNode(
-                        "system", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                        description = "System Configuration"
+                        name = "system",
+                        path = "/data/system",
+                        nodeType = NodeType.FOLDER,
+                        folderType = FolderType.OTHER,
+                        description = "System configuration settings, usage stats, and packages.xml."
                     )
                 )
             ),
 
-            // System partitions
+            // System OS partitions
             FileSysNode(
-                "system", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Android System OS"
+                name = "system",
+                path = "/system",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/system", "system")
             ),
             FileSysNode(
-                "system_ext", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "System Extensions"
+                name = "system_ext",
+                path = "/system_ext",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/system_ext", "system_ext")
             ),
             FileSysNode(
-                "product", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Product Specific Files"
+                name = "product",
+                path = "/product",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/product", "product")
             ),
             FileSysNode(
-                "vendor", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Hardware Vendor Files"
+                name = "vendor",
+                path = "/vendor",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/vendor", "vendor")
             ),
             FileSysNode(
-                "odm", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Original Design Manufacturer Files"
+                name = "odm",
+                path = "/odm",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/odm", "odm")
             ),
 
             // APEX and config
             FileSysNode(
-                "apex", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Modular System Components"
+                name = "apex",
+                path = "/apex",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/apex", "apex")
             ),
             FileSysNode(
-                "linkerconfig", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Runtime Linker Config"
+                name = "linkerconfig",
+                path = "/linkerconfig",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/linkerconfig", "linkerconfig")
             ),
             FileSysNode(
-                "etc", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Configuration Files"
-            ),
-
-            // Virtual/kernel
-            FileSysNode(
-                "proc", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Process Information"
-            ),
-            FileSysNode(
-                "sys", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Kernel System Files"
-            ),
-            FileSysNode(
-                "dev", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Device Nodes"
+                name = "etc",
+                path = "/etc",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/etc", "etc")
             ),
 
-            // Mount/cache/metadata
+            // Kernel and Virtual FS
             FileSysNode(
-                "mnt", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Mount Points"
+                name = "proc",
+                path = "/proc",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/proc", "proc")
             ),
             FileSysNode(
-                "cache", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Temporary Cache"
+                name = "sys",
+                path = "/sys",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/sys", "sys")
             ),
             FileSysNode(
-                "metadata", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Encrypted Metadata"
+                name = "dev",
+                path = "/dev",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/dev", "dev")
             ),
 
-            // Optional/vendor-specific
+            // Mount & Cache
             FileSysNode(
-                "persist", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Persistent Vendor Data"
+                name = "mnt",
+                path = "/mnt",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/mnt", "mnt")
             ),
             FileSysNode(
-                "oem", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "OEM Customizations"
+                name = "cache",
+                path = "/cache",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/cache", "cache")
             ),
             FileSysNode(
-                "config", nodeType = NodeType.FOLDER, folderType = FolderType.OTHER,
-                description = "Storage Config"
+                name = "metadata",
+                path = "/metadata",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/metadata", "metadata")
+            ),
+
+            // Vendor/OEM
+            FileSysNode(
+                name = "persist",
+                path = "/persist",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/persist", "persist")
+            ),
+            FileSysNode(
+                name = "oem",
+                path = "/oem",
+                nodeType = NodeType.FOLDER,
+                folderType = FolderType.OTHER,
+                description = AndroidFolderExplainer.explainFolder("/oem", "oem")
             )
         )
     )

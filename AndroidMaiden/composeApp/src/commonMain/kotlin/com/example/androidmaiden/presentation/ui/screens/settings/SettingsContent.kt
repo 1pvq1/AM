@@ -53,7 +53,8 @@ fun SettingsContent(
     onOnlineCheckUrlChange: (String) -> Unit,
     checkOnlineConnection: () -> Unit,
     checkLocalLlmConnection: () -> Unit,
-    onNavigateToAdvancedLlmSettings: () -> Unit
+    onNavigateToAdvancedLlmSettings: () -> Unit,
+    onNavigateToControlAppearance: () -> Unit = {}
 ) {
     if (isWide) {
         ListDetailSettings(
@@ -77,7 +78,8 @@ fun SettingsContent(
             onOnlineCheckUrlChange = onOnlineCheckUrlChange,
             checkOnlineConnection = checkOnlineConnection,
             checkLocalLlmConnection = checkLocalLlmConnection,
-            onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings
+            onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings,
+            onNavigateToControlAppearance = onNavigateToControlAppearance
         )
     } else {
         CompactSettings(
@@ -99,7 +101,8 @@ fun SettingsContent(
             onOnlineCheckUrlChange = onOnlineCheckUrlChange,
             checkOnlineConnection = checkOnlineConnection,
             checkLocalLlmConnection = checkLocalLlmConnection,
-            onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings
+            onNavigateToAdvancedLlmSettings = onNavigateToAdvancedLlmSettings,
+            onNavigateToControlAppearance = onNavigateToControlAppearance
         )
     }
 }
@@ -127,7 +130,8 @@ private fun ListDetailSettings(
     onOnlineCheckUrlChange: (String) -> Unit,
     checkOnlineConnection: () -> Unit,
     checkLocalLlmConnection: () -> Unit,
-    onNavigateToAdvancedLlmSettings: () -> Unit
+    onNavigateToAdvancedLlmSettings: () -> Unit,
+    onNavigateToControlAppearance: () -> Unit
 ) {
     Row(modifier = Modifier.fillMaxSize()) {
         // Navigation Pane
@@ -181,7 +185,8 @@ private fun ListDetailSettings(
                             useDynamicColor = useDynamicColor,
                             onDynamicColorChange = onDynamicColorChange,
                             buttonDisplayStyle = buttonDisplayStyle,
-                            onButtonDisplayStyleChange = onButtonDisplayStyleChange
+                            onButtonDisplayStyleChange = onButtonDisplayStyleChange,
+                            onNavigateToControlAppearance = onNavigateToControlAppearance
                         )
                     }
                     SettingsSection.LANGUAGE -> {
@@ -245,7 +250,8 @@ private fun CompactSettings(
     onOnlineCheckUrlChange: (String) -> Unit,
     checkOnlineConnection: () -> Unit,
     checkLocalLlmConnection: () -> Unit,
-    onNavigateToAdvancedLlmSettings: () -> Unit
+    onNavigateToAdvancedLlmSettings: () -> Unit,
+    onNavigateToControlAppearance: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
@@ -290,7 +296,8 @@ private fun CompactSettings(
                     useDynamicColor = useDynamicColor,
                     onDynamicColorChange = onDynamicColorChange,
                     buttonDisplayStyle = buttonDisplayStyle,
-                    onButtonDisplayStyleChange = onButtonDisplayStyleChange
+                    onButtonDisplayStyleChange = onButtonDisplayStyleChange,
+                    onNavigateToControlAppearance = onNavigateToControlAppearance
                 )
             }
             item { Spacer(modifier = Modifier.height(16.dp)) }

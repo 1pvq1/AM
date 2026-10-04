@@ -5,18 +5,19 @@
 The project follows a **Modular Monolith + Clean Architecture** approach with **MVVM** in the UI layer.
 
 ### Core Components:
-- **UI Layer (`FileClassifyPage`, `FilesListPage`)**:
+- **UI Layer (`FileClassifyPage`, `FilesListPage`, `FileAnalysisPage`)**:
     - `FileClassifyPage`: Entry point showing storage summary, search, file categories, and analysis blocks.
     - `FilesListPage`: Detailed viewer for categories with List/Grid modes, sorting, and file operations.
-    - **Responsibility**: UI state observation, user interaction handling, and navigation.
+    - `FileAnalysisPage`: Deep architectural explorer offering simulated Android 13 OS and real device storage analysis.
 
-- **Presentation Layer (`PersistentFileViewModel`)**:
+- **Presentation Layer (`PersistentFileViewModel`, `FileScannerViewModel`)**:
     - Bridges Repository and UI.
     - Handles data transformation (Classification, Stats calculation).
-    - Manages search state and UI view modes.
+    - Manages search state, path stack, and UI view modes.
 
-- **Domain/Data Layer (`FileRepository`, `FileMetadataDao`)**:
-    - `FileRepository`: Single source of truth. Orchestrates DB and Scanner.
+- **Domain/Data Layer (`FileRepository`, `FileMetadataDao`, `AndroidFolderExplainer`)**:
+    - `FileRepository`: Single source of truth orchestrating DB and Scanner.
+    - `AndroidFolderExplainer`: Domain service providing Android 13 architecture context for directories.
     - `FileMetadata`: Core entity with rich metadata.
     - `FileMetadataDao`: Reactive SQL queries (Flow).
 
@@ -32,9 +33,9 @@ The project follows a **Modular Monolith + Clean Architecture** approach with **
 - ✅ **Incremental Scanning**: Efficient updates based on directory timestamps.
 - ✅ **Rich Metadata**: Video/Audio/Image tag extraction.
 - ✅ **Search**: Global real-time search with debounce.
-- ✅ **Storage Analysis**: "Large Files" (>50MB) and "Recent Files" (7 days) implemented.
+- ✅ **Storage Analysis**: Large files, recent files, and folder type distribution.
 - ✅ **File Operations**: Delete and Rename integrated with UI and physical storage.
-- ✅ **Adaptive UI**: Category-specific layouts and density control.
+- ✅ **File Analysis Integration**: Synced "Real Data" and "Simulated Data" modes in `FileAnalysisPage` with `AndroidFolderExplainer` architecture insights.
 
 ### Remaining Tasks & Shortcomings:
 - [ ] **Move Operation**: Infrastructure is ready, but UI needs a folder picker or "Move Mode".
@@ -42,29 +43,10 @@ The project follows a **Modular Monolith + Clean Architecture** approach with **
 - [ ] **Search Interaction**: Search results should open preview or navigate to location.
 - [ ] **Thumbnail Caching**: Improve performance of large list scrolling with optimized thumbnails.
 - [ ] **Batch Operations**: Allow selecting multiple files for delete/move.
-- [ ] **File Analysis Integration**: Sync "Real Data" mode in `FileAnalysisScreen` with the `FileRepository` database.
 
 ## 3. Improvement Suggestions
 
 1. **Background Syncing**: Move `syncRoot` to `WorkManager` for periodic background updates.
-2. **Unified Navigation**: clicking a file in search results should trigger the `FilePreviewOverlay` or navigate to its parent category.
+2. **Unified Navigation**: Clicking a file in search results should trigger the `FilePreviewOverlay` or navigate to its parent category.
 3. **Permission Handling**: Add a more graceful "Permission Denied" UI state.
 4. **MIME Type Mapping**: Use `mimeType` from `FileMetadata` for more accurate icon and viewer selection.
-
-## 4. Development Plan
-
-### Phase 1: Interaction & UX (Current)
-- [x] Implement search and storage stats.
-- [x] Implement file deletion and renaming.
-- [ ] Integrate Search Result interactions.
-- [ ] Add "Share" and "Copy Path" actions.
-
-### Phase 2: Functional Enhancements
-- [ ] Implement a simple "Move to Folder" selection dialog.
-- [ ] Add "Favorite" toggle functionality.
-- [ ] Implement batch selection mode.
-
-### Phase 3: Performance & Polish
-- [ ] Integrate `WorkManager` for background indexing.
-- [ ] Refine Coil thumbnail loading for videos.
-- [ ] Add "Empty Category" placeholders with illustrations.

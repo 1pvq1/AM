@@ -2,12 +2,18 @@ package com.example.androidmaiden.presentation.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.example.androidmaiden.data.repository.SettingsRepository
+import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.ui.theme.core.AppThemeType
 import com.example.androidmaiden.presentation.ui.theme.core.ButtonDisplayStyle
 import com.example.androidmaiden.presentation.ui.theme.core.ThemeMode
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for managing global application settings and UI control appearance preferences.
+ *
+ * @param repository The central settings repository backing DataStore preferences.
+ */
 class SettingsViewModel(private val repository: SettingsRepository) : BaseViewModel() {
 
     val themeMode: StateFlow<ThemeMode> = repository.themeMode
@@ -44,6 +50,12 @@ class SettingsViewModel(private val repository: SettingsRepository) : BaseViewMo
 
     val useMatureMarkdown: StateFlow<Boolean> = repository.useMatureMarkdown
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    /**
+     * Observable configuration state for UI controls appearance customization.
+     */
+    val controlAppearanceConfig: StateFlow<ControlAppearanceConfig> = repository.controlAppearanceConfig
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ControlAppearanceConfig())
 
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch { repository.saveThemeMode(mode) }
@@ -82,5 +94,47 @@ class SettingsViewModel(private val repository: SettingsRepository) : BaseViewMo
 
     fun setUseMatureMarkdown(use: Boolean) {
         viewModelScope.launch { repository.saveUseMatureMarkdown(use) }
+    }
+
+    /**
+     * Updates the breadcrumb separator symbol preference.
+     */
+    fun setBreadcrumbSeparator(separator: BreadcrumbSeparator) {
+        viewModelScope.launch { repository.saveBreadcrumbSeparator(separator) }
+    }
+
+    /**
+     * Updates the breadcrumb maximum visible segments preference.
+     */
+    fun setBreadcrumbMaxSegments(maxSegments: BreadcrumbMaxSegments) {
+        viewModelScope.launch { repository.saveBreadcrumbMaxSegments(maxSegments) }
+    }
+
+    /**
+     * Updates the breadcrumb root segment display label preference.
+     */
+    fun setBreadcrumbRootLabel(label: BreadcrumbRootLabel) {
+        viewModelScope.launch { repository.saveBreadcrumbRootLabel(label) }
+    }
+
+    /**
+     * Updates the file item content description display mode preference.
+     */
+    fun setFileItemDescriptionMode(mode: FileItemDescriptionMode) {
+        viewModelScope.launch { repository.saveFileItemDescriptionMode(mode) }
+    }
+
+    /**
+     * Updates the file item icon style preference.
+     */
+    fun setFileItemIconStyle(style: FileItemIconStyle) {
+        viewModelScope.launch { repository.saveFileItemIconStyle(style) }
+    }
+
+    /**
+     * Updates whether file item metadata details (timestamp and size/count) are shown.
+     */
+    fun setFileItemShowDetails(show: Boolean) {
+        viewModelScope.launch { repository.saveFileItemShowDetails(show) }
     }
 }

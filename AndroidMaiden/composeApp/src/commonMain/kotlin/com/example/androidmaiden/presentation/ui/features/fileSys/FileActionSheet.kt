@@ -15,7 +15,7 @@ import com.example.androidmaiden.core.util.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
- * Bottom sheet content for file/folder actions and analysis info.
+ * Bottom sheet content for file/folder actions and Android OS architectural analysis info.
  *
  * @param node The file system node to perform actions on.
  * @param onEnterClick Callback for opening a folder.
@@ -50,25 +50,51 @@ fun FileActionSheetContent(
         if (node.isFolder) {
             ListItem(
                 headlineContent = { Text("Open Folder") },
-                leadingContent = { Icon(Icons.Default.FolderOpen, null) },
+                leadingContent = { Icon(Icons.Default.FolderOpen, contentDescription = "Open Folder") },
                 modifier = Modifier.clickable { onEnterClick() }
             )
         }
 
         ListItem(
             headlineContent = { Text("Rename") },
-            leadingContent = { Icon(Icons.Default.Edit, null) },
+            leadingContent = { Icon(Icons.Default.Edit, contentDescription = "Rename") },
             modifier = Modifier.clickable { onRenameClick() }
         )
         ListItem(
             headlineContent = { Text("Delete", color = MaterialTheme.colorScheme.error) },
-            leadingContent = { Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error) },
+            leadingContent = { Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error) },
             modifier = Modifier.clickable { onDeleteClick() }
         )
 
         HorizontalDivider()
 
-        // Analysis Info section
+        // Architectural Description Section
+        if (node.description.isNotBlank() && !node.description.startsWith("Path:")) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        text = "Android Architecture Insights",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = node.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+
+        // Analysis Info Section
         Text(
             text = "Item Details",
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -105,7 +131,7 @@ fun FileActionSheetContentPreview() {
         name = "Documents",
         nodeType = NodeType.FOLDER,
         folderType = FolderType.DOCUMENT,
-        description = "User Documents",
+        description = "User Documents: Standard directory for user documents and text files.",
     )
 
     FileActionSheetContent(
@@ -113,7 +139,7 @@ fun FileActionSheetContentPreview() {
         onEnterClick = {},
         onRenameClick = {},
         onDeleteClick = {}
-        )
+    )
 }
 
 /**

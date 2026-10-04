@@ -13,7 +13,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.platform.*
 import com.example.androidmaiden.presentation.ui.screens.*
-import com.example.androidmaiden.presentation.ui.components.*import com.example.androidmaiden.presentation.ui.theme.isDynamicColorSupported
+import com.example.androidmaiden.presentation.ui.components.*
+import com.example.androidmaiden.presentation.ui.theme.isDynamicColorSupported
 import com.example.androidmaiden.presentation.ui.theme.core.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -31,12 +32,13 @@ fun PreviewAppearanceSettingsGroup() {
         useDynamicColor = true,
         onDynamicColorChange = {},
         buttonDisplayStyle = ButtonDisplayStyle.ICON_ONLY,
-        onButtonDisplayStyleChange = {}
+        onButtonDisplayStyleChange = {},
+        onNavigateToControlAppearance = {}
     )
 }
 
 /**
- * A group of settings for controlling the application's appearance and theme.
+ * A group of settings for controlling the application's appearance, theme, and UI controls customization.
  */
 @Composable
 fun AppearanceSettingsGroup(
@@ -48,6 +50,7 @@ fun AppearanceSettingsGroup(
     onDynamicColorChange: (Boolean) -> Unit,
     buttonDisplayStyle: ButtonDisplayStyle,
     onButtonDisplayStyleChange: (ButtonDisplayStyle) -> Unit,
+    onNavigateToControlAppearance: () -> Unit = {}
 ) {
     SettingsGroup(title = stringResource(id = "settings_appearance_title")) {
         ThemeModeSetting(previewThemeMode, onThemePreview)
@@ -64,6 +67,47 @@ fun AppearanceSettingsGroup(
         DynamicColorSetting(useDynamicColor, onDynamicColorChange)
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
         ButtonDisplayStyleSetting(buttonDisplayStyle, onButtonDisplayStyleChange)
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        ControlAppearanceNavigationSetting(onNavigateToControlAppearance = onNavigateToControlAppearance)
+    }
+}
+
+/**
+ * Entry item in Appearance Settings that navigates to the Control Appearance Customization screen.
+ */
+@Composable
+private fun ControlAppearanceNavigationSetting(
+    onNavigateToControlAppearance: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onNavigateToControlAppearance() }
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Tune,
+            contentDescription = null,
+            modifier = Modifier.padding(end = 16.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Control Appearance Options",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = "Customize PathBreadcrumbs separators, display length & FileItem descriptions",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.outline
+        )
     }
 }
 

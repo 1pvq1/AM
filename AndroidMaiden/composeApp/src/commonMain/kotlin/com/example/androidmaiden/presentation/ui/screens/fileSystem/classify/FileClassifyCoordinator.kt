@@ -51,8 +51,9 @@ fun FileClassifyCoordinator(
     onCategoryBack: () -> Unit,
     onDeleteFile: (FileItem) -> Unit
 ) {
-    // For now, classification is mostly a list/grid which works well across sizes.
-    // In the future, we could show a split-pane for expanded screens here.
+    // Determine whether to use the canonical list-detail split-pane for wide screens
+    val isSplitPane = windowSizeClass.widthCategory != com.example.androidmaiden.presentation.ui.adaptive.WindowSizeCategory.Compact
+
     FileClassifyContent(
         categories = categories,
         isSyncing = isSyncing,
@@ -61,6 +62,7 @@ fun FileClassifyCoordinator(
         searchQuery = searchQuery,
         searchResults = searchResults,
         isSearchActive = isSearchActive,
+        isSplitPane = isSplitPane,
         onBack = onBack,
         onSync = onSync,
         onToggleView = onToggleView,

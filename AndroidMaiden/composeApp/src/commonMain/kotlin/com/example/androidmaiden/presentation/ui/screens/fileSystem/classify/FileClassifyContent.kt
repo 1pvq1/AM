@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.ui.features.fileSys.ViewMode
 import com.example.androidmaiden.presentation.ui.screens.fileSystem.classify.components.*
@@ -18,6 +19,7 @@ import kotlin.time.ExperimentalTime
 
 /**
  * Stateless screen content for the File Classification feature.
+ * Supports split-pane canonical layout configurations on wide/tablet viewports.
  *
  * @param categories List of file categories to display.
  * @param isSyncing Whether a file scan is currently in progress.
@@ -26,6 +28,7 @@ import kotlin.time.ExperimentalTime
  * @param searchQuery The current search query string.
  * @param searchResults List of file items matching the search query.
  * @param isSearchActive Whether the search interface is currently active.
+ * @param isSplitPane Flag enforcing canonical list-detail layout presentation.
  * @param onBack Callback for navigating back.
  * @param onSync Callback to trigger a manual file re-scan.
  * @param onToggleView Callback to switch between List and Grid view modes.
@@ -46,6 +49,7 @@ fun FileClassifyContent(
     searchQuery: String,
     searchResults: List<FileItem>,
     isSearchActive: Boolean,
+    isSplitPane: Boolean,
     onBack: () -> Unit,
     onSync: () -> Unit,
     onToggleView: () -> Unit,
@@ -58,14 +62,8 @@ fun FileClassifyContent(
 ) {
     var previewFile by remember { mutableStateOf<FileItem?>(null) }
 
-    if (selectedCategory != null) {
-        FilesListPage(
-            categoryName = selectedCategory.name,
-            files = selectedCategory.files,
-            onBack = onCategoryBack,
-            onDelete = onDeleteFile
-        )
-    } else {
+    if (isSplitPane) {
+        // Canonical List-Detail Split-Pane for Large Screens/Tablets/Foldables
         Scaffold(
             topBar = {
                 if (isSearchActive) {
@@ -86,25 +84,105 @@ fun FileClassifyContent(
                 }
             }
         ) { padding ->
-            Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-                if (isSearchActive && searchQuery.length >= 2) {
-                    SearchResultsView(searchResults) { file ->
-                        previewFile = file
+            Row(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Left Column: Master List Categories
+                Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    if (viewMode == ViewMode.GRID) {
+                        CategoryGridView(categories, onSelect = onCategorySelect)
+                    } else {
+                        CategoryListView(categories, onSelect = onCategorySelect)
                     }
-                } else {
-                    Column {
-                        Box(modifier = Modifier.weight(1f)) {
-                            if (viewMode == ViewMode.GRID) {
-                                CategoryGridView(categories, onSelect = onCategorySelect)
-                            } else {
-                                CategoryListView(categories, onSelect = onCategorySelect)
-                            }
 
-                            if (isSyncing && categories.isEmpty()) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.align(Alignment.Center),
-                                    color = MaterialTheme.colorScheme.primary
-                                )
+                    if (isSyncing && categories.isEmpty()) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                VerticalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+
+                // Right Column: Detail Screen Viewport
+                Box(modifier = Modifier.weight(1.5f).fillMaxHeight()) {
+                    if (isSearchActive && searchQuery.length >= 2) {
+                        SearchResultsView(searchResults) { file ->
+                            previewFile = file
+                        }
+                    } else if (selectedCategory != null) {
+                        FilesListPage(
+                            categoryName = selectedCategory.name,
+                            files = selectedCategory.files,
+                            onBack = onCategoryBack,
+                            onDelete = onDeleteFile
+                        )
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = "Select a category to view files",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        // Standard full screen sequential navigation for compact mobile phones
+        if (selectedCategory != null) {
+            FilesListPage(
+                categoryName = selectedCategory.name,
+                files = selectedCategory.files,
+                onBack = onCategoryBack,
+                onDelete = onDeleteFile
+            )
+        } else {
+            Scaffold(
+                topBar = {
+                    if (isSearchActive) {
+                        SearchTopBar(
+                            query = searchQuery,
+                            onQueryChange = onSearchQueryChange,
+                            onClose = onSearchClose
+                        )
+                    } else {
+                        MainTopBar(
+                            isSyncing = isSyncing,
+                            viewMode = viewMode,
+                            onBack = onBack,
+                            onSync = onSync,
+                            onToggleView = onToggleView,
+                            onSearchOpen = onSearchOpen
+                        )
+                    }
+                }
+            ) { padding ->
+                Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+                    if (isSearchActive && searchQuery.length >= 2) {
+                        SearchResultsView(searchResults) { file ->
+                            previewFile = file
+                        }
+                    } else {
+                        Column {
+                            Box(modifier = Modifier.weight(1f)) {
+                                if (viewMode == ViewMode.GRID) {
+                                    CategoryGridView(categories, onSelect = onCategorySelect)
+                                } else {
+                                    CategoryListView(categories, onSelect = onCategorySelect)
+                                }
+
+                                if (isSyncing && categories.isEmpty()) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.align(Alignment.Center),
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
                             }
                         }
                     }
@@ -144,6 +222,44 @@ fun FileClassifyContentLightPreview() {
                 searchQuery = "",
                 searchResults = emptyList(),
                 isSearchActive = false,
+                isSplitPane = false,
+                onBack = {},
+                onSync = {},
+                onToggleView = {},
+                onSearchOpen = {},
+                onSearchClose = {},
+                onSearchQueryChange = {},
+                onCategorySelect = {},
+                onCategoryBack = {},
+                onDeleteFile = {}
+            )
+        }
+    }
+}
+
+/**
+ * Dark theme split-pane preview for large viewport sizes.
+ */
+@ExperimentalTime
+@Preview
+@Composable
+fun FileClassifyContentSplitPaneDarkPreview() {
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.DARK,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            FileClassifyContent(
+                categories = initialCategories,
+                isSyncing = false,
+                viewMode = ViewMode.GRID,
+                selectedCategory = null,
+                searchQuery = "",
+                searchResults = emptyList(),
+                isSearchActive = false,
+                isSplitPane = true,
                 onBack = {},
                 onSync = {},
                 onToggleView = {},
