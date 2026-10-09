@@ -25,6 +25,7 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
     val selectedCategory by vm.selectedCategory.collectAsState()
     val searchQuery by vm.searchQuery.collectAsState()
     val searchResults by vm.searchResults.collectAsState()
+    val storageLocationInfo by vm.storageLocationInfo.collectAsState()
 
     // Local UI state
     var isSearchActive by remember { mutableStateOf(false) }
@@ -45,6 +46,7 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
         searchQuery = searchQuery,
         searchResults = searchResults,
         isSearchActive = isSearchActive,
+        storageLocationInfo = storageLocationInfo,
         onBack = onBack,
         onSync = { vm.startSync() },
         onToggleView = {

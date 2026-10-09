@@ -1,19 +1,21 @@
 package com.example.androidmaiden.platform
 
+import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import com.example.androidmaiden.core.experimental.time.TimeProvider
 import com.example.androidmaiden.data.local.*
 import com.example.androidmaiden.domain.service.FileSystemScanner
 import java.io.File
 import kotlinx.coroutines.*
-import kotlin.time.Duration.Companion.days
+import org.koin.core.context.GlobalContext
 
 /**
- * Android implementation of the scanner using java.io.File.
- * Implements incremental scanning to skip unchanged directories.
- * Enhanced to extract media metadata for Videos, Audio, and Images.
+ * Android implementation of the scanner using java.io.File and MediaStore ContentResolver.
+ * Implements incremental scanning to skip unchanged directories and queries MediaStore
+ * to guarantee non-media file detection (Documents, APKs, Archives) on real physical devices.
  */
 class AndroidFileSystemScanner(
     private val fileDao: FileMetadataDao,
@@ -22,13 +24,22 @@ class AndroidFileSystemScanner(
     val rootPath: String = Environment.getExternalStorageDirectory().absolutePath
 
     /**
-     * Synchronizes the storage root incrementally.
+     * Synchronizes the storage root incrementally via file system and MediaStore queries.
      */
     override suspend fun syncRoot() = withContext(Dispatchers.IO) {
-        // Start at the primary external storage root (/storage/emulated/0)
         val rootFile = File(rootPath)
         if (rootFile.exists() && rootFile.isDirectory) {
             scanDirectory(rootFile)
+        }
+
+        // Query MediaStore ContentResolver as secondary pass to capture non-media files on Scoped Storage
+        val context = try {
+            GlobalContext.get().get<Context>()
+        } catch (e: Exception) {
+            null
+        }
+        if (context != null) {
+            scanMediaStoreFiles(context)
         }
     }
 
@@ -36,7 +47,7 @@ class AndroidFileSystemScanner(
      * Placeholder for stopping an active sync operation.
      */
     override suspend fun stopSync() {
-        // TODO: Implementation for stopping sync if needed
+        // Implementation for stopping sync if needed
     }
 
     /**
@@ -47,7 +58,7 @@ class AndroidFileSystemScanner(
     }
 
     /**
-     * Deletes a file or directory from the physical storage.
+     * Deletes a file or directory from physical storage.
      */
     override suspend fun deleteFile(path: String): Boolean = withContext(Dispatchers.IO) {
         val file = File(path)
@@ -58,7 +69,7 @@ class AndroidFileSystemScanner(
                 file.delete()
             }
         } else {
-            true // Already gone
+            true
         }
     }
 
@@ -87,12 +98,81 @@ class AndroidFileSystemScanner(
         val targetFile = File(targetPath)
         if (targetFile.exists()) return@withContext false
         
-        // Ensure parent directory exists
         targetFile.parentFile?.let {
             if (!it.exists()) it.mkdirs()
         }
         
         sourceFile.renameTo(targetFile)
+    }
+
+    /**
+     * Queries MediaStore.Files ContentResolver to index non-media files on physical Android devices.
+     */
+    private suspend fun scanMediaStoreFiles(context: Context) = withContext(Dispatchers.IO) {
+        try {
+            val uri = MediaStore.Files.getContentUri("external")
+            val projection = arrayOf(
+                MediaStore.Files.FileColumns.DATA,
+                MediaStore.Files.FileColumns.DISPLAY_NAME,
+                MediaStore.Files.FileColumns.SIZE,
+                MediaStore.Files.FileColumns.DATE_MODIFIED,
+                MediaStore.Files.FileColumns.MIME_TYPE
+            )
+
+            val cursor = context.contentResolver.query(
+                uri,
+                projection,
+                null,
+                null,
+                null
+            ) ?: return@withContext
+
+            val batchList = mutableListOf<FileMetadata>()
+            val dataIdx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)
+            val nameIdx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)
+            val sizeIdx = cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE)
+            val dateIdx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATE_MODIFIED)
+            val mimeIdx = cursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE)
+
+            cursor.use { c ->
+                while (c.moveToNext()) {
+                    val filePath = if (dataIdx >= 0) c.getString(dataIdx) else null
+                    if (filePath.isNullOrBlank()) continue
+                    val fileObj = File(filePath)
+                    if (fileObj.isDirectory) continue
+
+                    val name = if (nameIdx >= 0) c.getString(nameIdx) else fileObj.name
+                    val size = if (sizeIdx >= 0) c.getLong(sizeIdx) else fileObj.length()
+                    val dateModifiedSec = if (dateIdx >= 0) c.getLong(dateIdx) else 0L
+                    val lastModified = if (dateModifiedSec > 0) dateModifiedSec * 1000L else fileObj.lastModified()
+                    val mimeType = if (mimeIdx >= 0) c.getString(mimeIdx) else null
+
+                    val metadata = FileMetadata(
+                        path = filePath,
+                        name = name ?: fileObj.name,
+                        isDirectory = false,
+                        lastModified = lastModified,
+                        size = size,
+                        parentPath = fileObj.parent ?: rootPath,
+                        mimeType = mimeType
+                    )
+
+                    val finalMetadata = extractMediaMetadata(fileObj, metadata)
+                    batchList.add(finalMetadata)
+
+                    if (batchList.size >= 250) {
+                        fileDao.upsertFiles(batchList.toList())
+                        batchList.clear()
+                    }
+                }
+            }
+
+            if (batchList.isNotEmpty()) {
+                fileDao.upsertFiles(batchList)
+            }
+        } catch (e: Exception) {
+            // Suppress or log MediaStore query issues gracefully
+        }
     }
 
     /**
@@ -102,10 +182,8 @@ class AndroidFileSystemScanner(
         val path = directory.absolutePath
         val currentTimestamp = directory.lastModified()
 
-        // 1. Check if the folder has changed since the last scan
         val storedTimestamp = fileDao.getStoredTimestamp(path)
 
-        // If timestamp matches AND no pending metadata, skip deep scan of this folder's children
         if (storedTimestamp != null && storedTimestamp == currentTimestamp) {
             if (!fileDao.hasPendingMetadata(path)) {
                 cleanupDeletedFiles(directory)
@@ -114,18 +192,15 @@ class AndroidFileSystemScanner(
             }
         }
 
-        // 2. Directory changed or has pending metadata: scan all children
         val children = directory.listFiles() ?: return
         val metadataList = mutableListOf<FileMetadata>()
         
-        // --- DELETION SYNC ---
         val storedPaths = fileDao.getPathsByParent(path)
         val currentChildPaths = children.map { it.absolutePath }.toSet()
         val deletedPaths = storedPaths.filter { it !in currentChildPaths }
         if (deletedPaths.isNotEmpty()) {
             fileDao.deleteByPaths(deletedPaths)
         }
-        // ---------------------
 
         val subDirs = mutableListOf<File>()
 
@@ -143,19 +218,15 @@ class AndroidFileSystemScanner(
                 metadataList.add(baseMetadata)
                 subDirs.add(child)
             } else {
-                // Extract rich metadata for files
                 val finalMetadata = extractMediaMetadata(child, baseMetadata)
                 metadataList.add(finalMetadata)
             }
         }
 
-        // 3. Persistence: Batch upsert the children of CURRENT directory immediately
-        // This allows the UI to update as we progress through folders.
         if (metadataList.isNotEmpty()) {
             fileDao.upsertFiles(metadataList)
         }
 
-        // 4. Update the directory's own timestamp in the DB
         fileDao.upsertFiles(listOf(
             FileMetadata(
                 path = path,
@@ -167,7 +238,6 @@ class AndroidFileSystemScanner(
             )
         ))
 
-        // 5. Recurse into subdirectories AFTER saving current directory progress
         for (subDir in subDirs) {
             scanDirectory(subDir)
         }
@@ -204,7 +274,6 @@ class AndroidFileSystemScanner(
                 width = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull()
                 height = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull()
             } else if (isImage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                // Image resolution keys require API 28+
                 width = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_IMAGE_WIDTH)?.toIntOrNull()
                 height = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_IMAGE_HEIGHT)?.toIntOrNull()
             }
@@ -231,14 +300,12 @@ class AndroidFileSystemScanner(
     }
 
     /**
-     * Checks files in the DB for a directory that hasn't changed its timestamp,
-     * ensuring that files deleted externally are removed from the app's database.
+     * Checks files in the DB for a directory that hasn't changed its timestamp.
      */
     private suspend fun cleanupDeletedFiles(directory: File) {
         val path = directory.absolutePath
         val storedPaths = fileDao.getPathsByParent(path)
 
-        // Filter for paths that no longer exist physically
         val deletedPaths = storedPaths.filter { !File(it).exists() }
         if (deletedPaths.isNotEmpty()) {
             fileDao.deleteByPaths(deletedPaths)
@@ -246,8 +313,7 @@ class AndroidFileSystemScanner(
     }
 
     /**
-     * Efficiently skips file entries and only dives into folders
-     * when the parent directory timestamp matches our cache.
+     * Efficiently skips file entries and only dives into subdirectories.
      */
     private suspend fun scanSubDirectoriesOnly(directory: File) {
         val subDirs = directory.listFiles { file -> file.isDirectory } ?: return

@@ -3,14 +3,14 @@ package com.example.androidmaiden.presentation.ui.screens.fileSystem.classify
 import androidx.compose.runtime.Composable
 import com.example.androidmaiden.domain.model.FileCategory
 import com.example.androidmaiden.domain.model.FileItem
+import com.example.androidmaiden.domain.model.StorageLocationInfo
 import com.example.androidmaiden.presentation.ui.adaptive.WindowSizeClass
 import com.example.androidmaiden.presentation.ui.features.fileSys.ViewMode
 import kotlin.time.ExperimentalTime
 
 /**
  * Adaptive Coordinator for the File Classification feature.
- * Currently, it delegates to FileClassifyContent, but it can be used to handle
- * different layout strategies for different window sizes in the future.
+ * Delegates to FileClassifyContent and handles viewport scoping.
  *
  * @param windowSizeClass The current window size class of the device.
  * @param categories List of file categories to display.
@@ -20,6 +20,7 @@ import kotlin.time.ExperimentalTime
  * @param searchQuery The current search query string.
  * @param searchResults List of file items matching the search query.
  * @param isSearchActive Whether the search interface is currently active.
+ * @param storageLocationInfo Detected storage space metrics (Internal vs SD Card).
  * @param onBack Callback for navigating back.
  * @param onSync Callback to trigger a manual file re-scan.
  * @param onToggleView Callback to switch between List and Grid view modes.
@@ -41,6 +42,7 @@ fun FileClassifyCoordinator(
     searchQuery: String,
     searchResults: List<FileItem>,
     isSearchActive: Boolean,
+    storageLocationInfo: StorageLocationInfo? = null,
     onBack: () -> Unit,
     onSync: () -> Unit,
     onToggleView: () -> Unit,
@@ -51,7 +53,6 @@ fun FileClassifyCoordinator(
     onCategoryBack: () -> Unit,
     onDeleteFile: (FileItem) -> Unit
 ) {
-    // Determine whether to use the canonical list-detail split-pane for wide screens
     val isSplitPane = windowSizeClass.widthCategory != com.example.androidmaiden.presentation.ui.adaptive.WindowSizeCategory.Compact
 
     FileClassifyContent(
@@ -63,6 +64,7 @@ fun FileClassifyCoordinator(
         searchResults = searchResults,
         isSearchActive = isSearchActive,
         isSplitPane = isSplitPane,
+        storageLocationInfo = storageLocationInfo,
         onBack = onBack,
         onSync = onSync,
         onToggleView = onToggleView,

@@ -1,7 +1,7 @@
 package com.example.androidmaiden.domain.model
 
 /**
- * Separator symbol styles for [PathBreadcrumbs] navigation segments.
+ * Separator symbol styles for navigation segments.
  */
 enum class BreadcrumbSeparator(val label: String, val symbol: String) {
     CHEVRON("Chevron (>)", ">"),
@@ -31,7 +31,7 @@ enum class BreadcrumbRootLabel(val label: String, val text: String) {
 }
 
 /**
- * Content description display modes for file list entries ([FileItem]).
+ * Content description display modes for file list entries.
  */
 enum class FileItemDescriptionMode(val label: String, val description: String) {
     CONCISE("Concise Summary", "Truncated summary with expand option"),
@@ -40,12 +40,21 @@ enum class FileItemDescriptionMode(val label: String, val description: String) {
 }
 
 /**
- * Icon styling options for file entries ([FileItem]).
+ * Icon styling options for file entries.
  */
 enum class FileItemIconStyle(val label: String) {
     DEFAULT("Default Filled"),
     OUTLINED("Outlined Vector"),
     MINIMAL("Monochrome Minimal")
+}
+
+/**
+ * Filter modes for handling system hidden files and folders (items starting with '.').
+ */
+enum class HiddenFilterMode(val label: String, val description: String) {
+    SHOW_ALL("Show All", "Show normal and system hidden files together"),
+    EXCLUDE_HIDDEN("Exclude Hidden", "Hide system hidden files and folders"),
+    ONLY_HIDDEN("Hidden Only", "Display system hidden files and folders separately")
 }
 
 /**
@@ -57,6 +66,7 @@ enum class FileItemIconStyle(val label: String) {
  * @param fileItemDescriptionMode Display mode for item descriptions in file lists.
  * @param fileItemIconStyle Icon styling theme for file entries.
  * @param fileItemShowDetails Whether file timestamp and count metadata details are shown.
+ * @param hiddenFilterMode Filter mode for system hidden files and folders.
  */
 data class ControlAppearanceConfig(
     val breadcrumbSeparator: BreadcrumbSeparator = BreadcrumbSeparator.CHEVRON,
@@ -64,5 +74,6 @@ data class ControlAppearanceConfig(
     val breadcrumbRootLabel: BreadcrumbRootLabel = BreadcrumbRootLabel.ROOT,
     val fileItemDescriptionMode: FileItemDescriptionMode = FileItemDescriptionMode.CONCISE,
     val fileItemIconStyle: FileItemIconStyle = FileItemIconStyle.DEFAULT,
-    val fileItemShowDetails: Boolean = true
+    val fileItemShowDetails: Boolean = true,
+    val hiddenFilterMode: HiddenFilterMode = HiddenFilterMode.SHOW_ALL
 )

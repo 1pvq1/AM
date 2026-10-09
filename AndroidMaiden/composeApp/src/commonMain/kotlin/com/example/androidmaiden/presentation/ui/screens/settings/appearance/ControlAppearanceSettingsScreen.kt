@@ -22,7 +22,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
- * Customization page for PathBreadcrumbs, FileItem entries, and future UI controls.
+ * Customization page for PathBreadcrumbs, FileItem entries, and System Hidden Files filtering.
  * Features real-time settings options and an interactive live preview.
  *
  * @param onBack Callback for navigating back to Appearance Settings.
@@ -44,7 +44,8 @@ fun ControlAppearanceSettingsScreen(
         onRootLabelChange = viewModel::setBreadcrumbRootLabel,
         onDescriptionModeChange = viewModel::setFileItemDescriptionMode,
         onIconStyleChange = viewModel::setFileItemIconStyle,
-        onShowDetailsChange = viewModel::setFileItemShowDetails
+        onShowDetailsChange = viewModel::setFileItemShowDetails,
+        onHiddenFilterModeChange = viewModel::setHiddenFilterMode
     )
 }
 
@@ -61,7 +62,8 @@ fun ControlAppearanceSettingsContent(
     onRootLabelChange: (BreadcrumbRootLabel) -> Unit,
     onDescriptionModeChange: (FileItemDescriptionMode) -> Unit,
     onIconStyleChange: (FileItemIconStyle) -> Unit,
-    onShowDetailsChange: (Boolean) -> Unit
+    onShowDetailsChange: (Boolean) -> Unit,
+    onHiddenFilterModeChange: (HiddenFilterMode) -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -96,6 +98,12 @@ fun ControlAppearanceSettingsContent(
                 onDescriptionModeChange = onDescriptionModeChange,
                 onIconStyleChange = onIconStyleChange,
                 onShowDetailsChange = onShowDetailsChange
+            )
+
+            // System Hidden Data Filtering Section
+            HiddenFilterConfigCard(
+                config = config,
+                onHiddenFilterModeChange = onHiddenFilterModeChange
             )
         }
     }
@@ -163,22 +171,41 @@ private fun LivePreviewCard(config: ControlAppearanceConfig) {
                 color = MaterialTheme.colorScheme.surface,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                FileItem(
-                    node = FileSysNode(
-                        name = "Android",
-                        nodeType = NodeType.FOLDER,
-                        folderType = FolderType.OTHER,
-                        description = "Private App Data: Private app storage accessible only by respective owner apps under Scoped Storage rules.",
-                        children = listOf(
-                            FileSysNode(name = "com.example.app", nodeType = NodeType.FOLDER),
-                            FileSysNode(name = "cache.db", nodeType = NodeType.FILE, size = 1024L * 256)
-                        ),
-                        lastModified = 1715856000000L
-                    ),
-                    descriptionMode = config.fileItemDescriptionMode,
-                    iconStyle = config.fileItemIconStyle,
-                    showDetails = config.fileItemShowDetails
-                )
+                Column {
+                    if (config.hiddenFilterMode != HiddenFilterMode.ONLY_HIDDEN) {
+                        FileItem(
+                            node = FileSysNode(
+                                name = "Android",
+                                nodeType = NodeType.FOLDER,
+                                folderType = FolderType.OTHER,
+                                description = "Private App Data: Private app storage accessible only by owner apps under Scoped Storage rules.",
+                                children = listOf(
+                                    FileSysNode(name = "com.example.app", nodeType = NodeType.FOLDER),
+                                    FileSysNode(name = "cache.db", nodeType = NodeType.FILE, size = 1024L * 256)
+                                ),
+                                lastModified = 1715856000000L
+                            ),
+                            descriptionMode = config.fileItemDescriptionMode,
+                            iconStyle = config.fileItemIconStyle,
+                            showDetails = config.fileItemShowDetails
+                        )
+                    }
+
+                    if (config.hiddenFilterMode != HiddenFilterMode.EXCLUDE_HIDDEN) {
+                        FileItem(
+                            node = FileSysNode(
+                                name = ".nomedia",
+                                nodeType = NodeType.FILE,
+                                size = 0L,
+                                description = "System Hidden File: Instructs media scanner to skip indexing media in this folder.",
+                                lastModified = 1715856000000L
+                            ),
+                            descriptionMode = config.fileItemDescriptionMode,
+                            iconStyle = config.fileItemIconStyle,
+                            showDetails = config.fileItemShowDetails
+                        )
+                    }
+                }
             }
         }
     }
@@ -336,6 +363,45 @@ private fun FileItemConfigCard(
 }
 
 /**
+ * Card containing options for customizing System Hidden Files filter mode.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HiddenFilterConfigCard(
+    config: ControlAppearanceConfig,
+    onHiddenFilterModeChange: (HiddenFilterMode) -> Unit
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "System Hidden Data Settings",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Text("Hidden Files Filter Mode (e.g., .nomedia, .git, .thumbnails)", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                HiddenFilterMode.entries.forEachIndexed { index, item ->
+                    SegmentedButton(
+                        selected = config.hiddenFilterMode == item,
+                        onClick = { onHiddenFilterModeChange(item) },
+                        shape = SegmentedButtonDefaults.itemShape(index = index, count = HiddenFilterMode.entries.size),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(item.label, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
  * Preview for the Control Appearance Settings content.
  */
 @Preview
@@ -349,6 +415,7 @@ fun ControlAppearanceSettingsContentPreview() {
         onRootLabelChange = {},
         onDescriptionModeChange = {},
         onIconStyleChange = {},
-        onShowDetailsChange = {}
+        onShowDetailsChange = {},
+        onHiddenFilterModeChange = {}
     )
 }

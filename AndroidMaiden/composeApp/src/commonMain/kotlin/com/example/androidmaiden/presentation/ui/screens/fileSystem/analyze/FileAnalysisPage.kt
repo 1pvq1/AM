@@ -29,11 +29,6 @@ fun FileAnalysisPage(
 
     // --- ViewModel & Data ---
     val useMock = vm.useMock
-    
-    val root by remember(vm.currentDirectory) { mutableStateOf(vm.currentDirectory) } // Note: vm.currentDirectory is not a flow in the original code, but we assume it updates.
-    // Re-reading original FileAnalysis.kt, vm.currentDirectory was accessed directly. 
-    // In a real KMP app, this should be a Flow.
-    
     val stats = vm.folderStats
     val isLoading by vm.isLoading.collectAsState()
     val loadError by vm.error.collectAsState()
@@ -50,7 +45,7 @@ fun FileAnalysisPage(
 
     FileAnalysisCoordinator(
         windowSizeClass = windowSizeClass,
-        root = vm.currentDirectory, // Accessing directly as in original
+        root = vm.currentDirectory,
         stats = stats,
         isLoading = isLoading,
         loadError = loadError,
@@ -59,6 +54,7 @@ fun FileAnalysisPage(
         viewMode = viewMode,
         sortMode = sortMode,
         sortOrder = sortOrder,
+        hiddenFilterMode = vm.hiddenFilterMode,
         onBack = {
             if (!vm.navigateBack()) {
                 onNavigateUp()
@@ -69,6 +65,7 @@ fun FileAnalysisPage(
         onViewModeChange = { viewMode = it },
         onSortModeChange = { sortMode = it },
         onSortOrderChange = { sortOrder = it },
+        onHiddenFilterModeChange = { vm.updateHiddenFilterMode(it) },
         onNavigateToStackIndex = { vm.navigateToStackIndex(it) },
         onDeleteNode = { vm.deleteNode(it) },
         onRenameNode = { node, newName -> vm.renameNode(node, newName) }

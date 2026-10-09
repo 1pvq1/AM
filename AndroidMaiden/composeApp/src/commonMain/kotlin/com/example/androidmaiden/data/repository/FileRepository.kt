@@ -7,6 +7,7 @@ import com.example.androidmaiden.data.local.*
 import com.example.androidmaiden.domain.model.FileItem
 import com.example.androidmaiden.domain.model.FileWithTags
 import com.example.androidmaiden.domain.model.Tag
+import com.example.androidmaiden.domain.model.StorageLocationInfo
 import kotlinx.coroutines.*
 
 /**
@@ -72,6 +73,20 @@ class FileRepository(
     }
 
     /**
+     * Lists files directly from the OS file system in real-time.
+     *
+     * @param path The directory path to list.
+     * @return List of [FileItem] entries in the directory.
+     */
+    fun getRealTimeFiles(path: String): List<FileItem> {
+        return try {
+            fileProvider.listFiles(path)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    /**
      * Global search across all indexed files.
      */
     fun searchFiles(query: String): Flow<List<FileItem>> {
@@ -110,6 +125,13 @@ class FileRepository(
      */
     fun getScannedPath(): String {
         return fileProvider.getRootPath()
+    }
+
+    /**
+     * Returns metrics and location information for the primary detected storage.
+     */
+    fun getStorageLocationInfo(): StorageLocationInfo {
+        return fileProvider.getStorageLocationInfo()
     }
 
     /**

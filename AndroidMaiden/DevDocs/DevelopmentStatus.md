@@ -21,7 +21,7 @@ The project is a Kotlin Multiplatform application with a focus on providing a ch
 ### Android
 
 *   **Status:** Most advanced platform.
-*   **UI:** Fully implemented using Jetpack Compose. Includes a settings screen for API key and model selection, and a chat screen with two view modes (regular and virtual).
+*   **UI:** Fully implemented using Jetpack Compose. Includes settings, chat screen with virtual modes, and complete file management with smart sub-classification (Audio, Documents, APKs, Archives, Images, Videos).
 *   **LLM Integration:**  The Android app is fully connected to the Gemini API. Users can enter their API key, select a model, and have a real-time conversation with the character.
 *   **Next Steps:** Continue to refine the chat experience and add more advanced features.
 

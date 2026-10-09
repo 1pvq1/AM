@@ -22,12 +22,14 @@ import kotlin.time.ExperimentalTime
  * @param viewMode The current view mode (List, Grid, or Tree).
  * @param sortMode The current sort mode (Name, Size, or Date).
  * @param sortOrder The current sort order (Ascending or Descending).
+ * @param hiddenFilterMode System hidden files filter mode.
  * @param onBack Callback for navigating back.
  * @param onNavigateTo Callback to navigate to a specific node.
  * @param onToggleSource Callback to switch between mock and real data.
  * @param onViewModeChange Callback when the view mode is changed.
  * @param onSortModeChange Callback when the sort mode is changed.
  * @param onSortOrderChange Callback when the sort order is changed.
+ * @param onHiddenFilterModeChange Callback when the hidden files filter mode is changed.
  * @param onNavigateToStackIndex Callback to navigate to a specific index in the path stack.
  * @param onDeleteNode Callback to delete a file system node.
  * @param onRenameNode Callback to rename a file system node.
@@ -45,18 +47,18 @@ fun FileAnalysisCoordinator(
     viewMode: ViewMode,
     sortMode: SortMode,
     sortOrder: SortOrder,
+    hiddenFilterMode: HiddenFilterMode = HiddenFilterMode.SHOW_ALL,
     onBack: () -> Unit,
     onNavigateTo: (FileSysNode) -> Unit,
     onToggleSource: () -> Unit,
     onViewModeChange: (ViewMode) -> Unit,
     onSortModeChange: (SortMode) -> Unit,
     onSortOrderChange: (SortOrder) -> Unit,
+    onHiddenFilterModeChange: (HiddenFilterMode) -> Unit = {},
     onNavigateToStackIndex: (Int) -> Unit,
     onDeleteNode: (FileSysNode) -> Unit,
     onRenameNode: (FileSysNode, String) -> Unit
 ) {
-    // Analysis UI is complex and might benefit from different layouts on larger screens.
-    // For now, it uses the standard responsive content.
     FileAnalysisContent(
         root = root,
         stats = stats,
@@ -67,12 +69,14 @@ fun FileAnalysisCoordinator(
         viewMode = viewMode,
         sortMode = sortMode,
         sortOrder = sortOrder,
+        hiddenFilterMode = hiddenFilterMode,
         onBack = onBack,
         onNavigateTo = onNavigateTo,
         onToggleSource = onToggleSource,
         onViewModeChange = onViewModeChange,
         onSortModeChange = onSortModeChange,
         onSortOrderChange = onSortOrderChange,
+        onHiddenFilterModeChange = onHiddenFilterModeChange,
         onNavigateToStackIndex = onNavigateToStackIndex,
         onDeleteNode = onDeleteNode,
         onRenameNode = onRenameNode

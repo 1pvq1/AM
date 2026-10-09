@@ -1,11 +1,15 @@
 package com.example.androidmaiden.presentation.ui.features.panel
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.domain.model.HiddenFilterMode
 import com.example.androidmaiden.platform.*
 import com.example.androidmaiden.presentation.ui.features.fileSys.ViewMode
 import com.example.androidmaiden.core.util.deprecated.SortMode
@@ -32,7 +36,9 @@ fun FileAnalysisToolbarPreview() {
                 sortMode = SortMode.NAME,
                 onSortModeChange = {},
                 sortOrder = SortOrder.ASC,
-                onSortOrderChange = {}
+                onSortOrderChange = {},
+                hiddenFilterMode = HiddenFilterMode.SHOW_ALL,
+                onHiddenFilterModeChange = {}
             )
         }
     }
@@ -60,13 +66,15 @@ fun FAToolBarAndroidPreview() {
                 onSortOrderChange = {},
                 useMock = true,
                 onUseMockChange = {},
+                hiddenFilterMode = HiddenFilterMode.SHOW_ALL,
+                onHiddenFilterModeChange = {}
             )
         }
     }
 }
 
 /**
- * A toolbar for the file analysis screen that provides view mode and sorting options.
+ * A toolbar for the file analysis screen that provides view mode, sorting, and hidden file filtering options.
  */
 @Composable
 fun FileAnalysisToolbar(
@@ -79,6 +87,8 @@ fun FileAnalysisToolbar(
     onSortModeChange: (SortMode) -> Unit,
     sortOrder: SortOrder,
     onSortOrderChange: (SortOrder) -> Unit,
+    hiddenFilterMode: HiddenFilterMode = HiddenFilterMode.SHOW_ALL,
+    onHiddenFilterModeChange: (HiddenFilterMode) -> Unit = {}
 ) {
     if (isAndroid) {
         FAToolBarAndroid(
@@ -89,13 +99,14 @@ fun FileAnalysisToolbar(
             useMock = useMock,
             onUseMockChange = onUseMockChange,
             sortOrder = sortOrder,
-            onSortOrderChange = onSortOrderChange
+            onSortOrderChange = onSortOrderChange,
+            hiddenFilterMode = hiddenFilterMode,
+            onHiddenFilterModeChange = onHiddenFilterModeChange
         )
     } else {
         FAToolBarGeneral(viewMode, onViewModeChange, sortMode, onSortModeChange)
     }
 }
-
 
 /**
  * Android-specific implementation of the file analysis toolbar.
@@ -110,8 +121,12 @@ fun FAToolBarAndroid(
     sortOrder: SortOrder,
     onSortOrderChange: (SortOrder) -> Unit,
     useMock: Boolean,
-    onUseMockChange: (Boolean) -> Unit
+    onUseMockChange: (Boolean) -> Unit,
+    hiddenFilterMode: HiddenFilterMode,
+    onHiddenFilterModeChange: (HiddenFilterMode) -> Unit
 ) {
+    var filterMenuExpanded by remember { mutableStateOf(false) }
+
     FileActions(
         viewMode = viewMode,
         onViewModeChange = onViewModeChange,
@@ -120,6 +135,37 @@ fun FAToolBarAndroid(
         onSortOrderChange = onSortOrderChange,
         isAndroid = true
     )
+
+    // Hidden File Filter Menu Button
+    Box {
+        IconButton(onClick = { filterMenuExpanded = true }) {
+            Icon(
+                imageVector = Icons.Default.FilterList,
+                contentDescription = "Hidden Data Filter",
+                tint = if (hiddenFilterMode != HiddenFilterMode.SHOW_ALL) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        DropdownMenu(
+            expanded = filterMenuExpanded,
+            onDismissRequest = { filterMenuExpanded = false }
+        ) {
+            HiddenFilterMode.entries.forEach { mode ->
+                DropdownMenuItem(
+                    text = { Text(mode.label) },
+                    onClick = {
+                        onHiddenFilterModeChange(mode)
+                        filterMenuExpanded = false
+                    },
+                    trailingIcon = {
+                        if (hiddenFilterMode == mode) {
+                            Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                        }
+                    }
+                )
+            }
+        }
+    }
 
     TooltipBox(
         positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),

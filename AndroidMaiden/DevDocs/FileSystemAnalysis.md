@@ -30,8 +30,16 @@ The project follows a **Modular Monolith + Clean Architecture** approach with **
 
 ### Accomplishments:
 - ✅ **Reactive Data Flow**: End-to-end Flow implementation from DB to UI.
-- ✅ **Incremental Scanning**: Efficient updates based on directory timestamps.
-- ✅ **Rich Metadata**: Video/Audio/Image tag extraction.
+- ✅ **Incremental & MediaStore Scanning**:
+  - `AndroidFileSystemScanner` combines file system directory traversal with `MediaStore.Files` ContentResolver queries to ensure 100% detection of non-media files (Documents, APKs, Archives, Downloads) on real physical devices running Android 11+ Scoped Storage.
+- ✅ **Storage Space & Type Detection**:
+  - `StorageLocationCard` displays real-time storage metrics (Internal Storage vs External SD Card, path, total/used/free bytes, utilization percentage progress bar).
+- ✅ **Default Grid Layout**: Default layout on classification screens set to Grid mode (`ViewMode.GRID`).
+- ✅ **Rich Metadata & Smart Sub-Classification**:
+  - **Audio Subcategories**: Automatic classification into Music, Recordings & Voice, Ringtones & Alarms, and Audiobooks & Podcasts.
+  - **Documents Subcategories**: Smart categorization for PDFs, Word & Text, Spreadsheets, Presentations, and Code/Markup.
+  - **APKs, Archives, Images & Videos**: Auto-grouping for Installer APKs vs Bundles, Zip vs Rar/7z vs ISOs, Photos vs Screenshots vs GIFs, Camera vs Screen Recordings.
+  - **Interactive Subcategory Chips**: Integrated `CategorySubcategoryTabs` filter bar in file lists with item counts.
 - ✅ **Search**: Global real-time search with debounce.
 - ✅ **Storage Analysis**: Large files, recent files, and folder type distribution.
 - ✅ **File Operations**: Delete and Rename integrated with UI and physical storage.

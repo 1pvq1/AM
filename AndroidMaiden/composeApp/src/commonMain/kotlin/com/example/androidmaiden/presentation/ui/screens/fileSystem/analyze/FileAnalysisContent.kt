@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.viewmodel.FolderAnalysisStats
+import com.example.androidmaiden.presentation.viewmodel.filterByHiddenMode
 import com.example.androidmaiden.presentation.ui.screens.pages.BasePage
 import com.example.androidmaiden.presentation.ui.features.fileSys.*
 import com.example.androidmaiden.presentation.ui.features.panel.*
@@ -29,6 +30,7 @@ import kotlin.time.ExperimentalTime
 
 /**
  * Stateless content for the File System Analysis feature.
+ * Supports hidden file filtering, view modes, sorting, and folder operations.
  *
  * @param root The current root directory node being analyzed.
  * @param stats Statistics for the current folder.
@@ -39,12 +41,14 @@ import kotlin.time.ExperimentalTime
  * @param viewMode The current view mode (List, Grid, or Tree).
  * @param sortMode The current sort mode (Name, Size, or Date).
  * @param sortOrder The current sort order (Ascending or Descending).
+ * @param hiddenFilterMode Filter mode for system hidden files (Show All, Exclude Hidden, Hidden Only).
  * @param onBack Callback for navigating back.
  * @param onNavigateTo Callback to navigate to a specific node.
  * @param onToggleSource Callback to switch between mock and real data.
  * @param onViewModeChange Callback when the view mode is changed.
  * @param onSortModeChange Callback when the sort mode is changed.
  * @param onSortOrderChange Callback when the sort order is changed.
+ * @param onHiddenFilterModeChange Callback when the hidden files filter mode is changed.
  * @param onNavigateToStackIndex Callback to navigate to a specific index in the path stack.
  * @param onDeleteNode Callback to delete a file system node.
  * @param onRenameNode Callback to rename a file system node.
@@ -61,12 +65,14 @@ fun FileAnalysisContent(
     viewMode: ViewMode,
     sortMode: SortMode,
     sortOrder: SortOrder,
+    hiddenFilterMode: HiddenFilterMode = HiddenFilterMode.SHOW_ALL,
     onBack: () -> Unit,
     onNavigateTo: (FileSysNode) -> Unit,
     onToggleSource: () -> Unit,
     onViewModeChange: (ViewMode) -> Unit,
     onSortModeChange: (SortMode) -> Unit,
     onSortOrderChange: (SortOrder) -> Unit,
+    onHiddenFilterModeChange: (HiddenFilterMode) -> Unit = {},
     onNavigateToStackIndex: (Int) -> Unit,
     onDeleteNode: (FileSysNode) -> Unit,
     onRenameNode: (FileSysNode, String) -> Unit
@@ -89,7 +95,7 @@ fun FileAnalysisContent(
             IconButton(onClick = { showStatsPopUp = true }) {
                 Icon(Icons.Default.BarChart, contentDescription = "Folder Stats")
             }
-            // Sorting & View Mode Toolbar
+            // Sorting, Hidden Filtering & View Mode Toolbar
             FileAnalysisToolbar(
                 viewMode = viewMode,
                 onViewModeChange = onViewModeChange,
@@ -99,7 +105,9 @@ fun FileAnalysisContent(
                 sortMode = sortMode,
                 onSortModeChange = onSortModeChange,
                 sortOrder = sortOrder,
-                onSortOrderChange = onSortOrderChange
+                onSortOrderChange = onSortOrderChange,
+                hiddenFilterMode = hiddenFilterMode,
+                onHiddenFilterModeChange = onHiddenFilterModeChange
             )
         }
     ) { innerPadding ->
@@ -136,9 +144,10 @@ fun FileAnalysisContent(
                     }
 
                     root != null -> {
-                        val sortedRoot = root.copy(
-                            children = root.sortedChildren(mode = sortMode, order = sortOrder)
-                        )
+                        val filteredChildren = root.children.filterByHiddenMode(hiddenFilterMode)
+                        val sortedChildrenList = root.copy(children = filteredChildren)
+                            .sortedChildren(mode = sortMode, order = sortOrder)
+                        val sortedRoot = root.copy(children = sortedChildrenList)
 
                         // Interaction handlers
                         val onNodeClick: (FileSysNode) -> Unit = { node ->
@@ -240,12 +249,14 @@ fun FileAnalysisContentLightPreview() {
                 viewMode = ViewMode.LIST,
                 sortMode = SortMode.NAME,
                 sortOrder = SortOrder.ASC,
+                hiddenFilterMode = HiddenFilterMode.SHOW_ALL,
                 onBack = {},
                 onNavigateTo = {},
                 onToggleSource = {},
                 onViewModeChange = {},
                 onSortModeChange = {},
                 onSortOrderChange = {},
+                onHiddenFilterModeChange = {},
                 onNavigateToStackIndex = {},
                 onDeleteNode = {},
                 onRenameNode = { _, _ -> }

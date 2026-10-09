@@ -18,12 +18,13 @@ import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import com.example.androidmaiden.core.util.*
+import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.ui.components.*
-import com.example.androidmaiden.presentation.ui.theme.core.*
-import com.example.androidmaiden.presentation.ui.features.fileSys.*
 import com.example.androidmaiden.presentation.ui.features.eg.*
+import com.example.androidmaiden.presentation.ui.features.fileSys.*
+import com.example.androidmaiden.presentation.ui.screens.fileSystem.classify.components.CategorySubcategoryTabs
+import com.example.androidmaiden.presentation.ui.theme.core.*
 import coil3.compose.*
-import com.example.androidmaiden.domain.model.FileItem
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -56,7 +57,7 @@ private class FileActionState(
 
 /**
  * FilesListPage provides a detailed view of files in a specific category.
- * Supports switching between List and Grid modes, sorting, searching, and basic file operations.
+ * Supports switching between List and Grid modes, sorting, smart subcategory filtering, and basic file operations.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class, ExperimentalFoundationApi::class)
 @Composable
@@ -64,6 +65,9 @@ fun FilesListPage(
     categoryName: String, 
     files: List<FileItem>, 
     onBack: () -> Unit,
+    subcategories: List<SubcategoryInfo> = emptyList(),
+    selectedSubcategoryId: String? = null,
+    onSelectSubcategory: (String?) -> Unit = {},
     onDelete: (FileItem) -> Unit = {},
     onRename: (FileItem, String) -> Unit = { _, _ -> }
 ) {
@@ -98,11 +102,21 @@ fun FilesListPage(
     // Action State Object
     val actionState = remember { FileActionState() }
 
-    val sortedFiles = remember(files, sortOrder) {
+    // Dynamic fallback calculation of subcategories if not supplied
+    val activeSubcategories = remember(files, subcategories, categoryType) {
+        if (subcategories.isNotEmpty()) subcategories
+        else FileTypeUtils.calculateSubcategoriesForCategory(categoryType, files)
+    }
+
+    // Local subcategory selection state if controlled internally or synced externally
+    var internalSubcategoryId by remember(selectedSubcategoryId) { mutableStateOf(selectedSubcategoryId) }
+
+    val displayedFiles = remember(files, categoryType, internalSubcategoryId, sortOrder) {
+        val filtered = FileTypeUtils.filterFilesBySubcategory(categoryType, internalSubcategoryId, files)
         when (sortOrder) {
-            SortBy.NAME -> files.sortedBy { it.name }
-            SortBy.SIZE -> files.sortedByDescending { it.size }
-            SortBy.DATE -> files.sortedByDescending { it.lastModified }
+            SortBy.NAME -> filtered.sortedBy { it.name }
+            SortBy.SIZE -> filtered.sortedByDescending { it.size }
+            SortBy.DATE -> filtered.sortedByDescending { it.lastModified }
         }
     }
 
@@ -196,20 +210,36 @@ fun FilesListPage(
             )
         }
     ) { padding ->
-        if (files.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("No files found")
-            }
-        } else {
-            Box(modifier = Modifier.padding(padding)) {
-                FileCellFactory(
-                    viewMode = viewMode,
-                    categoryType = categoryType,
-                    files = sortedFiles,
-                    gridColumns = gridColumns,
-                    onFileClick = { previewFile = it },
-                    onFileLongClick = { actionState.file = it }
+        Column(modifier = Modifier.padding(padding).fillMaxSize()) {
+            if (activeSubcategories.isNotEmpty()) {
+                CategorySubcategoryTabs(
+                    subcategories = activeSubcategories,
+                    selectedSubcategoryId = internalSubcategoryId,
+                    onSelectSubcategory = { subId ->
+                        internalSubcategoryId = subId
+                        onSelectSubcategory(subId)
+                    }
                 )
+            }
+
+            if (displayedFiles.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = if (files.isEmpty()) "No files found" else "No matching items in this subcategory",
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
+            } else {
+                Box(modifier = Modifier.weight(1f)) {
+                    FileCellFactory(
+                        viewMode = viewMode,
+                        categoryType = categoryType,
+                        files = displayedFiles,
+                        gridColumns = gridColumns,
+                        onFileClick = { previewFile = it },
+                        onFileLongClick = { actionState.file = it }
+                    )
+                }
             }
         }
     }
@@ -416,7 +446,7 @@ private fun GenericItemCell(file: FileItem, viewMode: ViewMode, modifier: Modifi
     if (viewMode == ViewMode.LIST) {
         ListItem(
             headlineContent = { Text(file.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-            supportingContent = { Text("${formatSize(file.size)} â€?${file.path}") },
+            supportingContent = { Text("${formatSize(file.size)} â€¢ ${file.path}") },
             leadingContent = {
                 Icon(
                     imageVector = if (file.isDirectory) Icons.Default.Folder else Icons.AutoMirrored.Filled.InsertDriveFile,
@@ -441,6 +471,7 @@ private fun GenericItemCell(file: FileItem, viewMode: ViewMode, modifier: Modifi
  */
 @Composable
 private fun ImagesCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = Modifier) {
+    val subcategory = remember(file) { FileTypeUtils.getImageSubcategory(file) }
     if (viewMode == ViewMode.GRID) {
         Card(shape = MaterialTheme.shapes.small, modifier = modifier) {
             Box {
@@ -469,8 +500,8 @@ private fun ImagesCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = 
         ListItem(
             headlineContent = { Text(file.name) },
             supportingContent = { 
-                val resolution = if (file.width != null && file.height != null) " â€?${file.width}x${file.height}" else ""
-                Text("${formatSize(file.size)} â€?${formatDateTime(file.lastModified)}$resolution") 
+                val resolution = if (file.width != null && file.height != null) " â€¢ ${file.width}x${file.height}" else ""
+                Text("${formatSize(file.size)} â€¢ ${formatDateTime(file.lastModified)}$resolution â€¢ ${subcategory.displayName}") 
             },
             leadingContent = {
                 AsyncImage(
@@ -490,6 +521,7 @@ private fun ImagesCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = 
  */
 @Composable
 private fun VideosCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = Modifier) {
+    val subcategory = remember(file) { FileTypeUtils.getVideoSubcategory(file) }
     if (viewMode == ViewMode.GRID) {
         Card(modifier = modifier.fillMaxWidth()) {
             Box {
@@ -521,7 +553,7 @@ private fun VideosCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = 
                 }
 
                 Text(
-                    "$resolutionText â€?$durationText",
+                    "$resolutionText â€¢ $durationText",
                     color = Color.White,
                     modifier = Modifier.align(Alignment.BottomEnd).padding(4.dp)
                         .background(Color.Black.copy(0.6f), MaterialTheme.shapes.extraSmall).padding(horizontal = 4.dp),
@@ -534,9 +566,9 @@ private fun VideosCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = 
         ListItem(
             headlineContent = { Text(file.name) },
             supportingContent = { 
-                val durationText = file.duration?.let { " â€?${formatDuration(it)}" } ?: ""
-                val resolution = if (file.width != null && file.height != null) " â€?${file.width}x${file.height}" else ""
-                Text("${formatSize(file.size)} â€?${formatDateTime(file.lastModified)}$durationText$resolution") 
+                val durationText = file.duration?.let { " â€¢ ${formatDuration(it)}" } ?: ""
+                val resolution = if (file.width != null && file.height != null) " â€¢ ${file.width}x${file.height}" else ""
+                Text("${formatSize(file.size)} â€¢ ${formatDateTime(file.lastModified)}$durationText$resolution â€¢ ${subcategory.displayName}") 
             },
             leadingContent = {
                 Box {
@@ -559,25 +591,23 @@ private fun VideosCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = 
 }
 
 /**
- * Item cell for audio files.
+ * Item cell for audio files with smart subcategory display.
  */
 @Composable
 private fun AudioCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = Modifier) {
     val fileTypeColors = LocalFileTypeColors.current
-    val path = file.path
-    val isRecording = remember(path) {
-        val keywords = listOf("record", "voice")
-        keywords.any { path.contains(it, ignoreCase = true) }
-    }
+    val subcategory = remember(file) { FileTypeUtils.getAudioSubcategory(file) }
+    val isRecording = subcategory == AudioSubcategory.RECORDINGS
 
     ListItem(
         headlineContent = { Text(file.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         supportingContent = {
-            val author = file.artist ?: "Unknown Artist"
-            val album = file.album ?: "Unknown Album"
-            val bitrateText = file.bitrate?.let { " â€?${it / 1000}kbps" } ?: ""
-            val durationText = file.duration?.let { " â€?${formatDuration(it)}" } ?: ""
-            Text("$author â€?$album$bitrateText$durationText â€?${formatSize(file.size)}")
+            val author = file.artist ?: subcategory.displayName
+            val album = file.album ?: ""
+            val albumText = if (album.isNotBlank()) " â€¢ $album" else ""
+            val bitrateText = file.bitrate?.let { " â€¢ ${it / 1000}kbps" } ?: ""
+            val durationText = file.duration?.let { " â€¢ ${formatDuration(it)}" } ?: ""
+            Text("$author$albumText$bitrateText$durationText â€¢ ${formatSize(file.size)}")
         },
         leadingContent = {
             Box(contentAlignment = Alignment.Center) {
@@ -590,8 +620,10 @@ private fun AudioCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = M
                 )
 
                 Icon(
-                    imageVector = when {
-                        isRecording -> Icons.Default.Mic
+                    imageVector = when (subcategory) {
+                        AudioSubcategory.RECORDINGS -> Icons.Default.Mic
+                        AudioSubcategory.RINGTONES -> Icons.Default.Notifications
+                        AudioSubcategory.PODCASTS_AUDIOBOOKS -> Icons.AutoMirrored.Filled.MenuBook
                         else -> Icons.Default.Audiotrack
                     },
                     contentDescription = null,
@@ -609,15 +641,17 @@ private fun AudioCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = M
 }
 
 /**
- * Item cell for document files.
+ * Item cell for document files with smart subcategory chip.
  */
 @Composable
 private fun DocumentsCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = Modifier) {
     val fileTypeColors = LocalFileTypeColors.current
     val ext = file.name.substringAfterLast(".").uppercase()
+    val subcategory = remember(file) { FileTypeUtils.getDocumentSubcategory(file) }
+
     ListItem(
         headlineContent = { Text(file.name) },
-        supportingContent = { Text("${formatSize(file.size)} â€?${formatDateTime(file.lastModified)}") },
+        supportingContent = { Text("${formatSize(file.size)} â€¢ ${formatDateTime(file.lastModified)} â€¢ ${subcategory.displayName}") },
         leadingContent = {
             Surface(
                 color = when(ext) {
@@ -642,18 +676,20 @@ private fun DocumentsCell(file: FileItem, viewMode: ViewMode, modifier: Modifier
 @Composable
 private fun APKCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = Modifier) {
     val fileTypeColors = LocalFileTypeColors.current
+    val subcategory = remember(file) { FileTypeUtils.getApkSubcategory(file) }
+
     if (viewMode == ViewMode.GRID) {
         Card(modifier = modifier.fillMaxWidth().padding(4.dp)) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
                 Icon(Icons.Default.Android, null, modifier = Modifier.size(48.dp), tint = fileTypeColors.apk)
                 Text(file.name, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text("v1.0.2", style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp), color = MaterialTheme.colorScheme.outline)
+                Text(subcategory.displayName, style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp), color = MaterialTheme.colorScheme.outline)
             }
         }
     } else {
         ListItem(
             headlineContent = { Text(file.name) },
-            supportingContent = { Text("com.example.app â€?${formatSize(file.size)}") },
+            supportingContent = { Text("${subcategory.displayName} â€¢ ${formatSize(file.size)}") },
             leadingContent = { Icon(Icons.Default.Android, null, tint = fileTypeColors.apk) },
             modifier = modifier
         )
@@ -666,9 +702,11 @@ private fun APKCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = Mod
 @Composable
 private fun ArchiveCell(file: FileItem, viewMode: ViewMode, modifier: Modifier = Modifier) {
     val fileTypeColors = LocalFileTypeColors.current
+    val subcategory = remember(file) { FileTypeUtils.getArchiveSubcategory(file) }
+
     ListItem(
         headlineContent = { Text(file.name) },
-        supportingContent = { Text("${formatSize(file.size)} â€?${formatDateTime(file.lastModified)}") },
+        supportingContent = { Text("${formatSize(file.size)} â€¢ ${formatDateTime(file.lastModified)} â€¢ ${subcategory.displayName}") },
         leadingContent = { Icon(Icons.Default.Archive, null, tint = fileTypeColors.archive) },
         modifier = modifier
     )
@@ -683,7 +721,6 @@ private fun ArchiveCell(file: FileItem, viewMode: ViewMode, modifier: Modifier =
 fun FilesListPageGeneralPreview() {
     FilesListPage("General", FileListPagePreviewSamples.images, {})
 }
-
 
 @Preview
 @Composable

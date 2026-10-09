@@ -30,7 +30,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun CategoryListView(
     categories: List<FileCategory>,
-    onSelect: (FileCategory) -> Unit
+    onSelect: (FileCategory) -> Unit = {},
+    headerContent: (@Composable () -> Unit)? = null
 ) {
     val commonTypes = remember(categories) {
         val commonNames = FileTypeUtils.categoryDefinitions.map { it.name }
@@ -49,6 +50,13 @@ fun CategoryListView(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        if (headerContent != null) {
+            item {
+                headerContent()
+                Spacer(Modifier.height(8.dp))
+            }
+        }
+
         if (commonTypes.isNotEmpty()) {
             item { SectionHeader("Common Types") }
             items(commonTypes) { FileCategoryCard(it, onClick = { onSelect(it) }) }
@@ -77,7 +85,8 @@ fun CategoryListView(
 @Composable
 fun CategoryGridView(
     categories: List<FileCategory>,
-    onSelect: (FileCategory) -> Unit
+    onSelect: (FileCategory) -> Unit = {},
+    headerContent: (@Composable () -> Unit)? = null
 ) {
     val commonTypes = remember(categories) {
         val commonNames = FileTypeUtils.categoryDefinitions.map { it.name }
@@ -98,6 +107,12 @@ fun CategoryGridView(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        if (headerContent != null) {
+            item(span = { GridItemSpan(2) }) {
+                headerContent()
+            }
+        }
+
         if (commonTypes.isNotEmpty()) {
             item(span = { GridItemSpan(2) }) { SectionHeader("Common Types") }
             items(commonTypes) { FileCategoryStrip(it, onClick = { onSelect(it) }) }
@@ -172,6 +187,14 @@ fun FileCategoryCard(category: FileCategory, onClick: () -> Unit) {
     } else {
         "Calculating..."
     }
+
+    val subcategorySummary = remember(category.subcategories) {
+        val nonAll = category.subcategories.filter { !it.id.endsWith("_all") && it.count > 0 }
+        if (nonAll.isNotEmpty()) {
+            nonAll.take(3).joinToString(" • ") { "${it.displayName} (${it.count})" }
+        } else null
+    }
+
     ElevatedCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
@@ -196,6 +219,16 @@ fun FileCategoryCard(category: FileCategory, onClick: () -> Unit) {
                     text = description,
                     style = MaterialTheme.typography.bodySmall
                 )
+                if (subcategorySummary != null) {
+                    Text(
+                        text = subcategorySummary,
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
             }
             Icon(
                 imageVector = Icons.Default.ChevronRight,

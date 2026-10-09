@@ -137,4 +137,11 @@ class SettingsViewModel(private val repository: SettingsRepository) : BaseViewMo
     fun setFileItemShowDetails(show: Boolean) {
         viewModelScope.launch { repository.saveFileItemShowDetails(show) }
     }
+
+    /**
+     * Updates the system hidden files filter mode preference.
+     */
+    fun setHiddenFilterMode(mode: HiddenFilterMode) {
+        viewModelScope.launch { repository.saveHiddenFilterMode(mode) }
+    }
 }

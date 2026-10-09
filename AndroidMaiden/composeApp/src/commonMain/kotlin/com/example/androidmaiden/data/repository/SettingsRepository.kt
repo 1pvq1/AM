@@ -39,6 +39,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         val FILE_ITEM_DESCRIPTION_MODE = stringPreferencesKey("file_item_description_mode")
         val FILE_ITEM_ICON_STYLE = stringPreferencesKey("file_item_icon_style")
         val FILE_ITEM_SHOW_DETAILS = booleanPreferencesKey("file_item_show_details")
+        val HIDDEN_FILTER_MODE = stringPreferencesKey("hidden_filter_mode")
     }
 
     // LLM Settings
@@ -74,7 +75,8 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
             breadcrumbRootLabel = BreadcrumbRootLabel.entries.find { it.name == pref[Keys.BREADCRUMB_ROOT_LABEL] } ?: BreadcrumbRootLabel.ROOT,
             fileItemDescriptionMode = FileItemDescriptionMode.entries.find { it.name == pref[Keys.FILE_ITEM_DESCRIPTION_MODE] } ?: FileItemDescriptionMode.CONCISE,
             fileItemIconStyle = FileItemIconStyle.entries.find { it.name == pref[Keys.FILE_ITEM_ICON_STYLE] } ?: FileItemIconStyle.DEFAULT,
-            fileItemShowDetails = pref[Keys.FILE_ITEM_SHOW_DETAILS] ?: true
+            fileItemShowDetails = pref[Keys.FILE_ITEM_SHOW_DETAILS] ?: true,
+            hiddenFilterMode = HiddenFilterMode.entries.find { it.name == pref[Keys.HIDDEN_FILTER_MODE] } ?: HiddenFilterMode.SHOW_ALL
         )
     }
 
@@ -102,4 +104,5 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     suspend fun saveFileItemDescriptionMode(mode: FileItemDescriptionMode) = dataStore.edit { it[Keys.FILE_ITEM_DESCRIPTION_MODE] = mode.name }
     suspend fun saveFileItemIconStyle(style: FileItemIconStyle) = dataStore.edit { it[Keys.FILE_ITEM_ICON_STYLE] = style.name }
     suspend fun saveFileItemShowDetails(show: Boolean) = dataStore.edit { it[Keys.FILE_ITEM_SHOW_DETAILS] = show }
+    suspend fun saveHiddenFilterMode(mode: HiddenFilterMode) = dataStore.edit { it[Keys.HIDDEN_FILTER_MODE] = mode.name }
 }

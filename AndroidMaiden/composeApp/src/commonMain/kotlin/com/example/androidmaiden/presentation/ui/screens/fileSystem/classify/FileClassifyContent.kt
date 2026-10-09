@@ -23,12 +23,13 @@ import kotlin.time.ExperimentalTime
  *
  * @param categories List of file categories to display.
  * @param isSyncing Whether a file scan is currently in progress.
- * @param viewMode The current view mode (List or Grid).
+ * @param viewMode The current view mode (List or Grid). Default is Grid.
  * @param selectedCategory The currently selected category, if any.
  * @param searchQuery The current search query string.
  * @param searchResults List of file items matching the search query.
  * @param isSearchActive Whether the search interface is currently active.
  * @param isSplitPane Flag enforcing canonical list-detail layout presentation.
+ * @param storageLocationInfo Detected storage location metrics (Internal Storage vs External SD Card).
  * @param onBack Callback for navigating back.
  * @param onSync Callback to trigger a manual file re-scan.
  * @param onToggleView Callback to switch between List and Grid view modes.
@@ -50,6 +51,7 @@ fun FileClassifyContent(
     searchResults: List<FileItem>,
     isSearchActive: Boolean,
     isSplitPane: Boolean,
+    storageLocationInfo: StorageLocationInfo? = null,
     onBack: () -> Unit,
     onSync: () -> Unit,
     onToggleView: () -> Unit,
@@ -61,6 +63,12 @@ fun FileClassifyContent(
     onDeleteFile: (FileItem) -> Unit
 ) {
     var previewFile by remember { mutableStateOf<FileItem?>(null) }
+
+    val headerComposable: (@Composable () -> Unit)? = remember(storageLocationInfo) {
+        if (storageLocationInfo != null) {
+            { StorageLocationCard(info = storageLocationInfo) }
+        } else null
+    }
 
     if (isSplitPane) {
         // Canonical List-Detail Split-Pane for Large Screens/Tablets/Foldables
@@ -93,9 +101,9 @@ fun FileClassifyContent(
                 // Left Column: Master List Categories
                 Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
                     if (viewMode == ViewMode.GRID) {
-                        CategoryGridView(categories, onSelect = onCategorySelect)
+                        CategoryGridView(categories, onSelect = onCategorySelect, headerContent = headerComposable)
                     } else {
-                        CategoryListView(categories, onSelect = onCategorySelect)
+                        CategoryListView(categories, onSelect = onCategorySelect, headerContent = headerComposable)
                     }
 
                     if (isSyncing && categories.isEmpty()) {
@@ -118,6 +126,7 @@ fun FileClassifyContent(
                         FilesListPage(
                             categoryName = selectedCategory.name,
                             files = selectedCategory.files,
+                            subcategories = selectedCategory.subcategories,
                             onBack = onCategoryBack,
                             onDelete = onDeleteFile
                         )
@@ -139,6 +148,7 @@ fun FileClassifyContent(
             FilesListPage(
                 categoryName = selectedCategory.name,
                 files = selectedCategory.files,
+                subcategories = selectedCategory.subcategories,
                 onBack = onCategoryBack,
                 onDelete = onDeleteFile
             )
@@ -172,9 +182,9 @@ fun FileClassifyContent(
                         Column {
                             Box(modifier = Modifier.weight(1f)) {
                                 if (viewMode == ViewMode.GRID) {
-                                    CategoryGridView(categories, onSelect = onCategorySelect)
+                                    CategoryGridView(categories, onSelect = onCategorySelect, headerContent = headerComposable)
                                 } else {
-                                    CategoryListView(categories, onSelect = onCategorySelect)
+                                    CategoryListView(categories, onSelect = onCategorySelect, headerContent = headerComposable)
                                 }
 
                                 if (isSyncing && categories.isEmpty()) {
@@ -217,12 +227,20 @@ fun FileClassifyContentLightPreview() {
             FileClassifyContent(
                 categories = initialCategories,
                 isSyncing = false,
-                viewMode = ViewMode.LIST,
+                viewMode = ViewMode.GRID,
                 selectedCategory = null,
                 searchQuery = "",
                 searchResults = emptyList(),
                 isSearchActive = false,
                 isSplitPane = false,
+                storageLocationInfo = StorageLocationInfo(
+                    name = "Primary Internal Storage",
+                    path = "/storage/emulated/0",
+                    isExternalRemovable = false,
+                    totalBytes = 128_000_000_000L,
+                    usedBytes = 42_000_000_000L,
+                    freeBytes = 86_000_000_000L
+                ),
                 onBack = {},
                 onSync = {},
                 onToggleView = {},
@@ -260,6 +278,14 @@ fun FileClassifyContentSplitPaneDarkPreview() {
                 searchResults = emptyList(),
                 isSearchActive = false,
                 isSplitPane = true,
+                storageLocationInfo = StorageLocationInfo(
+                    name = "External SD Card Storage",
+                    path = "/storage/sdcard1",
+                    isExternalRemovable = true,
+                    totalBytes = 64_000_000_000L,
+                    usedBytes = 32_000_000_000L,
+                    freeBytes = 32_000_000_000L
+                ),
                 onBack = {},
                 onSync = {},
                 onToggleView = {},

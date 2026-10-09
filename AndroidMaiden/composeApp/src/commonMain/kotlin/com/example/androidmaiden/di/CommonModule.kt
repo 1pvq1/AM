@@ -44,7 +44,7 @@ val commonModule = module {
     // 3. Provide the ViewModels
     factory { PersistentFileViewModel(get(), get()) }
     factory { NavigationViewModel() }
-    factory { FileScannerViewModel(get(), get()) }
+    factory { FileScannerViewModel(get(), get(), getOrNull()) }
     factory { FileOrganizeViewModel(get()) }
     factory { FileClearViewModel(get()) }
     factory { TodoViewModel(get(), get()) }

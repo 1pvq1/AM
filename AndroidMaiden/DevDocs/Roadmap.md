@@ -10,7 +10,7 @@ Welcome to the development journey of **AndroidMaiden**! This roadmap outlines o
 Focusing on the core Android experience and basic cross-platform architecture.
 
 - [x] **Core UI Framework:** Jetpack Compose Multiplatform integration.
-- [x] **Android File System:** Basic explorer, analysis, and classification logic.
+- [x] **Android File System:** Explorer, storage analysis, smart sub-classification (Audio, Documents, APKs, Archives, Images, Videos).
 - [x] **LLM Integration (Android):** Gemini API connection for character interaction.
 - [x] **Task Management:** Fundamental Todo list functionality.
 - [x] **Base Components:** Extracted reusable `BaseCard` and `FileActions` toolbar.

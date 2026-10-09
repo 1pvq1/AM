@@ -83,5 +83,6 @@ data class FileCategory(
     val type: String,
     val count: Int? = null,
     val totalSizeMb: Long? = null,
-    val files: List<FileItem> = emptyList()
+    val files: List<FileItem> = emptyList(),
+    val subcategories: List<SubcategoryInfo> = emptyList()
 )

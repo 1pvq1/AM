@@ -5,6 +5,7 @@ import com.example.androidmaiden.core.experimental.time.TimeProvider
 import com.example.androidmaiden.data.repository.FileRepository
 import com.example.androidmaiden.domain.model.FileCategory
 import com.example.androidmaiden.domain.model.FileItem
+import com.example.androidmaiden.domain.model.StorageLocationInfo
 import com.example.androidmaiden.core.util.FileTypeUtils
 import com.example.androidmaiden.core.util.FileTypeUtils.getExtensionType
 import com.example.androidmaiden.presentation.ui.features.fileSys.ViewMode
@@ -31,7 +32,7 @@ val initialCategories =
         }
 
 /**
- * ViewModel for persistent file classification and management.
+ * ViewModel for persistent file classification, sub-classification, and management.
  */
 class PersistentFileViewModel(
     private val repository: FileRepository,
@@ -42,6 +43,17 @@ class PersistentFileViewModel(
      * Flow of the repository's sync status.
      */
     val isSyncing: StateFlow<Boolean> = repository.isSyncing
+
+    /**
+     * Flow of detected storage location metrics (Internal Storage vs External SD Card).
+     */
+    val storageLocationInfo: StateFlow<StorageLocationInfo> = flow {
+        emit(repository.getStorageLocationInfo())
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = repository.getStorageLocationInfo()
+    )
 
     /**
      * Flow of calculated storage statistics.
@@ -61,7 +73,7 @@ class PersistentFileViewModel(
         )
 
     /**
-     * Flow of processed file categories with file lists and counts.
+     * Flow of processed file categories with file lists, counts, and smart subcategory breakdowns.
      */
     val categories: StateFlow<List<FileCategory>> = repository.allFiles
         .map { metadataList ->
@@ -114,18 +126,45 @@ class PersistentFileViewModel(
      */
     val selectedCategory: StateFlow<FileCategory?> = _selectedCategory.asStateFlow()
 
-    private val _viewMode = MutableStateFlow(ViewMode.LIST)
+    private val _selectedSubcategoryId = MutableStateFlow<String?>(null)
 
     /**
-     * The current view mode (List or Grid).
+     * Active subcategory filter ID (e.g., "audio_music", "doc_pdf").
+     */
+    val selectedSubcategoryId: StateFlow<String?> = _selectedSubcategoryId.asStateFlow()
+
+    /**
+     * Flow of files in the selected category filtered by the active subcategory.
+     */
+    val filteredCategoryFiles: StateFlow<List<FileItem>> = combine(selectedCategory, selectedSubcategoryId) { category, subId ->
+        if (category == null) emptyList()
+        else FileTypeUtils.filterFilesBySubcategory(category.type, subId, category.files)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    private val _viewMode = MutableStateFlow(ViewMode.GRID)
+
+    /**
+     * The current view mode (List or Grid). Default is Grid view mode.
      */
     val viewMode: StateFlow<ViewMode> = _viewMode.asStateFlow()
 
     /**
-     * Selects a category to display.
+     * Selects a category to display and resets any active subcategory filter.
      */
     fun selectCategory(category: FileCategory?) {
         _selectedCategory.value = category
+        _selectedSubcategoryId.value = null
+    }
+
+    /**
+     * Selects an active subcategory filter ID for the current category.
+     */
+    fun selectSubcategory(subcategoryId: String?) {
+        _selectedSubcategoryId.value = subcategoryId
     }
 
     /**
@@ -168,7 +207,7 @@ class PersistentFileViewModel(
     }
 
     /**
-     * Processes raw metadata into categorized lists.
+     * Processes raw metadata into categorized lists with calculated subcategories.
      */
     private fun processMetadata(list: List<FileItem>): List<FileCategory> {
         val allFilesOnly = list.filter { !it.isDirectory }
@@ -176,13 +215,15 @@ class PersistentFileViewModel(
 
         val classificationCategories = FileTypeUtils.categoryDefinitions.map { def ->
             val items = groups[def.type] ?: emptyList()
+            val subcategories = FileTypeUtils.calculateSubcategoriesForCategory(def.type, items)
             FileCategory(
                 name = def.name,
                 icon = def.icon,
                 type = def.type,
                 count = items.size,
                 totalSizeMb = items.sumOf { it.size } / (1024 * 1024),
-                files = items
+                files = items,
+                subcategories = subcategories
             )
         }
 
@@ -204,7 +245,8 @@ class PersistentFileViewModel(
                 type = def.type,
                 count = filteredFiles.size,
                 totalSizeMb = filteredFiles.sumOf { it.size } / (1024 * 1024),
-                files = filteredFiles
+                files = filteredFiles,
+                subcategories = emptyList()
             )
         }
 

@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.viewModelScope
 import com.example.androidmaiden.core.experimental.time.TimeProvider
 import com.example.androidmaiden.data.repository.FileRepository
+import com.example.androidmaiden.data.repository.SettingsRepository
 import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.domain.service.AndroidFolderExplainer
 import com.example.androidmaiden.core.util.FileTypeUtils
@@ -27,12 +28,24 @@ data class FolderAnalysisStats(
 )
 
 /**
+ * Filter extension function to filter [FileSysNode] lists based on [HiddenFilterMode].
+ */
+fun List<FileSysNode>.filterByHiddenMode(mode: HiddenFilterMode): List<FileSysNode> {
+    return when (mode) {
+        HiddenFilterMode.SHOW_ALL -> this
+        HiddenFilterMode.EXCLUDE_HIDDEN -> filter { !it.name.startsWith(".") }
+        HiddenFilterMode.ONLY_HIDDEN -> filter { it.name.startsWith(".") }
+    }
+}
+
+/**
  * ViewModel for the File System Analysis screen.
- * Handles navigation, file operations, simulated and real data mapping, and content analysis.
+ * Handles navigation, file operations, simulated and real data mapping, content analysis, and hidden file filtering.
  */
 class FileScannerViewModel(
     val repository: FileRepository,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
+    private val settingsRepository: SettingsRepository? = null
 ) : BaseViewModel() {
 
     private val defaultRoot: String get() = repository.getScannedPath()
@@ -42,6 +55,12 @@ class FileScannerViewModel(
      * The current directory node being displayed.
      */
     var currentDirectory by mutableStateOf<FileSysNode?>(null)
+        private set
+
+    /**
+     * Current system hidden files filter mode (Show All, Exclude Hidden, or Hidden Only).
+     */
+    var hiddenFilterMode by mutableStateOf(HiddenFilterMode.SHOW_ALL)
         private set
 
     /**
@@ -70,6 +89,25 @@ class FileScannerViewModel(
     init {
         _isLoading.value = true
         loadDirectory(if (useMock) mockRootPath else defaultRoot)
+
+        settingsRepository?.let { settings ->
+            viewModelScope.launch {
+                settings.controlAppearanceConfig.collect { config ->
+                    updateHiddenFilterMode(config.hiddenFilterMode)
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates the hidden files filter mode and recalculates stats.
+     */
+    fun updateHiddenFilterMode(mode: HiddenFilterMode) {
+        hiddenFilterMode = mode
+        currentDirectory?.let { dir ->
+            val filteredChildren = dir.children.filterByHiddenMode(mode)
+            calculateStats(filteredChildren)
+        }
     }
 
     /**
@@ -177,7 +215,7 @@ class FileScannerViewModel(
 
                 withContext(Dispatchers.Main) {
                     currentDirectory = targetNode
-                    calculateStats(targetNode.children)
+                    calculateStats(targetNode.children.filterByHiddenMode(hiddenFilterMode))
                 }
             } catch (e: Exception) {
                 _error.value = "Mock data error: ${e.message}"
@@ -210,27 +248,52 @@ class FileScannerViewModel(
     }
 
     /**
-     * Loads real directory data from the database and maps metadata to domain nodes.
+     * Loads real directory data by querying real-time OS file listing and observing database flow.
      *
      * @param path The physical directory path on the device.
      */
     private fun loadRealDirectory(path: String) {
-        realDataJob = repository.getFilesByParent(path)
-            .onEach { metadataList ->
-                val node = mapMetadataToNode(path, metadataList)
-                withContext(Dispatchers.Main) {
-                    currentDirectory = node
-                    calculateStats(node.children)
-                    _isLoading.value = false
+        viewModelScope.launch(Dispatchers.Default) {
+            // First: Immediately load real-time directory listing from OS for instant feedback
+            try {
+                val realTimeItems = repository.getRealTimeFiles(path)
+                if (realTimeItems.isNotEmpty()) {
+                    val realTimeNode = mapMetadataToNode(path, realTimeItems)
+                    withContext(Dispatchers.Main) {
+                        currentDirectory = realTimeNode
+                        calculateStats(realTimeNode.children.filterByHiddenMode(hiddenFilterMode))
+                        _isLoading.value = false
+                    }
                 }
+            } catch (e: Exception) {
+                // Fallback gracefully to database flow if direct OS listing fails
             }
-            .catch { e ->
-                withContext(Dispatchers.Main) {
-                    _error.value = "Database error: ${e.message}"
-                    _isLoading.value = false
+
+            // Second: Observe Room database flow for background updates
+            realDataJob = repository.getFilesByParent(path)
+                .onEach { metadataList ->
+                    val sourceItems = if (metadataList.isNotEmpty()) {
+                        metadataList
+                    } else {
+                        repository.getRealTimeFiles(path)
+                    }
+                    val node = mapMetadataToNode(path, sourceItems)
+                    withContext(Dispatchers.Main) {
+                        currentDirectory = node
+                        calculateStats(node.children.filterByHiddenMode(hiddenFilterMode))
+                        _isLoading.value = false
+                    }
                 }
-            }
-            .launchIn(viewModelScope)
+                .catch { e ->
+                    withContext(Dispatchers.Main) {
+                        if (currentDirectory == null) {
+                            _error.value = "Database error: ${e.message}"
+                        }
+                        _isLoading.value = false
+                    }
+                }
+                .launchIn(viewModelScope)
+        }
     }
 
     /**
@@ -288,11 +351,12 @@ class FileScannerViewModel(
     }
 
     /**
-     * Maps database metadata to [FileSysNode] instances enriched with Android architectural explanations.
+     * Maps database metadata or real-time items to [FileSysNode] instances enriched with Android architectural explanations
+     * and sub-folder child nodes for accurate counting.
      *
      * @param path The parent directory path.
-     * @param metadataList The list of child metadata items.
-     * @return The parent [FileSysNode] containing child nodes.
+     * @param metadataList The list of child metadata or real-time items.
+     * @return The parent [FileSysNode] containing child nodes with populated sub-children.
      */
     private fun mapMetadataToNode(path: String, metadataList: List<FileItem>): FileSysNode {
         val children = metadataList.map { metadata ->
@@ -301,6 +365,29 @@ class FileScannerViewModel(
             } else {
                 "${metadata.size / 1024} KB"
             }
+
+            // Populate immediate sub-folder child nodes so FileItem accurately computes folder & file counts
+            val subFolderChildren = if (metadata.isDirectory && !metadata.path.isNullOrBlank()) {
+                try {
+                    val subItems = repository.getRealTimeFiles(metadata.path)
+                    subItems.map { subItem ->
+                        FileSysNode(
+                            name = subItem.name,
+                            size = if (subItem.isDirectory) null else subItem.size,
+                            lastModified = subItem.lastModified,
+                            nodeType = if (subItem.isDirectory) NodeType.FOLDER else NodeType.FILE,
+                            folderType = if (subItem.isDirectory) FolderType.FOLDER else FolderType.OTHER,
+                            dataSource = DataSource.REAL,
+                            path = subItem.path
+                        )
+                    }
+                } catch (e: Exception) {
+                    emptyList()
+                }
+            } else {
+                emptyList()
+            }
+
             FileSysNode(
                 name = metadata.name,
                 size = if (metadata.isDirectory) null else metadata.size,
@@ -309,7 +396,8 @@ class FileScannerViewModel(
                 folderType = if (metadata.isDirectory) FolderType.FOLDER else FolderType.OTHER,
                 dataSource = DataSource.REAL,
                 path = metadata.path,
-                description = descriptionText
+                description = descriptionText,
+                children = subFolderChildren
             )
         }
 
