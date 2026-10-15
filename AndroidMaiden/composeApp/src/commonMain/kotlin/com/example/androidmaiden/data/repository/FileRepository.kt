@@ -135,6 +135,13 @@ class FileRepository(
     }
 
     /**
+     * Returns metrics and location information for all detected accessible storage volumes.
+     */
+    fun getStorageLocations(): List<StorageLocationInfo> {
+        return fileProvider.getStorageLocations()
+    }
+
+    /**
      * Lists files from the OS in real-time and enriches them with tag data from the DB.
      * @param path The directory path to list.
      */

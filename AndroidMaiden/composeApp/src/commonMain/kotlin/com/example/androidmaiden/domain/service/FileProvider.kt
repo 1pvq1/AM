@@ -21,4 +21,9 @@ interface FileProvider {
      * Returns detected storage location metrics (Internal vs External SD Card).
      */
     fun getStorageLocationInfo(): StorageLocationInfo
+
+    /**
+     * Returns a list of all detected accessible storage locations (Internal, SD Card, USB, etc.).
+     */
+    fun getStorageLocations(): List<StorageLocationInfo>
 }

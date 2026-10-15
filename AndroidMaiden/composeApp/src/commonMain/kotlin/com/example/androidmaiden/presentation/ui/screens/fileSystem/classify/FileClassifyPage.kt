@@ -26,6 +26,8 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
     val searchQuery by vm.searchQuery.collectAsState()
     val searchResults by vm.searchResults.collectAsState()
     val storageLocationInfo by vm.storageLocationInfo.collectAsState()
+    val storageLocations by vm.storageLocations.collectAsState()
+    val selectedStoragePath by vm.selectedStoragePath.collectAsState()
 
     // Local UI state
     var isSearchActive by remember { mutableStateOf(false) }
@@ -46,6 +48,8 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
         searchQuery = searchQuery,
         searchResults = searchResults,
         isSearchActive = isSearchActive,
+        storageLocations = storageLocations,
+        selectedStoragePath = selectedStoragePath,
         storageLocationInfo = storageLocationInfo,
         onBack = onBack,
         onSync = { vm.startSync() },
@@ -61,6 +65,7 @@ fun FileClassifyPage(onBack: () -> Unit = {}) {
         onSearchQueryChange = { vm.updateSearchQuery(it) },
         onCategorySelect = { vm.selectCategory(it) },
         onCategoryBack = { vm.selectCategory(null) },
+        onStorageSelect = { storage -> vm.selectStorageLocation(storage.path) },
         onDeleteFile = { vm.deleteFile(it.path) }
     )
 }

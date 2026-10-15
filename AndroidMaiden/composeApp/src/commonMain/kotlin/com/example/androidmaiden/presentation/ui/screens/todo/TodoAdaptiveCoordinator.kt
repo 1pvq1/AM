@@ -7,6 +7,9 @@ import com.example.androidmaiden.domain.model.TodoItem
 import com.example.androidmaiden.domain.model.TodoPriority
 import com.example.androidmaiden.presentation.ui.adaptive.*
 import com.example.androidmaiden.presentation.ui.theme.AppTheme
+import com.example.androidmaiden.presentation.ui.theme.core.AppThemeType
+import com.example.androidmaiden.presentation.ui.theme.core.ButtonDisplayStyle
+import com.example.androidmaiden.presentation.ui.theme.core.ThemeMode
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -61,19 +64,59 @@ fun TodoAdaptiveCoordinator(
     )
 }
 
-@Preview(name = "Compact", showBackground = true)
+// --- Visual Comparison Previews Across 3 Size Classes ---
+
+/**
+ * Visual Preview 1: Smartphone / Mobile (Compact Viewport Size Class).
+ */
+@Preview(name = "1. Smartphone (Compact)", widthDp = 360, heightDp = 800, showBackground = true)
 @Composable
 fun TodoAdaptiveCoordinatorCompactPreview() {
-    AppTheme {
-        TodoAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Compact)
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.LIGHT,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        androidx.compose.material3.Surface {
+            TodoAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Compact)
+        }
     }
 }
 
-@Preview(name = "Wide", showBackground = true)
+/**
+ * Visual Preview 2: Foldable / Extended (Medium Viewport Size Class).
+ */
+@Preview(name = "2. Foldable / Extended (Medium)", widthDp = 700, heightDp = 900, showBackground = true)
 @Composable
-fun TodoAdaptiveCoordinatorWidePreview() {
-    AppTheme {
-        TodoAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Expanded)
+fun TodoAdaptiveCoordinatorMediumPreview() {
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.DARK,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        androidx.compose.material3.Surface {
+            TodoAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Medium)
+        }
+    }
+}
+
+/**
+ * Visual Preview 3: Tablet / Desktop Wide Screen (Expanded Viewport Size Class).
+ */
+@Preview(name = "3. Wide Screen (Expanded)", widthDp = 1200, heightDp = 800, showBackground = true)
+@Composable
+fun TodoAdaptiveCoordinatorExpandedPreview() {
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.DARK,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        androidx.compose.material3.Surface {
+            TodoAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Expanded)
+        }
     }
 }
 
@@ -105,3 +148,4 @@ private fun TodoAdaptiveCoordinatorPreviewHelper(widthCategory: WindowSizeCatego
         currentTimeMillis = 0L
     )
 }
+

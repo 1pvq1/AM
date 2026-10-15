@@ -67,27 +67,59 @@ fun SettingsAdaptiveCoordinator(
     )
 }
 
-@Preview(name = "Compact", showBackground = true)
+// --- Visual Comparison Previews Across 3 Size Classes ---
+
+/**
+ * Visual Preview 1: Smartphone / Mobile (Compact Viewport Size Class).
+ */
+@Preview(name = "1. Smartphone (Compact)", widthDp = 360, heightDp = 800, showBackground = true)
 @Composable
 fun SettingsScreenCompactPreview() {
-    AppTheme {
-        SettingsAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Compact)
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.LIGHT,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        androidx.compose.material3.Surface {
+            SettingsAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Compact)
+        }
     }
 }
 
-@Preview(name = "Medium", showBackground = true)
+/**
+ * Visual Preview 2: Foldable / Extended (Medium Viewport Size Class).
+ */
+@Preview(name = "2. Foldable / Extended (Medium)", widthDp = 700, heightDp = 900, showBackground = true)
 @Composable
 fun SettingsScreenMediumPreview() {
-    AppTheme {
-        SettingsAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Medium)
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.DARK,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        androidx.compose.material3.Surface {
+            SettingsAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Medium)
+        }
     }
 }
 
-@Preview(name = "Expanded", showBackground = true)
+/**
+ * Visual Preview 3: Tablet / Desktop Wide Screen (Expanded Viewport Size Class).
+ */
+@Preview(name = "3. Wide Screen (Expanded)", widthDp = 1200, heightDp = 800, showBackground = true)
 @Composable
 fun SettingsScreenExpandedPreview() {
-    AppTheme {
-        SettingsAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Expanded)
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.DARK,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        androidx.compose.material3.Surface {
+            SettingsAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Expanded)
+        }
     }
 }
 
@@ -119,3 +151,4 @@ private fun SettingsAdaptiveCoordinatorPreviewHelper(widthCategory: WindowSizeCa
         onNavigateToControlAppearance = { }
     )
 }
+

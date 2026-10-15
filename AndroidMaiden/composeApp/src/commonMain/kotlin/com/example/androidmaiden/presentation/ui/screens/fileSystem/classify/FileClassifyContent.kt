@@ -19,7 +19,7 @@ import kotlin.time.ExperimentalTime
 
 /**
  * Stateless screen content for the File Classification feature.
- * Supports split-pane canonical layout configurations on wide/tablet viewports.
+ * Prioritizes mobile devices and smartphone screen layouts.
  *
  * @param categories List of file categories to display.
  * @param isSyncing Whether a file scan is currently in progress.
@@ -29,7 +29,9 @@ import kotlin.time.ExperimentalTime
  * @param searchResults List of file items matching the search query.
  * @param isSearchActive Whether the search interface is currently active.
  * @param isSplitPane Flag enforcing canonical list-detail layout presentation.
- * @param storageLocationInfo Detected storage location metrics (Internal Storage vs External SD Card).
+ * @param storageLocations List of detected storage locations (Internal Storage, SD Card, etc.).
+ * @param selectedStoragePath Currently selected storage location path.
+ * @param storageLocationInfo Fallback single storage location metric model.
  * @param onBack Callback for navigating back.
  * @param onSync Callback to trigger a manual file re-scan.
  * @param onToggleView Callback to switch between List and Grid view modes.
@@ -38,6 +40,7 @@ import kotlin.time.ExperimentalTime
  * @param onSearchQueryChange Callback when the search query is updated.
  * @param onCategorySelect Callback when a category is selected.
  * @param onCategoryBack Callback to deselect the current category.
+ * @param onStorageSelect Callback when a storage location volume card is selected.
  * @param onDeleteFile Callback to delete a file.
  */
 @ExperimentalTime
@@ -51,6 +54,8 @@ fun FileClassifyContent(
     searchResults: List<FileItem>,
     isSearchActive: Boolean,
     isSplitPane: Boolean,
+    storageLocations: List<StorageLocationInfo> = emptyList(),
+    selectedStoragePath: String? = null,
     storageLocationInfo: StorageLocationInfo? = null,
     onBack: () -> Unit,
     onSync: () -> Unit,
@@ -60,13 +65,34 @@ fun FileClassifyContent(
     onSearchQueryChange: (String) -> Unit,
     onCategorySelect: (FileCategory) -> Unit,
     onCategoryBack: () -> Unit,
+    onStorageSelect: (StorageLocationInfo) -> Unit = {},
     onDeleteFile: (FileItem) -> Unit
 ) {
     var previewFile by remember { mutableStateOf<FileItem?>(null) }
 
-    val headerComposable: (@Composable () -> Unit)? = remember(storageLocationInfo) {
-        if (storageLocationInfo != null) {
-            { StorageLocationCard(info = storageLocationInfo) }
+    val effectiveStorageLocations = remember(storageLocations, storageLocationInfo) {
+        if (storageLocations.isNotEmpty()) {
+            storageLocations
+        } else if (storageLocationInfo != null) {
+            listOf(storageLocationInfo)
+        } else {
+            emptyList()
+        }
+    }
+
+    val headerComposable: (@Composable () -> Unit)? = remember(
+        effectiveStorageLocations,
+        selectedStoragePath
+    ) {
+        if (effectiveStorageLocations.isNotEmpty()) {
+            {
+                StorageLocationsSection(
+                    locations = effectiveStorageLocations,
+                    selectedPath = selectedStoragePath,
+                    isCompactWidth = true,
+                    onStorageSelect = onStorageSelect
+                )
+            }
         } else null
     }
 
@@ -118,7 +144,7 @@ fun FileClassifyContent(
 
                 // Right Column: Detail Screen Viewport
                 Box(modifier = Modifier.weight(1.5f).fillMaxHeight()) {
-                    if (isSearchActive && searchQuery.length >= 2) {
+                    if ((isSearchActive) && (searchQuery.length >= 2)) {
                         SearchResultsView(searchResults) { file ->
                             previewFile = file
                         }
@@ -174,7 +200,7 @@ fun FileClassifyContent(
                 }
             ) { padding ->
                 Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-                    if (isSearchActive && searchQuery.length >= 2) {
+                    if ((isSearchActive) && (searchQuery.length >= 2)) {
                         SearchResultsView(searchResults) { file ->
                             previewFile = file
                         }
@@ -211,12 +237,29 @@ fun FileClassifyContent(
 }
 
 /**
- * Light theme preview for the classification content.
+ * Light theme smartphone preview for the file classification content.
  */
 @ExperimentalTime
 @Preview
 @Composable
 fun FileClassifyContentLightPreview() {
+    val internalStorage = StorageLocationInfo(
+        name = "Primary Internal Storage",
+        path = "/storage/emulated/0",
+        isExternalRemovable = false,
+        totalBytes = 128_000_000_000L,
+        usedBytes = 42_000_000_000L,
+        freeBytes = 86_000_000_000L
+    )
+    val sdCardStorage = StorageLocationInfo(
+        name = "External SD Card Storage",
+        path = "/storage/sdcard1",
+        isExternalRemovable = true,
+        totalBytes = 64_000_000_000L,
+        usedBytes = 20_000_000_000L,
+        freeBytes = 44_000_000_000L
+    )
+
     AppTheme(
         themeType = AppThemeType.DEFAULT,
         themeMode = ThemeMode.LIGHT,
@@ -233,14 +276,8 @@ fun FileClassifyContentLightPreview() {
                 searchResults = emptyList(),
                 isSearchActive = false,
                 isSplitPane = false,
-                storageLocationInfo = StorageLocationInfo(
-                    name = "Primary Internal Storage",
-                    path = "/storage/emulated/0",
-                    isExternalRemovable = false,
-                    totalBytes = 128_000_000_000L,
-                    usedBytes = 42_000_000_000L,
-                    freeBytes = 86_000_000_000L
-                ),
+                storageLocations = listOf(internalStorage, sdCardStorage),
+                selectedStoragePath = internalStorage.path,
                 onBack = {},
                 onSync = {},
                 onToggleView = {},
@@ -249,6 +286,7 @@ fun FileClassifyContentLightPreview() {
                 onSearchQueryChange = {},
                 onCategorySelect = {},
                 onCategoryBack = {},
+                onStorageSelect = {},
                 onDeleteFile = {}
             )
         }
@@ -256,12 +294,29 @@ fun FileClassifyContentLightPreview() {
 }
 
 /**
- * Dark theme split-pane preview for large viewport sizes.
+ * Dark theme smartphone preview for the file classification content.
  */
 @ExperimentalTime
 @Preview
 @Composable
-fun FileClassifyContentSplitPaneDarkPreview() {
+fun FileClassifyContentDarkPreview() {
+    val internalStorage = StorageLocationInfo(
+        name = "Primary Internal Storage",
+        path = "/storage/emulated/0",
+        isExternalRemovable = false,
+        totalBytes = 128_000_000_000L,
+        usedBytes = 42_000_000_000L,
+        freeBytes = 86_000_000_000L
+    )
+    val sdCardStorage = StorageLocationInfo(
+        name = "External SD Card Storage",
+        path = "/storage/sdcard1",
+        isExternalRemovable = true,
+        totalBytes = 64_000_000_000L,
+        usedBytes = 32_000_000_000L,
+        freeBytes = 32_000_000_000L
+    )
+
     AppTheme(
         themeType = AppThemeType.DEFAULT,
         themeMode = ThemeMode.DARK,
@@ -277,15 +332,9 @@ fun FileClassifyContentSplitPaneDarkPreview() {
                 searchQuery = "",
                 searchResults = emptyList(),
                 isSearchActive = false,
-                isSplitPane = true,
-                storageLocationInfo = StorageLocationInfo(
-                    name = "External SD Card Storage",
-                    path = "/storage/sdcard1",
-                    isExternalRemovable = true,
-                    totalBytes = 64_000_000_000L,
-                    usedBytes = 32_000_000_000L,
-                    freeBytes = 32_000_000_000L
-                ),
+                isSplitPane = false,
+                storageLocations = listOf(internalStorage, sdCardStorage),
+                selectedStoragePath = sdCardStorage.path,
                 onBack = {},
                 onSync = {},
                 onToggleView = {},
@@ -294,6 +343,7 @@ fun FileClassifyContentSplitPaneDarkPreview() {
                 onSearchQueryChange = {},
                 onCategorySelect = {},
                 onCategoryBack = {},
+                onStorageSelect = {},
                 onDeleteFile = {}
             )
         }

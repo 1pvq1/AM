@@ -56,6 +56,24 @@ class PersistentFileViewModel(
     )
 
     /**
+     * Flow of all detected storage locations (Internal Storage, External SD Card, USB, etc.).
+     */
+    val storageLocations: StateFlow<List<StorageLocationInfo>> = flow {
+        emit(repository.getStorageLocations())
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = repository.getStorageLocations()
+    )
+
+    private val _selectedStoragePath = MutableStateFlow<String?>(null)
+
+    /**
+     * Actively selected storage location path. Defaults to primary internal storage path when null.
+     */
+    val selectedStoragePath: StateFlow<String?> = _selectedStoragePath.asStateFlow()
+
+    /**
      * Flow of calculated storage statistics.
      */
     val storageStats: StateFlow<StorageStats> = repository.allFiles
@@ -158,6 +176,15 @@ class PersistentFileViewModel(
     fun selectCategory(category: FileCategory?) {
         _selectedCategory.value = category
         _selectedSubcategoryId.value = null
+    }
+
+    /**
+     * Selects an active storage location volume by its root path.
+     *
+     * @param path Root path of the storage volume.
+     */
+    fun selectStorageLocation(path: String?) {
+        _selectedStoragePath.value = path
     }
 
     /**

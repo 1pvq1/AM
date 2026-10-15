@@ -1,5 +1,6 @@
 package com.example.androidmaiden.presentation.ui.screens.interaction
 
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import com.example.androidmaiden.data.local.ChatSession
 import com.example.androidmaiden.data.network.LlmProvider
@@ -7,6 +8,9 @@ import com.example.androidmaiden.domain.model.ChatMessage
 import com.example.androidmaiden.domain.model.ChatViewMode
 import com.example.androidmaiden.presentation.ui.adaptive.*
 import com.example.androidmaiden.presentation.ui.theme.AppTheme
+import com.example.androidmaiden.presentation.ui.theme.core.AppThemeType
+import com.example.androidmaiden.presentation.ui.theme.core.ButtonDisplayStyle
+import com.example.androidmaiden.presentation.ui.theme.core.ThemeMode
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -83,27 +87,59 @@ fun CharacterInteractionAdaptiveCoordinator(
     )
 }
 
-@Preview(name = "Compact", showBackground = true)
+// --- Visual Comparison Previews Across 3 Size Classes ---
+
+/**
+ * Visual Preview 1: Smartphone / Mobile (Compact Viewport Size Class).
+ */
+@Preview(name = "1. Smartphone (Compact)", widthDp = 360, heightDp = 800, showBackground = true)
 @Composable
 fun CharacterInteractionAdaptiveCoordinatorCompactPreview() {
-    AppTheme {
-        CharacterInteractionAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Compact)
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.LIGHT,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            CharacterInteractionAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Compact)
+        }
     }
 }
 
-@Preview(name = "Medium", showBackground = true)
+/**
+ * Visual Preview 2: Foldable / Extended (Medium Viewport Size Class).
+ */
+@Preview(name = "2. Foldable / Extended (Medium)", widthDp = 700, heightDp = 900, showBackground = true)
 @Composable
 fun CharacterInteractionAdaptiveCoordinatorMediumPreview() {
-    AppTheme {
-        CharacterInteractionAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Medium)
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.DARK,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            CharacterInteractionAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Medium)
+        }
     }
 }
 
-@Preview(name = "Expanded", showBackground = true)
+/**
+ * Visual Preview 3: Tablet / Desktop Wide Screen (Expanded Viewport Size Class).
+ */
+@Preview(name = "3. Wide Screen (Expanded)", widthDp = 1200, heightDp = 800, showBackground = true)
 @Composable
 fun CharacterInteractionAdaptiveCoordinatorExpandedPreview() {
-    AppTheme {
-        CharacterInteractionAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Expanded)
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.DARK,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            CharacterInteractionAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Expanded)
+        }
     }
 }
 
@@ -142,3 +178,4 @@ private fun CharacterInteractionAdaptiveCoordinatorPreviewHelper(widthCategory: 
         tokenUsage = 0.5f
     )
 }
+

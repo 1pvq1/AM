@@ -1,24 +1,33 @@
 package com.example.androidmaiden.presentation.ui.screens.fileSystem.classify.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.androidmaiden.domain.model.FileCategory
+import coil3.compose.AsyncImagePainter
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
 import com.example.androidmaiden.core.util.FileTypeUtils
-import com.example.androidmaiden.presentation.viewmodel.initialCategories
+import com.example.androidmaiden.domain.model.FileCategory
+import com.example.androidmaiden.domain.model.FileItem
 import com.example.androidmaiden.presentation.ui.theme.AppTheme
 import com.example.androidmaiden.presentation.ui.theme.core.AppThemeType
-import com.example.androidmaiden.presentation.ui.theme.core.ThemeMode
 import com.example.androidmaiden.presentation.ui.theme.core.ButtonDisplayStyle
+import com.example.androidmaiden.presentation.ui.theme.core.ThemeMode
+import com.example.androidmaiden.presentation.viewmodel.initialCategories
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -26,6 +35,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  *
  * @param categories List of file categories to display.
  * @param onSelect Callback when a category is selected.
+ * @param headerContent Optional header composable displayed above categories.
  */
 @Composable
 fun CategoryListView(
@@ -81,6 +91,7 @@ fun CategoryListView(
  *
  * @param categories List of file categories to display.
  * @param onSelect Callback when a category is selected.
+ * @param headerContent Optional header composable displayed above categories.
  */
 @Composable
 fun CategoryGridView(
@@ -157,7 +168,7 @@ fun FileCategoryStrip(category: FileCategory, onClick: () -> Unit) {
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
             )
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = category.name,
                     style = MaterialTheme.typography.labelLarge,
@@ -170,12 +181,15 @@ fun FileCategoryStrip(category: FileCategory, onClick: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            if (category.files.isNotEmpty()) {
+                CategoryItemPreviewsRow(files = category.files)
+            }
         }
     }
 }
 
 /**
- * A card showing a single file category with more details.
+ * A card showing a single file category with detailed metadata and sample file preview avatars.
  *
  * @param category The file category data.
  * @param onClick Callback when the card is clicked.
@@ -230,11 +244,75 @@ fun FileCategoryCard(category: FileCategory, onClick: () -> Unit) {
                     )
                 }
             }
+            if (category.files.isNotEmpty()) {
+                CategoryItemPreviewsRow(files = category.files)
+            }
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.outline
             )
+        }
+    }
+}
+
+/**
+ * Mini thumbnail avatars row displaying sample icons/artwork for files in a category (e.g., APK app icons, album covers).
+ *
+ * @param files List of [FileItem] metadata in the category.
+ * @param modifier Optional layout modifier.
+ */
+@Composable
+private fun CategoryItemPreviewsRow(files: List<FileItem>, modifier: Modifier = Modifier) {
+    if (files.isEmpty()) return
+
+    val sampleFiles = remember(files) { files.filter { !it.isDirectory }.take(4) }
+    if (sampleFiles.isEmpty()) return
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy((-6).dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        sampleFiles.forEach { file ->
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.surface),
+                modifier = Modifier.size(26.dp)
+            ) {
+                SubcomposeAsyncImage(
+                    model = file.path,
+                    contentDescription = file.name,
+                    modifier = Modifier.fillMaxSize().clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                ) {
+                    when (painter.state) {
+                        is AsyncImagePainter.State.Success -> SubcomposeAsyncImageContent()
+                        else -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                val ext = file.name.substringAfterLast(".").lowercase()
+                                val icon = when (ext) {
+                                    "apk" -> Icons.Default.Android
+                                    "mp3", "flac", "wav", "m4a", "aac", "ogg" -> Icons.Default.Audiotrack
+                                    "jpg", "jpeg", "png", "webp" -> Icons.Default.Image
+                                    "mp4", "mkv", "mov" -> Icons.Default.Movie
+                                    else -> Icons.AutoMirrored.Filled.InsertDriveFile
+                                }
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -1,9 +1,13 @@
 package com.example.androidmaiden.presentation.ui.screens.home
 
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import com.example.androidmaiden.presentation.ui.adaptive.*
 import com.example.androidmaiden.presentation.ui.features.character.CharacterLayout
 import com.example.androidmaiden.presentation.ui.theme.AppTheme
+import com.example.androidmaiden.presentation.ui.theme.core.AppThemeType
+import com.example.androidmaiden.presentation.ui.theme.core.ButtonDisplayStyle
+import com.example.androidmaiden.presentation.ui.theme.core.ThemeMode
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -33,27 +37,59 @@ fun HomeAdaptiveCoordinator(
     )
 }
 
-@Preview(name = "Compact", showBackground = true)
+// --- Visual Comparison Previews Across 3 Size Classes ---
+
+/**
+ * Visual Preview 1: Smartphone / Mobile (Compact Viewport Size Class).
+ */
+@Preview(name = "1. Smartphone (Compact)", widthDp = 360, heightDp = 800, showBackground = true)
 @Composable
 fun HomeAdaptiveCoordinatorCompactPreview() {
-    AppTheme {
-        HomeAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Compact)
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.LIGHT,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            HomeAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Compact)
+        }
     }
 }
 
-@Preview(name = "Medium", showBackground = true)
+/**
+ * Visual Preview 2: Foldable / Extended (Medium Viewport Size Class).
+ */
+@Preview(name = "2. Foldable / Extended (Medium)", widthDp = 700, heightDp = 900, showBackground = true)
 @Composable
 fun HomeAdaptiveCoordinatorMediumPreview() {
-    AppTheme {
-        HomeAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Medium)
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.DARK,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            HomeAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Medium)
+        }
     }
 }
 
-@Preview(name = "Expanded", showBackground = true)
+/**
+ * Visual Preview 3: Tablet / Desktop Wide Screen (Expanded Viewport Size Class).
+ */
+@Preview(name = "3. Wide Screen (Expanded)", widthDp = 1200, heightDp = 800, showBackground = true)
 @Composable
 fun HomeAdaptiveCoordinatorExpandedPreview() {
-    AppTheme {
-        HomeAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Expanded)
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.DARK,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            HomeAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Expanded)
+        }
     }
 }
 
@@ -68,3 +104,4 @@ private fun HomeAdaptiveCoordinatorPreviewHelper(widthCategory: WindowSizeCatego
         dialogText = "Hello from Preview!"
     )
 }
+

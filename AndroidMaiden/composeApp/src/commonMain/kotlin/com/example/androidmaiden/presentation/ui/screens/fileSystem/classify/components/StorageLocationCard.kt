@@ -1,9 +1,11 @@
 package com.example.androidmaiden.presentation.ui.screens.fileSystem.classify.components
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SdCard
-import androidx.compose.material.icons.filled.Smartphone
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +20,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * Visual card component presenting detected storage space details (Internal Storage vs External SD Card).
+ * Retained for backwards compatibility; delegates to [ExpandedStorageCard].
  *
  * @param info The [StorageLocationInfo] model containing space capacity and metrics.
  * @param modifier Optional modifier for styling.
@@ -27,11 +30,47 @@ fun StorageLocationCard(
     info: StorageLocationInfo,
     modifier: Modifier = Modifier
 ) {
+    ExpandedStorageCard(
+        info = info,
+        isSelected = true,
+        onClick = null,
+        modifier = modifier
+    )
+}
+
+/**
+ * Full detailed card component displaying comprehensive storage capacity metrics, progress bar, and paths.
+ *
+ * @param info The [StorageLocationInfo] data model.
+ * @param modifier Optional modifier for layout customization.
+ * @param isSelected Whether this storage volume is actively selected.
+ * @param onClick Optional click callback when tapped.
+ */
+@Composable
+fun ExpandedStorageCard(
+    info: StorageLocationInfo,
+    modifier: Modifier = Modifier,
+    isSelected: Boolean = true,
+    onClick: (() -> Unit)? = null
+) {
+    val containerColor by animateColorAsState(
+        targetValue = if (isSelected) {
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f)
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        },
+        animationSpec = tween(durationMillis = 300)
+    )
+
     ElevatedCard(
-        modifier = modifier.fillMaxWidth(),
+        onClick = onClick ?: {},
+        enabled = onClick != null,
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessMediumLow)),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+            containerColor = containerColor
         )
     ) {
         Column(
@@ -47,7 +86,8 @@ fun StorageLocationCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.weight(1f)
                 ) {
                     Icon(
                         imageVector = if (info.isExternalRemovable) Icons.Default.SdCard else Icons.Default.Smartphone,
@@ -56,7 +96,7 @@ fun StorageLocationCard(
                         modifier = Modifier.size(32.dp)
                     )
 
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = info.name,
                             style = MaterialTheme.typography.titleMedium,
@@ -76,13 +116,15 @@ fun StorageLocationCard(
 
                 Surface(
                     color = if (info.isExternalRemovable) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.primaryContainer,
-                    shape = MaterialTheme.shapes.extraSmall
+                    shape = MaterialTheme.shapes.extraSmall,
+                    modifier = Modifier.padding(start = 8.dp)
                 ) {
                     Text(
                         text = if (info.isExternalRemovable) "External SD" else "Internal",
                         style = MaterialTheme.typography.labelSmall,
                         color = if (info.isExternalRemovable) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        maxLines = 1
                     )
                 }
             }
@@ -112,13 +154,160 @@ fun StorageLocationCard(
                     Text(
                         text = "Used: ${formatStorageBytes(info.usedBytes)} / ${formatStorageBytes(info.totalBytes)} (${info.usedPercentage.toInt()}%)",
                         style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
+
+                    Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
                         text = "Free: ${formatStorageBytes(info.freeBytes)}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline
+                        color = MaterialTheme.colorScheme.outline,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Compact/minimized storage card component displaying a small icon, title, and space summary value.
+ * Designed for adaptive minimized states on small viewports.
+ *
+ * @param info The [StorageLocationInfo] data model.
+ * @param isSelected Whether this storage volume is actively selected.
+ * @param onClick Callback triggered when tapping the card to expand it.
+ * @param modifier Optional modifier for layout styling.
+ */
+@Composable
+fun CompactStorageCard(
+    info: StorageLocationInfo,
+    isSelected: Boolean = false,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        onClick = onClick,
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+        border = BorderStroke(
+            width = 1.dp,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        ),
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessMediumLow))
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 10.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(
+                    imageVector = if (info.isExternalRemovable) Icons.Default.SdCard else Icons.Default.Smartphone,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = info.name,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = "Used ${formatStorageBytes(info.usedBytes)} / ${formatStorageBytes(info.totalBytes)}",
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
+            Surface(
+                color = if (info.isExternalRemovable) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.primaryContainer,
+                shape = MaterialTheme.shapes.extraSmall,
+                modifier = Modifier.padding(start = 8.dp)
+            ) {
+                Text(
+                    text = if (info.isExternalRemovable) "SD" else "Internal",
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                    color = if (info.isExternalRemovable) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                    maxLines = 1
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Adaptive storage location header section.
+ * Manages adaptive layout behaviors across screen form factors:
+ * Stacks storage location cards with expanded/collapsed states to ensure clear metrics display.
+ *
+ * @param locations List of available [StorageLocationInfo] models.
+ * @param selectedPath Path of the currently selected storage volume.
+ * @param isCompactWidth True if viewport width is compact.
+ * @param onStorageSelect Callback when a storage location card is selected.
+ * @param modifier Optional modifier for styling.
+ */
+@Composable
+fun StorageLocationsSection(
+    locations: List<StorageLocationInfo>,
+    selectedPath: String? = null,
+    isCompactWidth: Boolean = true,
+    onStorageSelect: (StorageLocationInfo) -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    if (locations.isEmpty()) return
+
+    val activePath = selectedPath ?: locations.first().path
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessMediumLow)),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        locations.forEach { location ->
+            val isExpanded = location.path == activePath
+
+            AnimatedContent(
+                targetState = isExpanded,
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(220)) + expandVertically() togetherWith
+                            fadeOut(animationSpec = tween(180)) + shrinkVertically()
+                },
+                label = "StorageCardExpansion"
+            ) { expanded ->
+                if (expanded) {
+                    ExpandedStorageCard(
+                        info = location,
+                        isSelected = true,
+                        onClick = null
+                    )
+                } else {
+                    CompactStorageCard(
+                        info = location,
+                        isSelected = false,
+                        onClick = { onStorageSelect(location) }
                     )
                 }
             }
@@ -138,6 +327,32 @@ fun PreviewStorageLocationCard() {
         freeBytes = 86_000_000_000L
     )
     StorageLocationCard(info)
+}
+
+@Preview
+@Composable
+fun PreviewStorageLocationsSection() {
+    val internal = StorageLocationInfo(
+        name = "Primary Internal Storage",
+        path = "/storage/emulated/0",
+        isExternalRemovable = false,
+        totalBytes = 128_000_000_000L,
+        usedBytes = 42_000_000_000L,
+        freeBytes = 86_000_000_000L
+    )
+    val sdCard = StorageLocationInfo(
+        name = "External SD Card Storage",
+        path = "/storage/sdcard1",
+        isExternalRemovable = true,
+        totalBytes = 64_000_000_000L,
+        usedBytes = 20_000_000_000L,
+        freeBytes = 44_000_000_000L
+    )
+    StorageLocationsSection(
+        locations = listOf(internal, sdCard),
+        selectedPath = internal.path,
+        isCompactWidth = true
+    )
 }
 
 /**

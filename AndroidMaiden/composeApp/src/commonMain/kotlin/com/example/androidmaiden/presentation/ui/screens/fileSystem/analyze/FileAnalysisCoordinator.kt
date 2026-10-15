@@ -1,12 +1,19 @@
 package com.example.androidmaiden.presentation.ui.screens.fileSystem.analyze
 
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import com.example.androidmaiden.domain.model.*
 import com.example.androidmaiden.presentation.ui.adaptive.WindowSizeClass
+import com.example.androidmaiden.presentation.ui.adaptive.WindowSizeCategory
 import com.example.androidmaiden.presentation.ui.features.fileSys.ViewMode
+import com.example.androidmaiden.presentation.ui.theme.AppTheme
+import com.example.androidmaiden.presentation.ui.theme.core.AppThemeType
+import com.example.androidmaiden.presentation.ui.theme.core.ButtonDisplayStyle
+import com.example.androidmaiden.presentation.ui.theme.core.ThemeMode
 import com.example.androidmaiden.core.util.deprecated.SortMode
 import com.example.androidmaiden.core.util.deprecated.SortOrder
 import com.example.androidmaiden.presentation.viewmodel.FolderAnalysisStats
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.ExperimentalTime
 
 /**
@@ -82,3 +89,175 @@ fun FileAnalysisCoordinator(
         onRenameNode = onRenameNode
     )
 }
+
+// --- Visual Comparison Previews Across 3 Size Classes ---
+
+private val sampleAnalysisRoot = FileSysNode(
+    name = "Documents",
+    nodeType = NodeType.FOLDER,
+    folderType = FolderType.FOLDER,
+    path = "/storage/emulated/0/Documents",
+    children = listOf(
+        FileSysNode(
+            name = "ProjectSpec.pdf",
+            size = 2_450_000L,
+            nodeType = NodeType.FILE,
+            folderType = FolderType.DOCUMENT,
+            path = "/storage/emulated/0/Documents/ProjectSpec.pdf"
+        ),
+        FileSysNode(
+            name = "SourceCode.zip",
+            size = 18_200_000L,
+            nodeType = NodeType.FILE,
+            folderType = FolderType.OTHER,
+            path = "/storage/emulated/0/Documents/SourceCode.zip"
+        ),
+        FileSysNode(
+            name = "Presentation.pptx",
+            size = 12_800_000L,
+            nodeType = NodeType.FILE,
+            folderType = FolderType.DOCUMENT,
+            path = "/storage/emulated/0/Documents/Presentation.pptx"
+        )
+    )
+)
+
+private val sampleAnalysisStats = FolderAnalysisStats(
+    typeDistribution = mapOf("pdf" to 2_450_000L, "zip" to 18_200_000L, "pptx" to 12_800_000L),
+    totalSize = 33_450_000L,
+    fileCount = 3,
+    folderCount = 0
+)
+
+/**
+ * Visual Preview 1: Smartphone / Mobile (Compact Viewport Size Class).
+ */
+@ExperimentalTime
+@Preview(name = "1. Smartphone (Compact)", widthDp = 360, heightDp = 800, showBackground = true)
+@Composable
+fun FileAnalysisCoordinatorCompactPreview() {
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.LIGHT,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            FileAnalysisCoordinator(
+                windowSizeClass = WindowSizeClass(
+                    widthCategory = WindowSizeCategory.Compact,
+                    heightCategory = WindowSizeCategory.Medium
+                ),
+                root = sampleAnalysisRoot,
+                stats = sampleAnalysisStats,
+                isLoading = false,
+                loadError = null,
+                pathStack = listOf("Storage", "Documents"),
+                useMock = true,
+                viewMode = ViewMode.LIST,
+                sortMode = SortMode.NAME,
+                sortOrder = SortOrder.ASC,
+                hiddenFilterMode = HiddenFilterMode.SHOW_ALL,
+                onBack = {},
+                onNavigateTo = {},
+                onToggleSource = {},
+                onViewModeChange = {},
+                onSortModeChange = {},
+                onSortOrderChange = {},
+                onHiddenFilterModeChange = {},
+                onNavigateToStackIndex = {},
+                onDeleteNode = {},
+                onRenameNode = { _, _ -> }
+            )
+        }
+    }
+}
+
+/**
+ * Visual Preview 2: Foldable / Extended (Medium Viewport Size Class).
+ */
+@ExperimentalTime
+@Preview(name = "2. Foldable / Extended (Medium)", widthDp = 700, heightDp = 900, showBackground = true)
+@Composable
+fun FileAnalysisCoordinatorMediumPreview() {
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.DARK,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            FileAnalysisCoordinator(
+                windowSizeClass = WindowSizeClass(
+                    widthCategory = WindowSizeCategory.Medium,
+                    heightCategory = WindowSizeCategory.Medium
+                ),
+                root = sampleAnalysisRoot,
+                stats = sampleAnalysisStats,
+                isLoading = false,
+                loadError = null,
+                pathStack = listOf("Storage", "Documents"),
+                useMock = true,
+                viewMode = ViewMode.GRID,
+                sortMode = SortMode.SIZE,
+                sortOrder = SortOrder.DESC,
+                hiddenFilterMode = HiddenFilterMode.SHOW_ALL,
+                onBack = {},
+                onNavigateTo = {},
+                onToggleSource = {},
+                onViewModeChange = {},
+                onSortModeChange = {},
+                onSortOrderChange = {},
+                onHiddenFilterModeChange = {},
+                onNavigateToStackIndex = {},
+                onDeleteNode = {},
+                onRenameNode = { _, _ -> }
+            )
+        }
+    }
+}
+
+/**
+ * Visual Preview 3: Tablet / Desktop Wide Screen (Expanded Viewport Size Class).
+ */
+@ExperimentalTime
+@Preview(name = "3. Wide Screen (Expanded)", widthDp = 1200, heightDp = 800, showBackground = true)
+@Composable
+fun FileAnalysisCoordinatorExpandedPreview() {
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.DARK,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            FileAnalysisCoordinator(
+                windowSizeClass = WindowSizeClass(
+                    widthCategory = WindowSizeCategory.Expanded,
+                    heightCategory = WindowSizeCategory.Expanded
+                ),
+                root = sampleAnalysisRoot,
+                stats = sampleAnalysisStats,
+                isLoading = false,
+                loadError = null,
+                pathStack = listOf("Storage", "Documents"),
+                useMock = true,
+                viewMode = ViewMode.TREE,
+                sortMode = SortMode.NAME,
+                sortOrder = SortOrder.ASC,
+                hiddenFilterMode = HiddenFilterMode.SHOW_ALL,
+                onBack = {},
+                onNavigateTo = {},
+                onToggleSource = {},
+                onViewModeChange = {},
+                onSortModeChange = {},
+                onSortOrderChange = {},
+                onHiddenFilterModeChange = {},
+                onNavigateToStackIndex = {},
+                onDeleteNode = {},
+                onRenameNode = { _, _ -> }
+            )
+        }
+    }
+}
+

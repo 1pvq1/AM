@@ -4,10 +4,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import com.example.androidmaiden.domain.model.Screen
 import com.example.androidmaiden.presentation.ui.adaptive.*
 import com.example.androidmaiden.presentation.ui.theme.AppTheme
+import com.example.androidmaiden.presentation.ui.theme.core.AppThemeType
+import com.example.androidmaiden.presentation.ui.theme.core.ButtonDisplayStyle
+import com.example.androidmaiden.presentation.ui.theme.core.ThemeMode
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -36,27 +40,59 @@ fun SkillsAdaptiveCoordinator(
     )
 }
 
-@Preview(name = "Compact", showBackground = true)
+// --- Visual Comparison Previews Across 3 Size Classes ---
+
+/**
+ * Visual Preview 1: Smartphone / Mobile (Compact Viewport Size Class).
+ */
+@Preview(name = "1. Smartphone (Compact)", widthDp = 360, heightDp = 800, showBackground = true)
 @Composable
 fun SkillsAdaptiveCoordinatorCompactPreview() {
-    AppTheme {
-        SkillsAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Compact)
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.LIGHT,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            SkillsAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Compact)
+        }
     }
 }
 
-@Preview(name = "Medium", showBackground = true)
+/**
+ * Visual Preview 2: Foldable / Extended (Medium Viewport Size Class).
+ */
+@Preview(name = "2. Foldable / Extended (Medium)", widthDp = 700, heightDp = 900, showBackground = true)
 @Composable
 fun SkillsAdaptiveCoordinatorMediumPreview() {
-    AppTheme {
-        SkillsAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Medium)
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.DARK,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            SkillsAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Medium)
+        }
     }
 }
 
-@Preview(name = "Expanded", showBackground = true)
+/**
+ * Visual Preview 3: Tablet / Desktop Wide Screen (Expanded Viewport Size Class).
+ */
+@Preview(name = "3. Wide Screen (Expanded)", widthDp = 1200, heightDp = 800, showBackground = true)
 @Composable
 fun SkillsAdaptiveCoordinatorExpandedPreview() {
-    AppTheme {
-        SkillsAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Expanded)
+    AppTheme(
+        themeType = AppThemeType.DEFAULT,
+        themeMode = ThemeMode.DARK,
+        useDynamicColor = false,
+        buttonDisplayStyle = ButtonDisplayStyle.ICON_AND_TEXT
+    ) {
+        Surface {
+            SkillsAdaptiveCoordinatorPreviewHelper(WindowSizeCategory.Expanded)
+        }
     }
 }
 
@@ -75,3 +111,4 @@ private fun SkillsAdaptiveCoordinatorPreviewHelper(widthCategory: WindowSizeCate
         onNavigate = { }
     )
 }
+
