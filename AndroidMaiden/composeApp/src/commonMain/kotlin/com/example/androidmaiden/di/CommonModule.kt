@@ -50,11 +50,12 @@ val commonModule = module {
     factory { TodoViewModel(get(), get()) }
     factory { CharacterInteractionViewModel(get(), get(), get(), get()) } // Pass ChatRepository
     factory { AdvancedLlmSettingsViewModel(get(), get(), get(), get()) } // Pass LlmService
+    factory { LocalModelViewModel(getOrNull()) }
     factory { ThemeMatchingViewModel(get()) }
     factory { HardwareViewModel(get()) }
     single { SettingsViewModel(get()) }
 
     // 4. Provide Services
     single<HostResolver> { DefaultHostResolver() }
-    single<LlmService> { LlmServiceImpl(get(), get(), get()) }
+    single<LlmService> { LlmServiceImpl(get(), get(), get(), getOrNull(), getOrNull()) }
 }

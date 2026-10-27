@@ -4,16 +4,19 @@ import io.ktor.client.*
 import kotlinx.coroutines.flow.*
 import com.example.androidmaiden.data.repository.SettingsRepository
 import com.example.androidmaiden.domain.model.ChatMessage
+import com.example.androidmaiden.domain.repository.LocalModelRepository
 import com.example.androidmaiden.domain.service.*
 
 /**
  * Core implementation of LlmService.
- * Uses extension functions to delegate logic to specific providers.
+ * Supports cloud LLM providers (Gemini, OpenAI) as well as on-device local models.
  */
 class LlmServiceImpl(
     internal val client: HttpClient,
     private val settingsRepository: SettingsRepository,
-    private val hostResolver: HostResolver
+    private val hostResolver: HostResolver,
+    private val onDeviceInferenceEngine: OnDeviceInferenceEngine? = null,
+    private val localModelRepository: LocalModelRepository? = null
 ) : LlmService {
 
     override fun generateContentStream(prompt: String, history: List<ChatMessage>): Flow<String> = flow {
@@ -28,12 +31,27 @@ class LlmServiceImpl(
             else -> ""
         }
 
-        if (providerId == "local") {
-            val resolvedAddress = hostResolver.resolve(address)
-            val localKey = settingsRepository.localApiKey.first()
-            emitAll(generateOpenAiStream(prompt, history, resolvedAddress, modelId, localKey))
-        } else {
-            emitAll(generateGeminiStream(prompt, history, apiKey))
+        when (providerId) {
+            "on_device", "local_file" -> {
+                val engine = onDeviceInferenceEngine
+                val activeModel = localModelRepository?.activeModel?.first()
+                if (engine != null && activeModel != null) {
+                    if (!engine.isReady()) {
+                        engine.initialize(activeModel).getOrThrow()
+                    }
+                    emitAll(engine.generateResponseStream(prompt, history))
+                } else {
+                    emit("No on-device local model is initialized or active. Please select a model in LLM Settings.")
+                }
+            }
+            "local" -> {
+                val resolvedAddress = hostResolver.resolve(address)
+                val localKey = settingsRepository.localApiKey.first()
+                emitAll(generateOpenAiStream(prompt, history, resolvedAddress, modelId, localKey))
+            }
+            else -> {
+                emitAll(generateGeminiStream(prompt, history, apiKey))
+            }
         }
     }
 
@@ -48,12 +66,18 @@ class LlmServiceImpl(
             else -> ""
         }
         
-        return if (providerId == "local") {
-            val resolvedAddress = hostResolver.resolve(address)
-            val localKey = settingsRepository.localApiKey.first()
-            validateOpenAi(resolvedAddress, localKey)
-        } else {
-            validateGemini(apiKey)
+        return when (providerId) {
+            "on_device", "local_file" -> {
+                onDeviceInferenceEngine?.isReady() == true || localModelRepository?.activeModel?.first() != null
+            }
+            "local" -> {
+                val resolvedAddress = hostResolver.resolve(address)
+                val localKey = settingsRepository.localApiKey.first()
+                validateOpenAi(resolvedAddress, localKey)
+            }
+            else -> {
+                validateGemini(apiKey)
+            }
         }
     }
 
@@ -61,12 +85,18 @@ class LlmServiceImpl(
         val providerId = settingsRepository.selectedProviderId.first()
         val address = settingsRepository.localLlmAddress.first()
         
-        return if (providerId == "local") {
-            val resolvedAddress = hostResolver.resolve(address)
-            val localKey = settingsRepository.localApiKey.first()
-            getOpenAiModels(resolvedAddress, localKey)
-        } else {
-            getGeminiModels()
+        return when (providerId) {
+            "on_device", "local_file" -> {
+                localModelRepository?.availableModels?.first()?.map { it.name } ?: emptyList()
+            }
+            "local" -> {
+                val resolvedAddress = hostResolver.resolve(address)
+                val localKey = settingsRepository.localApiKey.first()
+                getOpenAiModels(resolvedAddress, localKey)
+            }
+            else -> {
+                getGeminiModels()
+            }
         }
     }
 }

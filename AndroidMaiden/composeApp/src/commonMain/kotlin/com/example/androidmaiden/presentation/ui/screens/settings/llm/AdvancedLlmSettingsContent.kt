@@ -8,12 +8,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.platform.rememberFolderPicker
 import com.example.androidmaiden.platform.stringResource
 import com.example.androidmaiden.presentation.ui.screens.pages.AppBarType
 import com.example.androidmaiden.presentation.ui.screens.pages.BasePage
-import com.example.androidmaiden.presentation.ui.screens.settings.llm.components.LocalModelsSection
-import com.example.androidmaiden.presentation.ui.screens.settings.llm.components.OnlineModelsSection
+import com.example.androidmaiden.presentation.ui.screens.settings.llm.sections.LocalModelsSection
+import com.example.androidmaiden.presentation.ui.screens.settings.llm.sections.OnlineModelsSection
 import com.example.androidmaiden.presentation.viewmodel.AdvancedLlmSettingsUiState
+import com.example.androidmaiden.presentation.viewmodel.LocalModelViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Stateless content of the Advanced LLM Settings page.
@@ -34,6 +37,13 @@ fun AdvancedLlmSettingsContent(
     onUpdateModelOrder: (Int, Int) -> Unit
 ) {
     var showModelsList by remember { mutableStateOf(false) }
+
+    val localModelViewModel: LocalModelViewModel = koinViewModel()
+    val localModelUiState by localModelViewModel.uiState.collectAsState()
+
+    val folderPicker = rememberFolderPicker { uriString ->
+        localModelViewModel.addGrantedFolder(uriString)
+    }
 
     if (showModelsList) {
         ModelsListDialog(
@@ -77,7 +87,12 @@ fun AdvancedLlmSettingsContent(
                     onLocalLlmAddressChange = onLocalLlmAddressChange,
                     onLocalApiKeyChange = onLocalApiKeyChange,
                     onConnect = onConnect,
-                    onManageModels = { showModelsList = true }
+                    onManageModels = { showModelsList = true },
+                    localModelUiState = localModelUiState,
+                    onScanLocalModels = localModelViewModel::discoverModels,
+                    onSelectLocalModel = localModelViewModel::selectModel,
+                    onImportLocalModel = { localModelViewModel.discoverModels() },
+                    onAddFolderClick = folderPicker
                 )
             }
 

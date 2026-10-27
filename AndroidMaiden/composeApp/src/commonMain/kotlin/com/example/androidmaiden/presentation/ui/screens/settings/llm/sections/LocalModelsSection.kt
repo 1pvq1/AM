@@ -1,4 +1,4 @@
-package com.example.androidmaiden.presentation.ui.screens.settings.llm.components
+package com.example.androidmaiden.presentation.ui.screens.settings.llm.sections
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -10,11 +10,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.androidmaiden.presentation.ui.screens.settings.llm.components.LocalModelPickerSection
+import com.example.androidmaiden.presentation.ui.screens.settings.llm.components.LocalProviderFields
 import com.example.androidmaiden.presentation.ui.views.ExpandableLlmProviderItem
 import com.example.androidmaiden.presentation.ui.views.SettingsSectionHeader
+import com.example.androidmaiden.presentation.viewmodel.LocalModelUiState
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
- * Section for local model configuration.
+ * Section for local model configuration, supporting local device on-device models and LAN servers.
  */
 @Composable
 fun LocalModelsSection(
@@ -27,7 +31,12 @@ fun LocalModelsSection(
     onLocalLlmAddressChange: (String) -> Unit,
     onLocalApiKeyChange: (String) -> Unit,
     onConnect: () -> Unit,
-    onManageModels: () -> Unit
+    onManageModels: () -> Unit,
+    localModelUiState: LocalModelUiState = LocalModelUiState(),
+    onScanLocalModels: () -> Unit = {},
+    onSelectLocalModel: (String) -> Unit = {},
+    onImportLocalModel: () -> Unit = {},
+    onAddFolderClick: () -> Unit = {}
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         SettingsSectionHeader(title = "Local Models")
@@ -52,6 +61,14 @@ fun LocalModelsSection(
                     modifier = Modifier.padding(12.dp)
                 )
             }
+
+            LocalModelPickerSection(
+                uiState = localModelUiState,
+                onScanClick = onScanLocalModels,
+                onSelectModel = onSelectLocalModel,
+                onImportClick = onImportLocalModel,
+                onAddFolderClick = onAddFolderClick
+            )
         }
 
         // --- LAN Subsection ---
@@ -83,4 +100,24 @@ fun LocalModelsSection(
             }
         }
     }
+}
+
+/**
+ * Preview for LocalModelsSection.
+ */
+@Preview
+@Composable
+fun LocalModelsSectionPreview() {
+    LocalModelsSection(
+        localLlmAddress = "http://192.168.1.100:1234",
+        localApiKey = "",
+        localLlmStatus = "Connected",
+        localHelpText = "",
+        localHelpLink = "",
+        isCheckingLocalLlm = false,
+        onLocalLlmAddressChange = {},
+        onLocalApiKeyChange = {},
+        onConnect = {},
+        onManageModels = {}
+    )
 }

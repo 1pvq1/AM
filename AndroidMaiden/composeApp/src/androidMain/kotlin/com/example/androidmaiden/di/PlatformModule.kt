@@ -45,4 +45,11 @@ val platformModule = module {
 
     // 5. Provide the Android-specific FileProvider implementation
     single<FileProvider> { AndroidFileProvider() }
+
+    // 6. Provide Local Model Scanner, Repository, and On-Device Inference Engine
+    single<ModelScanner> { AndroidModelScanner(androidContext()) }
+    single<com.example.androidmaiden.domain.repository.LocalModelRepository> { 
+        com.example.androidmaiden.data.repository.LocalModelRepositoryImpl(get(), get()) 
+    }
+    single<OnDeviceInferenceEngine> { MediaPipeInferenceEngine(androidContext()) }
 }

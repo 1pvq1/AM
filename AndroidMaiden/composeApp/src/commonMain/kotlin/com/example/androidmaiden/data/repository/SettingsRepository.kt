@@ -23,6 +23,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         val SELECTED_MODEL = stringPreferencesKey("selected_model")
         val LOCAL_LLM_ADDRESS = stringPreferencesKey("local_llm_address")
         val SELECTED_PROVIDER_ID = stringPreferencesKey("selected_provider_id")
+        val GRANTED_MODEL_FOLDER_URIS = stringSetPreferencesKey("granted_model_folder_uris")
         
         // Appearance
         val THEME_MODE = stringPreferencesKey("theme_mode")
@@ -52,6 +53,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     val selectedModel: Flow<String?> = dataStore.data.map { it[Keys.SELECTED_MODEL] }
     val localLlmAddress: Flow<String> = dataStore.data.map { it[Keys.LOCAL_LLM_ADDRESS] ?: "http://localhost:1234/v1" }
     val selectedProviderId: Flow<String> = dataStore.data.map { it[Keys.SELECTED_PROVIDER_ID] ?: "gemini" }
+    val grantedModelFolderUris: Flow<Set<String>> = dataStore.data.map { it[Keys.GRANTED_MODEL_FOLDER_URIS] ?: emptySet() }
 
     // Appearance Settings
     val themeMode: Flow<ThemeMode> = dataStore.data.map { pref ->
@@ -90,6 +92,16 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     suspend fun saveSelectedModel(model: String) = dataStore.edit { it[Keys.SELECTED_MODEL] = model }
     suspend fun saveLocalLlmAddress(address: String) = dataStore.edit { it[Keys.LOCAL_LLM_ADDRESS] = address }
     suspend fun saveSelectedProviderId(id: String) = dataStore.edit { it[Keys.SELECTED_PROVIDER_ID] = id }
+
+    suspend fun addGrantedModelFolderUri(uri: String) = dataStore.edit { pref ->
+        val current = pref[Keys.GRANTED_MODEL_FOLDER_URIS] ?: emptySet()
+        pref[Keys.GRANTED_MODEL_FOLDER_URIS] = current + uri
+    }
+
+    suspend fun removeGrantedModelFolderUri(uri: String) = dataStore.edit { pref ->
+        val current = pref[Keys.GRANTED_MODEL_FOLDER_URIS] ?: emptySet()
+        pref[Keys.GRANTED_MODEL_FOLDER_URIS] = current - uri
+    }
 
     suspend fun saveThemeMode(mode: ThemeMode) = dataStore.edit { it[Keys.THEME_MODE] = mode.name }
     suspend fun saveThemeType(type: AppThemeType) = dataStore.edit { it[Keys.THEME_TYPE] = type.name }

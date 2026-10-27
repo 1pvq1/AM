@@ -57,6 +57,7 @@ kotlin {
             implementation(libs.androidx.media3.ui)
             implementation(libs.coil.video)
             implementation(libs.androidx.work.runtime)
+            implementation("androidx.documentfile:documentfile:1.0.1")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
